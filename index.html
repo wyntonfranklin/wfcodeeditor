@@ -3,15 +3,92 @@
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
     <title>Hello World!</title>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/main.css" rel="stylesheet">
+    <script>
+    </script>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+  <style>
+     .directory-lister-container {
+       -webkit-user-select: none;
+       margin-top: 10px;
+       overflow-x:auto;
+       border-right: 1px solid #ccc;
+       width: 100%;
+       max-height: 1024px;
+     }
+     .directory-lister {
+       list-style-type: none; padding: 0; margin: 0;
+     }
 
+     .directory-lister-sub {
+       list-style-type: none; padding: 0;
+       margin: 0 0 0 20px;
+     }
+
+
+
+     .directory-parent {
+      white-space: nowrap;
+     }
+
+     .directory-parent  img {
+       height: 16px; width: 16px; display: inline-block; vertical-align: middle;
+     }
+
+     .directory-parent a {
+       margin: 0;
+       padding: 0;
+       vertical-align: middle;
+     }
+
+     .directory-child {
+     }
+  </style>
+
+  <div class="container-fluid">
+
+    <div class="row">
+
+      <div class="col-2 directory-lister-container">
+        <p>Directory</p>
+          <ul class="directory-lister" id="directory">
+          </ul>
+      </div>
+
+
+      <div class="col-10">
+
+        <!--<label for="exampleFormControlTextarea1">Code snippet</label>-->
+
+        <div class="form-group">
+          Select Language: <select class="form-control float-right mb-3" id="language-modes">
+            <option value="php">PHP</option>
+            <option value="javascript">Javascript</option>
+            <option value="python">Python</option>
+            <option value="java">JAVA</option>
+            <option value="csharp">C#</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div id="code-input"  class="form-control code-input"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <script src="./vendor/ace/src-min/ace.js" type="text/javascript" charSet="utf-8"></script>
+  <script>
+    //editor.getSession().setUseWorker(false)
+    //editor.session.setMode("ace/mode/javascript");
+
+
+  </script>
     <!-- You can also require other files to run in this process -->
     <script src="./renderer.js"></script>
   </body>
