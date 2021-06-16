@@ -17,5 +17,22 @@ module.exports = {
       }
     }
     return false;
+  },
+  modesObject : ()=> {
+    return {
+      php : "php",
+      js: "javascript",
+      java : "java",
+      py : "python",
+      txt : "text",
+      md : "markdown",
+      cs : "csharp",
+      cpp : "cpp",
+      html : "html",
+      json : "json",
+      sql : "sql",
+      xml : "xml",
+      yaml : "yaml"
+    }
   }
 }

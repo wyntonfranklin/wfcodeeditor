@@ -111,10 +111,10 @@ function getCurrentDirectory(){
   }
 }
 
-let createDirectoryLink = (type, file) => {
+let createDirectoryLink = (type, file, styleclass) => {
   let fname = path.basename(file);
-  let  tempFolder = ` <li class="directory-parent"><a data-type="dir" data-path="${file}" class="file-link"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
-  let  tempFile = ` <li class="directory-parent"><a data-type="file" data-path="${file}" class="file-link"><img src="./icons/ic_file.png"> ${fname}</a></li>`;
+  let  tempFolder = ` <li class="directory-parent"><a data-type="dir" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
+  let  tempFile = ` <li class="directory-parent"><a data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_file.png"> ${fname}</a></li>`;
   if(type === 'dir'){
     return tempFolder;
   }
@@ -134,7 +134,8 @@ let closeSubDirectory = () => {
 let undoDirectoryStyling = () => {
   const divs = document.querySelectorAll('.file-link');
   divs.forEach( el => {
-    el.style.backgroundColor = "transparent";
+   // el.style.backgroundColor = "transparent";
+    el.classList.remove('active');
   })
 }
 
@@ -152,13 +153,9 @@ let setListeners = () => {
       editor.session.setValue(buffer.toString());
       currentFile = file;
       currentDirectory = null;
-      if(ext == ".php"){
-        editor.session.setMode("ace/mode/php")
-      }else if(ext == ".js"){
-        editor.session.setMode("ace/mode/javascript")
-      }
+      assignAceMode(editor, ext);
       //console.log(event.target.getAttribute("data-path"));
-      event.target.style.backgroundColor = "#6495ed"
+      event.target.className += " active"
     }else if(fileType === 'dir'){
       currentDirectory = file;
       currentFile = null;
@@ -172,30 +169,45 @@ let setListeners = () => {
   }));
 }
 
+function assignAceMode(editor, ext){
+  let modes = helper.modesObject();
+  console.log(modes);
+  let extName = ext.replace(/\./g,' ').trim();
+  console.log(extName);
+  if(modes.hasOwnProperty(extName)){
+    console.log(modes[extName], "full name");
+    editor.session.setMode("ace/mode/" + modes[extName]);
+  }
+}
+
 function readFilesFromDir(dir) {
   let fileListing = '';
+  let directoryListing = '';
   const files = fs.readdirSync(dir);
     files.forEach((file)=>{
       file = path.resolve(dir, file);
       var stats = fs.statSync(file);
       if(stats.isDirectory()){
-          fileListing += createDirectoryLink("dir", file);
+          if(currentDirectory == file){
+            directoryListing += createDirectoryLink("dir", file,"active");
+          }else{
+            directoryListing += createDirectoryLink("dir", file,"");
+          }
           if( openDir.indexOf( file) != -1){
-            fileListing += openSubDirectory();
-            fileListing += readFilesFromDir(file);
-            fileListing += closeSubDirectory();
+            directoryListing += openSubDirectory();
+            directoryListing += readFilesFromDir(file);
+            directoryListing += closeSubDirectory();
           }
       }else{
-        fileListing += createDirectoryLink("file", file);
+        fileListing += createDirectoryLink("file", file,"");
       }
     })
-  return fileListing;
+  return directoryListing + fileListing;
 }
 
 let readFiles = () => {
 
   let html = readFilesFromDir(baseDir);
-  console.log(html)
   document.getElementById("directory").innerHTML = html;
   setListeners();
 }
