@@ -32,7 +32,10 @@ let CURRENT_FILE_OPENER_ACTION = null;
 var openDir = [];
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/twilight");
-
+editor.getSession().on("change", e => {
+    helper.addElementClass(saveFileButton,"btn-success");
+    helper.removeElementClass(saveFileButton,"btn-primary");
+})
 
 
 closeModalXButton.addEventListener('click', e => {
@@ -43,12 +46,27 @@ closeModalButton.addEventListener('click', e => {
   hideShowModal("hide");
 });
 
+function setSaveButtonAsActive(){
+  helper.addElementClass(saveFileButton,"btn-success");
+  helper.removeElementClass(saveFileButton,"btn-secondary");
+}
+
+function setSaveButtonAsInActive(){
+  helper.addElementClass(saveFileButton,"btn-secondary");
+  helper.removeElementClass(saveFileButton,"btn-success");
+}
+
+
+function onFileClickEvent(e){
+  setSaveButtonAsInActive();
+}
 
 
 saveFileButton.addEventListener("click", e=> {
   if(currentFile){
     var code = editor.getValue();
     saveAFile(currentFile, code);
+    setSaveButtonAsInActive();
   }
 });
 
@@ -86,6 +104,11 @@ document.getElementById('new-file').addEventListener('click', e => {
   CURRENT_FILE_OPENER_ACTION = "file";
     hideShowModal("show");
 })
+
+function createANewFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  hideShowModal("show");
+}
 
 saveFolderButton.addEventListener('click', e => {
   CURRENT_FILE_OPENER_ACTION = "dir";
@@ -135,7 +158,8 @@ let undoDirectoryStyling = () => {
   const divs = document.querySelectorAll('.file-link');
   divs.forEach( el => {
    // el.style.backgroundColor = "transparent";
-    el.classList.remove('active');
+   // el.classList.remove('active');
+    helper.removeElementClass(el, "active");
   })
 }
 
@@ -155,7 +179,9 @@ let setListeners = () => {
       currentDirectory = null;
       assignAceMode(editor, ext);
       //console.log(event.target.getAttribute("data-path"));
-      event.target.className += " active"
+      helper.addElementClass(event.target, "active");
+      //event.target.className += " active"
+      onFileClickEvent(event);
     }else if(fileType === 'dir'){
       currentDirectory = file;
       currentFile = null;
@@ -199,7 +225,10 @@ function readFilesFromDir(dir) {
             directoryListing += closeSubDirectory();
           }
       }else{
-        fileListing += createDirectoryLink("file", file,"");
+        let ext = path.extname(file).replace(/\./g,' ').trim();
+        if(helper.modesObject()[ext]){
+          fileListing += createDirectoryLink("file", file,"");
+        }
       }
     })
   return directoryListing + fileListing;

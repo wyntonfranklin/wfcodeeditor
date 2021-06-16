@@ -34,5 +34,11 @@ module.exports = {
       xml : "xml",
       yaml : "yaml"
     }
+  },
+  addElementClass : (doc, cname) => {
+      doc.className += " " + cname
+  },
+  removeElementClass : (doc, cname) => {
+    doc.classList.remove(cname);
   }
 }

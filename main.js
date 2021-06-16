@@ -2,8 +2,8 @@
 const {app, BrowserWindow, Menu, MenuItem, ipcMain} = require('electron')
 const path = require('path')
 let mainWindow, createFileWindow;
-
-let mainMenu = Menu.buildFromTemplate( require('./mainMenu') )
+let wc;
+let mainMenu;
 
 ipcMain.handle('create-new-file', e => {
   createFileWindow = new BrowserWindow({
@@ -39,8 +39,8 @@ function createWindow () {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
-
-
+  wc = mainWindow.webContents
+  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc) )
   Menu.setApplicationMenu(mainMenu)
 
 
