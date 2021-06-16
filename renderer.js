@@ -8,12 +8,108 @@
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 const fs = require("fs")
 var path = require('path');
+const { ipcRenderer } = require('electron')
+
+
+const helper = require('./helper.js');
+
+let currentFile = "";
+let currentDirectory = "";
+
 let directoryUi = document.getElementById('directory');
+let backdropUi = document.getElementById('backdrop');
+let modalUi = document.getElementById('new-file-modal');
+
+let closeModalButton = document.getElementById('close-modal');
+let closeModalXButton = document.getElementById('close-modal-x');
+let saveButton = document.getElementById('save-file-btn');
+let fileNameInput = document.getElementById("file-name-input");
+
+let saveFileButton = document.getElementById('save-file-button');
+let saveFolderButton = document.getElementById('save-folder-button');
+
+let CURRENT_FILE_OPENER_ACTION = null;
 var openDir = [];
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/twilight");
 
 
+
+closeModalXButton.addEventListener('click', e => {
+  hideShowModal("hide");
+});
+
+closeModalButton.addEventListener('click', e => {
+  hideShowModal("hide");
+});
+
+
+
+saveFileButton.addEventListener("click", e=> {
+  if(currentFile){
+    var code = editor.getValue();
+    saveAFile(currentFile, code);
+  }
+});
+
+
+function saveAFile(path,content) {
+  fs.writeFile(path, content, function (err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
+}
+
+function saveADirectory(path){
+  fs.mkdir(path, (err) => {
+    if (err) {
+      throw err;
+    }
+    console.log("Directory is created.");
+  });
+}
+
+saveButton.addEventListener("click", e => {
+  let filename = fileNameInput.value;
+  if(CURRENT_FILE_OPENER_ACTION == "file"){
+    saveAFile(getCurrentDirectory()  + "/" + filename, "");
+  }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
+    saveADirectory(getCurrentDirectory() + "/" + filename);
+  }
+  console.log("The file was saved!");
+  hideShowModal('hide');
+  readFiles();
+});
+
+document.getElementById('new-file').addEventListener('click', e => {
+  CURRENT_FILE_OPENER_ACTION = "file";
+    hideShowModal("show");
+})
+
+saveFolderButton.addEventListener('click', e => {
+  CURRENT_FILE_OPENER_ACTION = "dir";
+  hideShowModal("show");
+});
+
+function hideShowModal(action){
+  if(action == "show"){
+    backdropUi.style.display = "block";
+    modalUi.style.display = "block";
+  }else{
+    backdropUi.style.display = "none";
+    modalUi.style.display = "none";
+  }
+
+}
+
+function getCurrentDirectory(){
+  if(currentDirectory){
+    return currentDirectory;
+  }else{
+    return path.dirname(currentFile)
+  }
+}
 
 let createDirectoryLink = (type, file) => {
   let fname = path.basename(file);
@@ -35,6 +131,13 @@ let closeSubDirectory = () => {
 }
 
 
+let undoDirectoryStyling = () => {
+  const divs = document.querySelectorAll('.file-link');
+  divs.forEach( el => {
+    el.style.backgroundColor = "transparent";
+  })
+}
+
 let setListeners = () => {
   const divs = document.querySelectorAll('.file-link');
 
@@ -42,13 +145,29 @@ let setListeners = () => {
     let el = document.getElementById('code-input');
     let file = event.target.getAttribute("data-path");
     let fileType = event.target.getAttribute("data-type");
+    undoDirectoryStyling();
     if(fileType === "file"){
       const buffer = fs.readFileSync(file);
+      let ext = path.extname(file);
       editor.session.setValue(buffer.toString());
-      console.log(event.target.getAttribute("data-path"));
+      currentFile = file;
+      currentDirectory = null;
+      if(ext == ".php"){
+        editor.session.setMode("ace/mode/php")
+      }else if(ext == ".js"){
+        editor.session.setMode("ace/mode/javascript")
+      }
+      //console.log(event.target.getAttribute("data-path"));
+      event.target.style.backgroundColor = "#6495ed"
     }else if(fileType === 'dir'){
-      openDir.push(file);
-     // readFiles()
+      currentDirectory = file;
+      currentFile = null;
+      if(helper.exitsInArray(openDir, file)){
+        helper.removeFromArray(openDir, file);
+      }else{
+        openDir.push(file);
+      }
+      readFiles()
     }
   }));
 }
@@ -61,9 +180,11 @@ function readFilesFromDir(dir) {
       var stats = fs.statSync(file);
       if(stats.isDirectory()){
           fileListing += createDirectoryLink("dir", file);
-          fileListing += openSubDirectory();
-          fileListing += readFilesFromDir(file);
-          fileListing += closeSubDirectory();
+          if( openDir.indexOf( file) != -1){
+            fileListing += openSubDirectory();
+            fileListing += readFilesFromDir(file);
+            fileListing += closeSubDirectory();
+          }
       }else{
         fileListing += createDirectoryLink("file", file);
       }

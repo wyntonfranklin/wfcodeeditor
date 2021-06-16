@@ -1,8 +1,25 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, Menu, MenuItem} = require('electron')
+const {app, BrowserWindow, Menu, MenuItem, ipcMain} = require('electron')
 const path = require('path')
+let mainWindow, createFileWindow;
 
 let mainMenu = Menu.buildFromTemplate( require('./mainMenu') )
+
+ipcMain.handle('create-new-file', e => {
+  createFileWindow = new BrowserWindow({
+    width: 300, height: 100,
+    webPreferences: { nodeIntegration: true },
+    parent: mainWindow,
+    modal: true,
+    titleBarStyle: 'hidden',
+    show: true,
+  })
+  createFileWindow.setMenuBarVisibility(false);
+  createFileWindow.loadFile('create-file-layout.html')
+  return "something;";
+
+})
+
 
 function createWindow () {
   // Create the browser window.
@@ -15,6 +32,8 @@ function createWindow () {
     }
   })
 
+
+
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
@@ -23,6 +42,7 @@ function createWindow () {
 
 
   Menu.setApplicationMenu(mainMenu)
+
 
 }
 

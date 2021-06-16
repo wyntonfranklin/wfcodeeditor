@@ -32,8 +32,14 @@
 
 
      .directory-parent {
-      white-space: nowrap;
+        white-space: nowrap;
+        font-size: 14px;
      }
+
+     .file-link {
+       padding: 5px 1px 5px 1px;
+     }
+
 
      .directory-parent  img {
        height: 16px; width: 16px; display: inline-block; vertical-align: middle;
@@ -65,13 +71,9 @@
         <!--<label for="exampleFormControlTextarea1">Code snippet</label>-->
 
         <div class="form-group">
-          Select Language: <select class="form-control float-right mb-3" id="language-modes">
-            <option value="php">PHP</option>
-            <option value="javascript">Javascript</option>
-            <option value="python">Python</option>
-            <option value="java">JAVA</option>
-            <option value="csharp">C#</option>
-          </select>
+          <button id="new-file" type="button" class="btn btn-primary">New File</button>
+          <button id="save-file-button" type="button" class="btn btn-secondary">Save File</button>
+          <button id="save-folder-button" type="button" class="btn btn-secondary">New Folder</button>
         </div>
 
         <div class="form-group">
@@ -82,6 +84,30 @@
     </div>
 
   </div>
+
+  <div id="backdrop" style="display: none;" class="modal-backdrop fade show"></div>
+  <div id="new-file-modal" class="modal fade show" tabindex="-1" role="dialog" style="display: none">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create new File/Folder</h5>
+          <button id="close-modal-x" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Filename</label>
+            <input type="text" class="form-control" id="file-name-input" placeholder="Enter filename"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="save-file-btn" type="button" class="btn btn-primary">Save changes</button>
+          <button id="close-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="./vendor/ace/src-min/ace.js" type="text/javascript" charSet="utf-8"></script>
   <script>
     //editor.getSession().setUseWorker(false)
