@@ -6,10 +6,30 @@
 // process.
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
+let currentProject = null;
 const fs = require("fs")
 var path = require('path');
+let Datastore = require('nedb');
+let db = {};
 const { ipcRenderer } = require('electron')
 
+ipcRenderer.invoke('read-user-data').then(dbPath=>{
+  let db = loadDatabases(dbPath);
+  db.settings.findOne({name:"current-project"}, function (err, doc) {
+    console.log(doc.value)
+    currentProject = doc.value;
+    readFiles(doc.value);
+  });
+
+});
+
+function loadDatabases(dbPath){
+  db.projects = new Datastore(dbPath +'/projects.db');
+  db.settings = new Datastore(dbPath +'/settings.db');
+  db.projects.loadDatabase();
+  db.settings.loadDatabase();
+  return db;
+}
 
 const helper = require('./helper.js');
 
@@ -63,13 +83,16 @@ function onFileClickEvent(e){
 
 
 saveFileButton.addEventListener("click", e=> {
+  saveCurrentFile();
+});
+
+function saveCurrentFile(){
   if(currentFile){
     var code = editor.getValue();
     saveAFile(currentFile, code);
     setSaveButtonAsInActive();
   }
-});
-
+}
 
 function saveAFile(path,content) {
   fs.writeFile(path, content, function (err) {
@@ -97,7 +120,7 @@ saveButton.addEventListener("click", e => {
   }
   console.log("The file was saved!");
   hideShowModal('hide');
-  readFiles();
+  readFiles(currentProject);
 });
 
 document.getElementById('new-file').addEventListener('click', e => {
@@ -107,6 +130,11 @@ document.getElementById('new-file').addEventListener('click', e => {
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
+  hideShowModal("show");
+}
+
+function createANewFolder(){
+  CURRENT_FILE_OPENER_ACTION = "dir";
   hideShowModal("show");
 }
 
@@ -136,12 +164,34 @@ function getCurrentDirectory(){
 
 let createDirectoryLink = (type, file, styleclass) => {
   let fname = path.basename(file);
-  let  tempFolder = ` <li class="directory-parent"><a data-type="dir" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
-  let  tempFile = ` <li class="directory-parent"><a data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_file.png"> ${fname}</a></li>`;
+  let fileIcon = getIcon(file);
+  console.log(fileIcon);
+  let  tempFolder = ` <li class="directory-parent"><a title="${fname}" data-type="dir" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
+  let  tempFile = ` <li class="directory-parent"><a title="${fname}" data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="${fileIcon}"> ${fname}</a></li>`;
   if(type === 'dir'){
     return tempFolder;
   }
   return tempFile;
+}
+
+function getIcon(fname){
+  let nodes = helper.modesObject();
+  let ext = path.extname(fname).replace(/\./g,' ').trim()
+  let defaultIcon = `./icons/ic_file.png`;
+  if(nodes.hasOwnProperty(ext)){
+    let iconname = `./icons/ic_${nodes[ext]}.png`;
+    try {
+      if(fs.existsSync(iconname)) {
+         return iconname;
+      } else {
+        return defaultIcon;
+      }
+    } catch (err) {
+      return defaultIcon;
+    }
+  }else{
+    return defaultIcon;
+  }
 }
 
 let openSubDirectory = () => {
@@ -190,20 +240,27 @@ let setListeners = () => {
       }else{
         openDir.push(file);
       }
-      readFiles()
+      readFiles(currentProject)
     }
   }));
 }
 
 function assignAceMode(editor, ext){
   let modes = helper.modesObject();
-  console.log(modes);
   let extName = ext.replace(/\./g,' ').trim();
-  console.log(extName);
   if(modes.hasOwnProperty(extName)){
-    console.log(modes[extName], "full name");
     editor.session.setMode("ace/mode/" + modes[extName]);
   }
+}
+
+function getProjectDir(){
+  let baseDir = '';
+  console.log("get project directory")
+  db.settings.find({name:"current-project"}, function (err, doc) {
+     //baseDir = doc.value;
+     console.log(doc.value)
+  });
+  return baseDir;
 }
 
 function readFilesFromDir(dir) {
@@ -234,12 +291,13 @@ function readFilesFromDir(dir) {
   return directoryListing + fileListing;
 }
 
-let readFiles = () => {
+let readFiles = (projectDir) => {
 
-  let html = readFilesFromDir(baseDir);
-  document.getElementById("directory").innerHTML = html;
-  setListeners();
+  if(projectDir){
+    let html = readFilesFromDir(projectDir);
+    document.getElementById("directory").innerHTML = html;
+    setListeners();
+  }
 }
 
-readFiles()
 

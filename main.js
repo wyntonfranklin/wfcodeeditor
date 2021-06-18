@@ -1,9 +1,23 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, Menu, MenuItem, ipcMain} = require('electron')
+const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog} = require('electron')
 const path = require('path')
 let mainWindow, createFileWindow;
+var Datastore = require('nedb');
+let dbPath = app.getPath('userData');
+console.log(dbPath)
+let db = {};
 let wc;
 let mainMenu;
+
+db = {};
+db.projects = new Datastore(dbPath +'/projects.db');
+db.files = new Datastore(dbPath +'/files.db');
+db.settings = new Datastore(dbPath +'/settings.db');
+
+// You need to load each database (here we do it asynchronously)
+db.projects.loadDatabase();
+db.files.loadDatabase();
+db.settings.loadDatabase();
 
 ipcMain.handle('create-new-file', e => {
   createFileWindow = new BrowserWindow({
@@ -18,6 +32,11 @@ ipcMain.handle('create-new-file', e => {
   createFileWindow.loadFile('create-file-layout.html')
   return "something;";
 
+})
+
+ipcMain.handle('read-user-data', (event) => {
+  const path = app.getPath('userData');
+  return path;
 })
 
 
@@ -40,7 +59,7 @@ function createWindow () {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
-  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc) )
+  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
 
 

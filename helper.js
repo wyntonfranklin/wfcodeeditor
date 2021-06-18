@@ -40,5 +40,5 @@ module.exports = {
   },
   removeElementClass : (doc, cname) => {
     doc.classList.remove(cname);
-  }
+  },
 }
