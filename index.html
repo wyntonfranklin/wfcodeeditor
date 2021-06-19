@@ -12,12 +12,18 @@
   </head>
   <body>
   <style>
+    .modal {
+      overflow-y:auto;
+    }
+    .list-group-item-action {
+      cursor: pointer;
+    }
      .directory-lister-container {
        -webkit-user-select: none;
        margin-top: 10px;
        overflow-x:auto;
        width: 100%;
-       max-height: 1024px;
+       max-height: 700px;
      }
      .directory-lister {
        list-style-type: none; padding: 0; margin: 0;
@@ -67,7 +73,7 @@
      }
   </style>
 
-  <div class="container-fluid">
+  <div class="container-fluid" style="height: 700px;">
 
     <div class="row">
 
@@ -90,7 +96,7 @@
         </div>
 
         <div class="form-group">
-          <div id="code-input"  class="form-control code-input" style="min-height: 700px; height: 100%;"></div>
+          <div id="code-input"  class="form-control code-input" style="min-height:650px; height: 100%;"></div>
         </div>
       </div>
 
@@ -104,7 +110,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create new File/Folder</h5>
-          <button id="close-modal-x" type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close close-modal-x" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -121,14 +127,25 @@
     </div>
   </div>
 
-  <script src="./vendor/ace/src-min/ace.js" type="text/javascript" charSet="utf-8"></script>
-  <script>
-    //editor.getSession().setUseWorker(false)
-    //editor.session.setMode("ace/mode/javascript");
-
-
-  </script>
-    <!-- You can also require other files to run in this process -->
+  <div id="projects-modal" class="modal fade show" tabindex="-1" role="dialog" style="display: none">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Recent Projects</h5>
+          <button type="button" class="close close-modal-x" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Select a project from the list</p>
+          <ul class="list-group" id="recent-projects">
+          </ul>
+      </div>
+    </div>
+  </div>
+  </div>
+  <input id="settings" value=""/>
+    <script src="./vendor/ace/src-min/ace.js" type="text/javascript" charSet="utf-8"></script>
     <script src="./renderer.js"></script>
   </body>
 </html>

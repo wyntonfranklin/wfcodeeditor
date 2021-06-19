@@ -1,3 +1,5 @@
+let db = require('./database');
+
 module.exports =  {
     createMenu : (webContents, dialog, db) => {
      return [
@@ -9,21 +11,19 @@ module.exports =  {
               click: () => {
                 var filename = dialog.showOpenDialogSync(
                   { defaultPath: '', properties: ['openDirectory'] });
-                console.log(filename[0]);
-                db.projects.insert([
-                  {
-                  'name' : filename[0]
-                }], function (err, newDocs) {
-
-                });
-                db.settings.insert([
-                  {
-                    'name' : "current-project",
-                    'value' : filename[0]
-                  }], function (err, newDocs) {
-
-                });
-                webContents.executeJavaScript(`readFiles()`)
+                if(filename !== undefined){
+                  var currentProject = filename[0];
+                  db.saveToProjects({
+                    'name' : currentProject
+                  })
+                  db.saveToSettings({'name': "current-project",},{
+                    'name': "current-project",
+                    'value': currentProject
+                  }, function(){
+                    console.log(currentProject)
+                    webContents.executeJavaScript('openNewProject()');
+                  })
+                }
               },
               accelerator: 'CTRL+P'
             },
@@ -41,7 +41,7 @@ module.exports =  {
             {
               label: 'Recent Projects',
               click: () => {
-                webContents.executeJavaScript(`createANewFile()`)
+                webContents.executeJavaScript(`showRecentProjects()`)
               },
             },
             {

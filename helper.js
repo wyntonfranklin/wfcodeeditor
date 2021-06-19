@@ -1,3 +1,6 @@
+const fs = require("fs")
+var path = require('path');
+
 module.exports = {
   removeFromArray : (arr, value) => {
     for( var i = 0; i < arr.length; i++){
@@ -41,4 +44,8 @@ module.exports = {
   removeElementClass : (doc, cname) => {
     doc.classList.remove(cname);
   },
+  getDirectoryName: (directoryPath) => {
+    return path.basename(directoryPath);
+  }
+
 }

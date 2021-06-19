@@ -3,21 +3,14 @@ const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog} = require('electron'
 const path = require('path')
 let mainWindow, createFileWindow;
 var Datastore = require('nedb');
+let db = require("./database");
 let dbPath = app.getPath('userData');
 console.log(dbPath)
-let db = {};
+db.init(dbPath)
 let wc;
 let mainMenu;
 
-db = {};
-db.projects = new Datastore(dbPath +'/projects.db');
-db.files = new Datastore(dbPath +'/files.db');
-db.settings = new Datastore(dbPath +'/settings.db');
-
-// You need to load each database (here we do it asynchronously)
-db.projects.loadDatabase();
-db.files.loadDatabase();
-db.settings.loadDatabase();
+db.loadDatabases();
 
 ipcMain.handle('create-new-file', e => {
   createFileWindow = new BrowserWindow({

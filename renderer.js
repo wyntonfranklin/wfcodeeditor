@@ -5,49 +5,39 @@
 // selectively enable features needed in the rendering
 // process.
 
-let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
-let currentProject = null;
+const { ipcRenderer } = require('electron')
+const helper = require('./helper.js');
 const fs = require("fs")
 var path = require('path');
-let Datastore = require('nedb');
-let db = {};
-const { ipcRenderer } = require('electron')
+let db = require('./database');
+
+let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
+let currentProject = null;
+let APPLICATION_PATH = "";
+
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
-  let db = loadDatabases(dbPath);
-  db.settings.findOne({name:"current-project"}, function (err, doc) {
-    console.log(doc.value)
-    currentProject = doc.value;
-    readFiles(doc.value);
-  });
-
+  APPLICATION_PATH = dbPath;
+  db.init(dbPath);
+  db.loadDatabases();
+  init();
 });
 
-function loadDatabases(dbPath){
-  db.projects = new Datastore(dbPath +'/projects.db');
-  db.settings = new Datastore(dbPath +'/settings.db');
-  db.projects.loadDatabase();
-  db.settings.loadDatabase();
-  return db;
-}
 
-const helper = require('./helper.js');
-
-let currentFile = "";
-let currentDirectory = "";
+let currentFile = null;
+let currentDirectory = null;
 
 let directoryUi = document.getElementById('directory');
 let backdropUi = document.getElementById('backdrop');
 let modalUi = document.getElementById('new-file-modal');
 
 let closeModalButton = document.getElementById('close-modal');
-let closeModalXButton = document.getElementById('close-modal-x');
 let saveButton = document.getElementById('save-file-btn');
 let fileNameInput = document.getElementById("file-name-input");
 
 let saveFileButton = document.getElementById('save-file-button');
 let saveFolderButton = document.getElementById('save-folder-button');
-
+let ACTIVE_MODAL_ID = "";
 let CURRENT_FILE_OPENER_ACTION = null;
 var openDir = [];
 var editor = ace.edit("code-input");
@@ -58,12 +48,9 @@ editor.getSession().on("change", e => {
 })
 
 
-closeModalXButton.addEventListener('click', e => {
-  hideShowModal("hide");
-});
 
 closeModalButton.addEventListener('click', e => {
-  hideShowModal("hide");
+  hideShowModal("hide","new-file-modal");
 });
 
 function setSaveButtonAsActive(){
@@ -119,37 +106,45 @@ saveButton.addEventListener("click", e => {
     saveADirectory(getCurrentDirectory() + "/" + filename);
   }
   console.log("The file was saved!");
-  hideShowModal('hide');
+  hideShowModal('hide',"new-file-modal");
   readFiles(currentProject);
 });
 
 document.getElementById('new-file').addEventListener('click', e => {
   CURRENT_FILE_OPENER_ACTION = "file";
-    hideShowModal("show");
+    hideShowModal("show","new-file-modal");
 })
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
-  hideShowModal("show");
+  hideShowModal("show" , "new-file-modal");
 }
 
 function createANewFolder(){
   CURRENT_FILE_OPENER_ACTION = "dir";
-  hideShowModal("show");
+  hideShowModal("show", "new-file-modal");
+}
+
+function showRecentProjects(){
+  loadRecentProjects();
+  hideShowModal("show", "projects-modal");
 }
 
 saveFolderButton.addEventListener('click', e => {
   CURRENT_FILE_OPENER_ACTION = "dir";
-  hideShowModal("show");
+  hideShowModal("show","new-file-modal");
 });
 
-function hideShowModal(action){
+function hideShowModal(action, id){
+  var el = document.getElementById(id);
   if(action == "show"){
+    ACTIVE_MODAL_ID = id;
     backdropUi.style.display = "block";
-    modalUi.style.display = "block";
+    el.style.display = "block";
   }else{
+    ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
-    modalUi.style.display = "none";
+    el.style.display = "none";
   }
 
 }
@@ -165,7 +160,6 @@ function getCurrentDirectory(){
 let createDirectoryLink = (type, file, styleclass) => {
   let fname = path.basename(file);
   let fileIcon = getIcon(file);
-  console.log(fileIcon);
   let  tempFolder = ` <li class="directory-parent"><a title="${fname}" data-type="dir" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
   let  tempFile = ` <li class="directory-parent"><a title="${fname}" data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="${fileIcon}"> ${fname}</a></li>`;
   if(type === 'dir'){
@@ -213,6 +207,15 @@ let undoDirectoryStyling = () => {
   })
 }
 
+function setModalsCloseEvents(){
+  const divs = document.querySelectorAll('.close-modal-x');
+  divs.forEach( el => {
+    el.addEventListener('click', e=>{
+      hideShowModal("hide", ACTIVE_MODAL_ID);
+    })
+  })
+}
+
 let setListeners = () => {
   const divs = document.querySelectorAll('.file-link');
 
@@ -235,6 +238,7 @@ let setListeners = () => {
     }else if(fileType === 'dir'){
       currentDirectory = file;
       currentFile = null;
+      console.log("click");
       if(helper.exitsInArray(openDir, file)){
         helper.removeFromArray(openDir, file);
       }else{
@@ -245,6 +249,13 @@ let setListeners = () => {
   }));
 }
 
+function saveLastProject(filepath){
+  db.saveToSettings({'name': "current-project",},{
+    'name': "current-project",
+    'value': filepath
+  })
+}
+
 function assignAceMode(editor, ext){
   let modes = helper.modesObject();
   let extName = ext.replace(/\./g,' ').trim();
@@ -253,14 +264,16 @@ function assignAceMode(editor, ext){
   }
 }
 
-function getProjectDir(){
-  let baseDir = '';
+function getProjectDir(callback){
   console.log("get project directory")
-  db.settings.find({name:"current-project"}, function (err, doc) {
-     //baseDir = doc.value;
-     console.log(doc.value)
+  db.getSetting({name:"current-project"}, function (err, doc) {
+    if(doc === null){
+      console.log("this is null")
+    }
+    console.log(doc.value);
+    currentProject = doc.value;
+     callback( doc.value)
   });
-  return baseDir;
 }
 
 function readFilesFromDir(dir) {
@@ -291,6 +304,13 @@ function readFilesFromDir(dir) {
   return directoryListing + fileListing;
 }
 
+function openNewProject(){
+  getProjectDir( dir =>{
+    console.log(dir)
+      readFiles(dir);
+  })
+}
+
 let readFiles = (projectDir) => {
 
   if(projectDir){
@@ -299,5 +319,39 @@ let readFiles = (projectDir) => {
     setListeners();
   }
 }
+
+function loadRecentProjects(){
+  let html = '';
+  db.getAllProjects({}, function (err, docs) {
+    docs.forEach(function(project){
+     // console.log(project.name, "here")
+      let projectName = helper.getDirectoryName(project.name);
+      html += `<li class="list-group-item list-group-item-action recent-project" data-filepath="${project.name}">${projectName}</li>`;
+    });
+    document.getElementById('recent-projects').innerHTML = html;
+    const divs = document.querySelectorAll('.recent-project');
+    divs.forEach( el => {
+      el.addEventListener('click', e=>{
+          currentProject = e.target.getAttribute("data-filepath");
+          editor.session.setValue("");
+          currentFile = null;
+          currentDirectory = currentProject;
+          saveLastProject(currentProject);
+          readFiles(currentProject);
+          hideShowModal('hide','projects-modal');
+      })
+    })
+  });
+
+}
+
+
+function init(){
+  setModalsCloseEvents();
+  getProjectDir(dir=>{
+    readFiles(dir)
+  })
+}
+
 
 
