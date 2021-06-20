@@ -229,6 +229,7 @@ let setListeners = () => {
       let ext = path.extname(file);
       editor.session.setValue(buffer.toString());
       currentFile = file;
+      updatePageTitle(file);
       currentDirectory = null;
       assignAceMode(editor, ext);
       //console.log(event.target.getAttribute("data-path"));
@@ -237,6 +238,7 @@ let setListeners = () => {
       onFileClickEvent(event);
     }else if(fileType === 'dir'){
       currentDirectory = file;
+      updatePageTitle(file);
       currentFile = null;
       console.log("click");
       if(helper.exitsInArray(openDir, file)){
@@ -339,6 +341,7 @@ function loadRecentProjects(){
           saveLastProject(currentProject);
           readFiles(currentProject);
           hideShowModal('hide','projects-modal');
+          updatePageTitle("");
       })
     })
   });
@@ -351,6 +354,10 @@ function init(){
   getProjectDir(dir=>{
     readFiles(dir)
   })
+}
+
+function updatePageTitle(title){
+  document.title = "A Code Editor - " + title;
 }
 
 

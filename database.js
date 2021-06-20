@@ -35,7 +35,9 @@ module.exports =  {
         console.log("is null");
         db.settings.insert([nDoc],function (err, newDocs) {
           console.log(nDoc);
-          callback();
+          if(callback !== undefined){
+            callback();
+          }
         });
       }else{
         console.log(doc);
