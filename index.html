@@ -12,6 +12,12 @@
   </head>
   <body>
   <style>
+    .code-input {
+      font-size: 17px;
+    }
+    img.logo {
+
+    }
     .modal {
       overflow-y:auto;
     }
@@ -77,26 +83,36 @@
 
     <div class="row">
 
-      <div class="col-2 directory-lister-container" style="">
+      <!-- Directory Listing -->
+
+      <div class="col-2 directory-lister-container" style="border-right: 1px solid #c8cbcf;">
         <div style="display: inline-block;">
-          <p>Project Home</p>
-          <ul class="directory-lister" id="directory">
+          <p id="project-name" style="overflow: hidden;white-space: nowrap;">Project Home</p>
+          <ul class="directory-lister" id="directory" style="margin-bottom: 10px;">
           </ul>
         </div>
       </div>
 
+
+      <!-- Content Pane -->
       <div class="col-10">
-
-        <!--<label for="exampleFormControlTextarea1">Code snippet</label>-->
-
-        <div class="form-group">
-          <button id="new-file" type="button" class="btn btn-primary">New File</button>
-          <button id="save-folder-button" type="button" class="btn btn-secondary">New Folder</button>
-          <button id="save-file-button" type="button" class="btn btn-secondary">Save</button>
+        <div style="width: 100%; border-radius: 3px; color:black;">
+          <div class="row">
+                <div class="col-4">
+                  <p id="project-title-bar"></p>
+                </div>
+                <div class="col-8">
+                  <span style="float: right;" class="badge badge-secondary">Secondary</span>
+                </div>
+          </div>
         </div>
-
         <div class="form-group">
-          <div id="code-input"  class="form-control code-input" style="min-height:650px; height: 100%;"></div>
+          <div id="code-view" style="display: none;">
+            <div id="code-input"  class="code-input" style="min-height:650px; height: 100%;"></div>
+          </div>
+          <div id="image-view" style="display: none;">
+            <img id="image-viewer" src="" class="logo">
+          </div>
         </div>
       </div>
 

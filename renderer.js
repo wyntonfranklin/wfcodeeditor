@@ -10,6 +10,7 @@ const helper = require('./helper.js');
 const fs = require("fs")
 var path = require('path');
 let db = require('./database');
+const extensions = require('./extensions');
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
@@ -34,17 +35,22 @@ let modalUi = document.getElementById('new-file-modal');
 let closeModalButton = document.getElementById('close-modal');
 let saveButton = document.getElementById('save-file-btn');
 let fileNameInput = document.getElementById("file-name-input");
+let projectName = document.getElementById("project-name");
+let projectTitleBar = document.getElementById("project-title-bar");
 
-let saveFileButton = document.getElementById('save-file-button');
-let saveFolderButton = document.getElementById('save-folder-button');
+
+let codeView = document.getElementById('code-view');
+let imageView = document.getElementById('image-view');
+let imageViewer = document.getElementById('image-viewer');
+let CURRENT_PROJECT_NAME = "";
+
 let ACTIVE_MODAL_ID = "";
 let CURRENT_FILE_OPENER_ACTION = null;
 var openDir = [];
 var editor = ace.edit("code-input");
-editor.setTheme("ace/theme/twilight");
+editor.setTheme("ace/theme/monokai");
 editor.getSession().on("change", e => {
-    helper.addElementClass(saveFileButton,"btn-success");
-    helper.removeElementClass(saveFileButton,"btn-primary");
+
 })
 
 
@@ -54,24 +60,56 @@ closeModalButton.addEventListener('click', e => {
 });
 
 function setSaveButtonAsActive(){
-  helper.addElementClass(saveFileButton,"btn-success");
-  helper.removeElementClass(saveFileButton,"btn-secondary");
+
 }
 
 function setSaveButtonAsInActive(){
-  helper.addElementClass(saveFileButton,"btn-secondary");
-  helper.removeElementClass(saveFileButton,"btn-success");
+
 }
 
 
-function onFileClickEvent(e){
+function onFileClickEvent(e, file){
+  let ext = path.extname(file).replace(/\./g,' ').trim()
+  let fileAction = null;
+  let fileActions = helper.acceptedFileTypes();
+  currentFile = file;
+  updatePageTitle(file);
+  currentDirectory = null;
+  if(fileActions.hasOwnProperty(ext)){
+      fileAction = fileActions[ext];
+      helper.addElementClass(event.target, "active");
+      if(fileAction === "code"){
+          appOpenCode(e, file, ext);
+      }else if(fileAction === "image"){
+          appOpenImage(e, file, ext)
+      }else{
+
+      }
+  }
+}
+
+function appOpenCode(event, file, ext){
+  hideAllViews(codeView);
+  const buffer = fs.readFileSync(file);
+  editor.session.setValue(buffer.toString());
+  assignAceMode(editor, ext);
   setSaveButtonAsInActive();
 }
 
+function appOpenImage(event, file, ext){
+  console.log(file);
+  hideAllViews(imageView);
+  imageViewer.src = file;
+  setSaveButtonAsInActive();
+}
 
-saveFileButton.addEventListener("click", e=> {
-  saveCurrentFile();
-});
+function hideAllViews(view){
+  codeView.style.display = "none";
+  imageView.style.display = "none";
+  view.style.display = "block";
+}
+
+
 
 function saveCurrentFile(){
   if(currentFile){
@@ -110,10 +148,6 @@ saveButton.addEventListener("click", e => {
   readFiles(currentProject);
 });
 
-document.getElementById('new-file').addEventListener('click', e => {
-  CURRENT_FILE_OPENER_ACTION = "file";
-    hideShowModal("show","new-file-modal");
-})
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
@@ -130,10 +164,6 @@ function showRecentProjects(){
   hideShowModal("show", "projects-modal");
 }
 
-saveFolderButton.addEventListener('click', e => {
-  CURRENT_FILE_OPENER_ACTION = "dir";
-  hideShowModal("show","new-file-modal");
-});
 
 function hideShowModal(action, id){
   var el = document.getElementById(id);
@@ -169,11 +199,10 @@ let createDirectoryLink = (type, file, styleclass) => {
 }
 
 function getIcon(fname){
-  let nodes = helper.modesObject();
   let ext = path.extname(fname).replace(/\./g,' ').trim()
   let defaultIcon = `./icons/ic_file.png`;
-  if(nodes.hasOwnProperty(ext)){
-    let iconname = `./icons/ic_${nodes[ext]}.png`;
+  if(extensions.hasOwnProperty(ext)){
+    let iconname = `./icons/ic_${extensions[ext].icon}.png`;
     try {
       if(fs.existsSync(iconname)) {
          return iconname;
@@ -225,22 +254,11 @@ let setListeners = () => {
     let fileType = event.target.getAttribute("data-type");
     undoDirectoryStyling();
     if(fileType === "file"){
-      const buffer = fs.readFileSync(file);
-      let ext = path.extname(file);
-      editor.session.setValue(buffer.toString());
-      currentFile = file;
-      updatePageTitle(file);
-      currentDirectory = null;
-      assignAceMode(editor, ext);
-      //console.log(event.target.getAttribute("data-path"));
-      helper.addElementClass(event.target, "active");
-      //event.target.className += " active"
-      onFileClickEvent(event);
+      onFileClickEvent(event, file);
     }else if(fileType === 'dir'){
       currentDirectory = file;
       updatePageTitle(file);
       currentFile = null;
-      console.log("click");
       if(helper.exitsInArray(openDir, file)){
         helper.removeFromArray(openDir, file);
       }else{
@@ -251,6 +269,7 @@ let setListeners = () => {
   }));
 }
 
+
 function saveLastProject(filepath){
   db.saveToSettings({'name': "current-project",},{
     'name': "current-project",
@@ -259,10 +278,9 @@ function saveLastProject(filepath){
 }
 
 function assignAceMode(editor, ext){
-  let modes = helper.modesObject();
   let extName = ext.replace(/\./g,' ').trim();
-  if(modes.hasOwnProperty(extName)){
-    editor.session.setMode("ace/mode/" + modes[extName]);
+  if(extensions.hasOwnProperty(extName)){
+    editor.session.setMode("ace/mode/" + extensions[extName].ace);
   }
 }
 
@@ -274,8 +292,17 @@ function getProjectDir(callback){
     }
     console.log(doc.value);
     currentProject = doc.value;
+    setCurrentProjectName(helper.getDirectoryName(currentProject));
      callback( doc.value)
   });
+}
+
+function setCurrentProjectName(name){
+  if(name){
+    projectName.innerHTML = "Project (" + name + ")";
+  }else{
+    projectName.innerHTML = "Project Title";
+  }
 }
 
 function readFilesFromDir(dir) {
@@ -298,9 +325,10 @@ function readFilesFromDir(dir) {
           }
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
-        if(helper.modesObject()[ext]){
+        fileListing += createDirectoryLink("file", file,"");
+        /*if(helper.modesObject()[ext]){
           fileListing += createDirectoryLink("file", file,"");
-        }
+        }*/
       }
     })
   return directoryListing + fileListing;
@@ -342,6 +370,7 @@ function loadRecentProjects(){
           readFiles(currentProject);
           hideShowModal('hide','projects-modal');
           updatePageTitle("");
+          setCurrentProjectName(e.target.innerHTML)
       })
     })
   });
@@ -358,6 +387,7 @@ function init(){
 
 function updatePageTitle(title){
   document.title = "A Code Editor - " + title;
+  projectTitleBar.innerHTML =  title;
 }
 
 
