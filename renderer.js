@@ -62,8 +62,15 @@ codeView.addEventListener('contextmenu', e=>{
 
 });
 
+
 closeModalButton.addEventListener('click', e => {
   hideShowModal("hide","new-file-modal");
+});
+
+ipcRenderer.on('get-code', function (evt, message) {
+  console.log(message); // Returns: {'SAVED': 'File Saved'}
+  var cursor = editor.selection.getCursor() // returns object like {row:1 , column: 4}
+  editor.insert(message.code)
 });
 
 function setSaveButtonAsActive(){

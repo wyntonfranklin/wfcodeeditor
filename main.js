@@ -9,13 +9,10 @@ console.log(dbPath)
 db.init(dbPath)
 let wc;
 let mainMenu;
+let contextMenu;
 
 db.loadDatabases();
 
-let contextMenu = Menu.buildFromTemplate([
-  { label: 'Item 1' },
-  { role: 'editMenu' }
-])
 
 ipcMain.handle('create-new-file', e => {
   createFileWindow = new BrowserWindow({
@@ -62,6 +59,41 @@ function createWindow () {
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
+
+  contextMenu = Menu.buildFromTemplate([
+    { role: 'copy'},
+    { role: 'paste'},
+    {
+      label: 'Snippets',
+      submenu: [
+        {
+          label: 'PHP',
+          click: () => {
+            wc.send('get-code', {'code': 'function get_connection(){\n' +
+                '   global $database;\n' +
+                '   global $db_user;\n' +
+                '   global $db_password;\n' +
+                '\n' +
+                '   $dsn = "mysql:host=localhost;dbname=$database";\n' +
+                '   $user = $db_user;\n' +
+                '   $passwd = $db_password;\n' +
+                '\n' +
+                '   $conn = new PDO($dsn, $user, $passwd);\n' +
+                '\n' +
+                '   return $conn;\n' +
+                '}'});
+          },
+        },
+        {
+          label: 'SQL'
+        },
+        {
+          label: 'Javascript'
+        }
+
+      ]
+    }
+  ])
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);

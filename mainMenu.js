@@ -67,7 +67,8 @@ module.exports =  {
             { role: 'paste'},
           ]
         },
-       { label: 'Snippets', submenu: [
+       { label: 'Snippets',
+         submenu: [
          {
            label: 'PHP'
          },
