@@ -52,8 +52,9 @@ module.exports =  {
               accelerator: 'CTRL+S'
             },
             { label: 'Save as'},
-            { label: 'Item 2', submenu: [ { label: 'Sub Item 1'} ]},
-            { label: 'Item 3'},
+            {
+              label : 'Preferences'
+            },
             {role :  'close' }
           ]
         },
@@ -66,6 +67,19 @@ module.exports =  {
             { role: 'paste'},
           ]
         },
+       { label: 'Snippets', submenu: [
+         {
+           label: 'PHP'
+         },
+         {
+           label: 'SQL'
+         },
+         {
+           label: 'Javascript'
+         }
+
+         ]
+       },
         {
           label: 'Actions',
           submenu: [

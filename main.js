@@ -12,6 +12,11 @@ let mainMenu;
 
 db.loadDatabases();
 
+let contextMenu = Menu.buildFromTemplate([
+  { label: 'Item 1' },
+  { role: 'editMenu' }
+])
+
 ipcMain.handle('create-new-file', e => {
   createFileWindow = new BrowserWindow({
     width: 300, height: 100,
@@ -32,6 +37,9 @@ ipcMain.handle('read-user-data', (event) => {
   return path;
 })
 
+ipcMain.handle('show-code-context-menu', (event) => {
+  contextMenu.popup();
+})
 
 function createWindow () {
   // Create the browser window.
@@ -54,6 +62,11 @@ function createWindow () {
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
+
+  mainWindow.webContents.on('context-menu', (e, params) => {
+   // console.log(params.);
+    //contextMenu.popup()
+  })
 
 
 }

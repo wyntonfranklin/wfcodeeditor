@@ -60,21 +60,25 @@ module.exports = {
     ace: "yaml",
   },
   png : {
-    type : "picture",
+    type : "image",
     icon : "picture"
   },
   jpeg : {
-    type : "picture",
+    type : "image",
     icon : "picture"
   },
   jpg : {
-    type : "picture",
+    type : "image",
     icon : "picture"
   },
   css : {
     type : "code",
     ace: "css",
     icon : "css",
+  },
+  sh : {
+    type : "code",
+    ace : "batchfile"
   }
 }
 

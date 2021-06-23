@@ -55,6 +55,13 @@ editor.getSession().on("change", e => {
 
 
 
+codeView.addEventListener('contextmenu', e=>{
+  ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
+
+  });
+
+});
+
 closeModalButton.addEventListener('click', e => {
   hideShowModal("hide","new-file-modal");
 });
@@ -71,24 +78,31 @@ function setSaveButtonAsInActive(){
 function onFileClickEvent(e, file){
   let ext = path.extname(file).replace(/\./g,' ').trim()
   let fileAction = null;
-  let fileActions = helper.acceptedFileTypes();
+  let fileActions = extensions;
   currentFile = file;
   updatePageTitle(file);
   currentDirectory = null;
-  if(fileActions.hasOwnProperty(ext)){
-      fileAction = fileActions[ext];
-      helper.addElementClass(event.target, "active");
+  if(extensions.hasOwnProperty(ext)){
+      fileAction = fileActions[ext].type;
       if(fileAction === "code"){
           appOpenCode(e, file, ext);
       }else if(fileAction === "image"){
           appOpenImage(e, file, ext)
       }else{
-
+        setMessageBox("Cant open this file");
       }
+  }else{
+    console.log(ext);
+    setMessageBox("Cant open this file");
   }
 }
 
 function appOpenCode(event, file, ext){
+  if(event){
+    helper.addElementClass(event.target, "active");
+  }
+  console.log(file,"code open");
+  currentFile = file;
   hideAllViews(codeView);
   const buffer = fs.readFileSync(file);
   editor.session.setValue(buffer.toString());
@@ -119,8 +133,13 @@ function saveCurrentFile(){
   }
 }
 
-function saveAFile(path,content) {
-  fs.writeFile(path, content, function (err) {
+function saveAFile(filepath,content) {
+  fs.writeFile(filepath, content, function (err) {
+    getProjectDir(dir=>{
+      let ext = path.extname(filepath).replace(/\./g,' ').trim();
+      appOpenCode(null, filepath, ext );
+      readFiles(dir)
+    })
     if (err) {
       return console.log(err);
     }
@@ -290,7 +309,8 @@ function getProjectDir(callback){
     if(doc === null){
       console.log("this is null")
     }
-    console.log(doc.value);
+    console.log(doc);
+    console.log("show doc")
     currentProject = doc.value;
     setCurrentProjectName(helper.getDirectoryName(currentProject));
      callback( doc.value)
@@ -362,6 +382,7 @@ function loadRecentProjects(){
     const divs = document.querySelectorAll('.recent-project');
     divs.forEach( el => {
       el.addEventListener('click', e=>{
+          closeProject();
           currentProject = e.target.getAttribute("data-filepath");
           editor.session.setValue("");
           currentFile = null;
@@ -377,6 +398,10 @@ function loadRecentProjects(){
 
 }
 
+function closeProject(){
+  editor.session.setValue("");
+  imageViewer.src = "";
+}
 
 function init(){
   setModalsCloseEvents();
@@ -390,5 +415,13 @@ function updatePageTitle(title){
   projectTitleBar.innerHTML =  title;
 }
 
+function setMessageBox(msg){
+  const mBox = document.getElementById("message-box");
+  mBox.innerText = msg;
+  mBox.style.display = "block";
+}
 
+function messageLog(log){
+  setMessageBox(log);
+}
 
