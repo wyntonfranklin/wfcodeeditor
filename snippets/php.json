@@ -1,0 +1,10 @@
+{
+  "create_function" : {
+    "name" : "Create Function",
+    "code": "function mailhelper_run_task($message){\n  $task = new TaskResult();\n  $taskToRun = $message->getTask();\n  switch ($taskToRun){\n    case TaskResult::TASK_CALCULATOR:\n      $task->setOutput(\"All good\");\n      mailhelper_calculate($task, $message);\n      break;\n    default:\n      $task->setOutput(\"Cant find this task $taskToRun\");\n\n  }\n  return $task;\n}"
+  },
+  "create_loop" : {
+    "name" : "Create Function",
+    "code": "function mailhelper_run_task($message){\n  $task = new TaskResult();\n  $taskToRun = $message->getTask();\n  switch ($taskToRun){\n    case TaskResult::TASK_CALCULATOR:\n      $task->setOutput(\"All good\");\n      mailhelper_calculate($task, $message);\n      break;\n    default:\n      $task->setOutput(\"Cant find this task $taskToRun\");\n\n  }\n  return $task;\n}"
+  }
+}

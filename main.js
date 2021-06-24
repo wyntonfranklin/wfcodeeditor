@@ -69,19 +69,12 @@ function createWindow () {
         {
           label: 'PHP',
           click: () => {
-            wc.send('get-code', {'code': 'function get_connection(){\n' +
-                '   global $database;\n' +
-                '   global $db_user;\n' +
-                '   global $db_password;\n' +
-                '\n' +
-                '   $dsn = "mysql:host=localhost;dbname=$database";\n' +
-                '   $user = $db_user;\n' +
-                '   $passwd = $db_password;\n' +
-                '\n' +
-                '   $conn = new PDO($dsn, $user, $passwd);\n' +
-                '\n' +
-                '   return $conn;\n' +
-                '}'});
+            var php = require("./snippets/php");
+           // console.log(php);
+            var info = JSON.parse(JSON.stringify(php));
+            console.log(info)
+           // console.log(info["create_function"].code);
+            wc.send('get-code', {'code': info["create_function"].code});
           },
         },
         {
