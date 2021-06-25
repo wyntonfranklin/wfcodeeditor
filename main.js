@@ -56,9 +56,11 @@ function createWindow () {
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
 
-  ipcMain.handle('set-code-to-view', (event) => {
-    console.log('working');
-    wc.send('get-code', {'code': "stuff"});
+  ipcMain.handle('set-code-to-view', (event, id) => {
+    var php = require("./snippets/php");
+    var info = JSON.parse(JSON.stringify(php));
+    wc.send('get-code', {'code': info[id].code});
+    snippetsWindow.hide();
   })
 
   contextMenu = Menu.buildFromTemplate([
