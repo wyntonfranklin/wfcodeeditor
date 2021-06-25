@@ -10,24 +10,10 @@ db.init(dbPath)
 let wc;
 let mainMenu;
 let contextMenu;
+let snippetsWindow;
 
 db.loadDatabases();
 
-
-ipcMain.handle('create-new-file', e => {
-  createFileWindow = new BrowserWindow({
-    width: 300, height: 100,
-    webPreferences: { nodeIntegration: true },
-    parent: mainWindow,
-    modal: true,
-    titleBarStyle: 'hidden',
-    show: true,
-  })
-  createFileWindow.setMenuBarVisibility(false);
-  createFileWindow.loadFile('create-file-layout.html')
-  return "something;";
-
-})
 
 ipcMain.handle('read-user-data', (event) => {
   const path = app.getPath('userData');
@@ -50,7 +36,17 @@ function createWindow () {
   })
 
 
-
+  snippetsWindow = new BrowserWindow({
+    width: 400, height: 300,
+    webPreferences: { nodeIntegration: true,    contextIsolation: false, },
+    parent: mainWindow,
+    modal: true,
+    titleBarStyle: 'hidden',
+    show: false,
+  })
+  snippetsWindow.setMenuBarVisibility(false);
+  snippetsWindow.loadFile('create-file-layout.html')
+  snippetsWindow.webContents.openDevTools()
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
@@ -59,6 +55,11 @@ function createWindow () {
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
+
+  ipcMain.handle('set-code-to-view', (event) => {
+    console.log('working');
+    wc.send('get-code', {'code': "stuff"});
+  })
 
   contextMenu = Menu.buildFromTemplate([
     { role: 'copy'},
@@ -69,12 +70,13 @@ function createWindow () {
         {
           label: 'PHP',
           click: () => {
-            var php = require("./snippets/php");
+            //var php = require("./snippets/php");
            // console.log(php);
-            var info = JSON.parse(JSON.stringify(php));
-            console.log(info)
+           // var info = JSON.parse(JSON.stringify(php));
+           // console.log(info)
            // console.log(info["create_function"].code);
-            wc.send('get-code', {'code': info["create_function"].code});
+            //wc.send('get-code', {'code': info["create_function"].code});
+            snippetsWindow.show();
           },
         },
         {

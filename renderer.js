@@ -11,10 +11,13 @@ const fs = require("fs")
 var path = require('path');
 let db = require('./database');
 const extensions = require('./extensions');
+const Store = require('electron-store');
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
 let APPLICATION_PATH = "";
+const settings = new Store();
+let recentlyCreatedFile = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -144,7 +147,8 @@ function saveAFile(filepath,content) {
   fs.writeFile(filepath, content, function (err) {
     getProjectDir(dir=>{
       let ext = path.extname(filepath).replace(/\./g,' ').trim();
-      appOpenCode(null, filepath, ext );
+      recentlyCreatedFile = filepath;
+      onFileClickEvent(null, filepath);
       readFiles(dir)
     })
     if (err) {
@@ -297,10 +301,13 @@ let setListeners = () => {
 
 
 function saveLastProject(filepath){
-  db.saveToSettings({'name': "current-project",},{
-    'name': "current-project",
-    'value': filepath
-  })
+
+   /** db.saveToSettings({'name': "current-project",},{
+      'name': "current-project",
+      'value': filepath
+    })
+    **/
+   settings.set("currentproject", filepath);
 }
 
 function assignAceMode(editor, ext){
@@ -312,6 +319,11 @@ function assignAceMode(editor, ext){
 
 function getProjectDir(callback){
   console.log("get project directory")
+  let cpPath = settings.get('currentproject');
+  currentProject = cpPath;
+  setCurrentProjectName(helper.getDirectoryName(cpPath));
+  callback(cpPath);
+  /*
   db.getSetting({name:"current-project"}, function (err, doc) {
     if(doc === null){
       console.log("this is null")
@@ -322,6 +334,7 @@ function getProjectDir(callback){
     setCurrentProjectName(helper.getDirectoryName(currentProject));
      callback( doc.value)
   });
+   */
 }
 
 function setCurrentProjectName(name){
@@ -352,7 +365,12 @@ function readFilesFromDir(dir) {
           }
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
-        fileListing += createDirectoryLink("file", file,"");
+        if(recentlyCreatedFile == file){
+         // recentlyCreatedFile = null;
+          fileListing += createDirectoryLink("file", file,"active");
+        }else{
+          fileListing += createDirectoryLink("file", file,"");
+        }
         /*if(helper.modesObject()[ext]){
           fileListing += createDirectoryLink("file", file,"");
         }*/

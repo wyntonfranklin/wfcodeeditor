@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "electron-prompt": "^1.6.2",
+    "electron-store": "^8.0.0",
     "highlight.js": "^11.0.1",
     "micromodal": "^0.4.6",
     "nedb": "^1.8.0"
