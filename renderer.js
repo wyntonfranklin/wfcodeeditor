@@ -138,12 +138,27 @@ function hideAllViews(view){
 function saveCurrentFile(){
   if(currentFile){
     var code = editor.getValue();
+    var sel = editor.getSelection();
+    let cpostion = sel.getCursor();
     saveAFile(currentFile, code);
+    sel.moveCursorToPosition(cpostion);
     setSaveButtonAsInActive();
   }
 }
 
 function saveAFile(filepath,content) {
+  try {
+    fs.writeFileSync(filepath, content);
+    getProjectDir(dir=>{
+      let ext = path.extname(filepath).replace(/\./g,' ').trim();
+      recentlyCreatedFile = filepath;
+      onFileClickEvent(null, filepath);
+      readFiles(dir)
+    })
+  } catch (err) {
+    console.error(err)
+  }
+  /*
   fs.writeFile(filepath, content, function (err) {
     getProjectDir(dir=>{
       let ext = path.extname(filepath).replace(/\./g,' ').trim();
@@ -154,7 +169,7 @@ function saveAFile(filepath,content) {
     if (err) {
       return console.log(err);
     }
-  });
+  });*/
 }
 
 function saveADirectory(path){

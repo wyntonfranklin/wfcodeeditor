@@ -3,6 +3,7 @@ const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog} = require('electron'
 const path = require('path')
 let mainWindow, createFileWindow;
 var Datastore = require('nedb');
+const snippetsManger = require('./snippets');
 let db = require("./database");
 let dbPath = app.getPath('userData');
 console.log(dbPath)
@@ -37,7 +38,7 @@ function createWindow () {
 
 
   snippetsWindow = new BrowserWindow({
-    width: 400, height: 300,
+    width: 500, height: 500,
     webPreferences: { nodeIntegration: true,    contextIsolation: false, },
     parent: mainWindow,
     modal: true,
@@ -46,7 +47,12 @@ function createWindow () {
   })
   snippetsWindow.setMenuBarVisibility(false);
   snippetsWindow.loadFile('create-file-layout.html')
-  snippetsWindow.webContents.openDevTools()
+  //snippetsWindow.webContents.openDevTools();
+
+  snippetsWindow.on('close',  (e) => {
+    snippetsWindow.hide();
+    e.preventDefault();
+  })
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
@@ -56,41 +62,13 @@ function createWindow () {
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
   Menu.setApplicationMenu(mainMenu)
 
-  ipcMain.handle('set-code-to-view', (event, id) => {
-    var php = require("./snippets/php");
-    var info = JSON.parse(JSON.stringify(php));
-    wc.send('get-code', {'code': info[id].code});
+  ipcMain.handle('set-code-to-view', (event, id, type) => {
+    var snippets = snippetsManger.getSnippets(type);
+    wc.send('get-code', {'code': snippets[id].code});
     snippetsWindow.hide();
   })
 
-  contextMenu = Menu.buildFromTemplate([
-    { role: 'copy'},
-    { role: 'paste'},
-    {
-      label: 'Snippets',
-      submenu: [
-        {
-          label: 'PHP',
-          click: () => {
-            //var php = require("./snippets/php");
-           // console.log(php);
-           // var info = JSON.parse(JSON.stringify(php));
-           // console.log(info)
-           // console.log(info["create_function"].code);
-            //wc.send('get-code', {'code': info["create_function"].code});
-            snippetsWindow.show();
-          },
-        },
-        {
-          label: 'SQL'
-        },
-        {
-          label: 'Javascript'
-        }
-
-      ]
-    }
-  ])
+  contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow));
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);

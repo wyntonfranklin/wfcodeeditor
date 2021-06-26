@@ -5,11 +5,16 @@
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
   <title></title>
+  <link href="./css/bootstrap.min.css" rel="stylesheet">
+  <link href="./css/main.css" rel="stylesheet">
   <script>
   </script>
 </head>
 <body>
 <style>
+  .snippet-item {
+    cursor: pointer;
+  }
 </style>
 
 <div class="container-fluid">
@@ -17,21 +22,23 @@
   <div class="row">
 
     <div class="col">
-        <input type="text"  class="form-control"/>
-      <button>Save File</button>
+      <div class="input-group">
+        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Search snippets">
+        <div class="input-group-append">
+          <div class="input-group-text">@</div>
+        </div>
+      </div>
     </div>
 
+  </div>
 
+  <br>
+
+  <div class="row">
     <div class="col">
       <ul class="list-group" id="snippets-listing">
-        <li class="list-group-item snippet-item">Cras justo odio</li>
-        <li class="list-group-item snippet-item">Dapibus ac facilisis in</li>
-        <li class="list-group-item snippet-item">Morbi leo risus</li>
-        <li class="list-group-item snippet-item">Porta ac consectetur ac</li>
-        <li class="list-group-item snippet-item">Vestibulum at eros</li>
       </ul>
     </div>
-
   </div>
 
 </div>
