@@ -59,7 +59,7 @@ function createWindow () {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
-  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db) )
+  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db, snippetsWindow) )
   Menu.setApplicationMenu(mainMenu)
 
   ipcMain.handle('set-code-to-view', (event, id, type) => {

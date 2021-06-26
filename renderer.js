@@ -18,6 +18,7 @@ let currentProject = null;
 let APPLICATION_PATH = "";
 const settings = new Store();
 let recentlyCreatedFile = null;
+let openFiles = [];
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -45,6 +46,8 @@ let projectTitleBar = document.getElementById("project-title-bar");
 let codeView = document.getElementById('code-view');
 let imageView = document.getElementById('image-view');
 let imageViewer = document.getElementById('image-viewer');
+let fileTabs = document.getElementById("file-tabs");
+
 let CURRENT_PROJECT_NAME = "";
 
 let ACTIVE_MODAL_ID = "";
@@ -74,6 +77,7 @@ ipcRenderer.on('get-code', function (evt, message) {
   console.log(message); // Returns: {'SAVED': 'File Saved'}
   var cursor = editor.selection.getCursor() // returns object like {row:1 , column: 4}
   editor.insert(message.code)
+  editor.focus();
 });
 
 function setSaveButtonAsActive(){
@@ -84,6 +88,16 @@ function setSaveButtonAsInActive(){
 
 }
 
+
+function addOpenFile(file){
+  if(!helper.exitsInArray(openFiles, file)){
+      openFiles.push(file);
+  }
+}
+
+function removeOpenFile(file){
+    helper.removeFromArray(openFiles, file);
+}
 
 function onFileClickEvent(e, file){
   let ext = path.extname(file).replace(/\./g,' ').trim()
@@ -101,6 +115,7 @@ function onFileClickEvent(e, file){
       }else{
         setMessageBox("Cant open this file");
       }
+      createTabs();
   }else{
     console.log(ext);
     setMessageBox("Cant open this file");
@@ -111,7 +126,7 @@ function appOpenCode(event, file, ext){
   if(event){
     helper.addElementClass(event.target, "active");
   }
-  console.log(file,"code open");
+  addOpenFile(file);
   currentFile = file;
   hideAllViews(codeView);
   const buffer = fs.readFileSync(file);
@@ -121,7 +136,7 @@ function appOpenCode(event, file, ext){
 }
 
 function appOpenImage(event, file, ext){
-  console.log(file);
+  addOpenFile(file);
   hideAllViews(imageView);
   imageViewer.src = file;
   setSaveButtonAsInActive();
@@ -241,6 +256,51 @@ let createDirectoryLink = (type, file, styleclass) => {
     return tempFolder;
   }
   return tempFile;
+}
+
+function createTabs(){
+  let html = '';
+  for(let i=0; i<= openFiles.length-1; i++){
+    let file = openFiles[i];
+    let fname = path.basename(file);
+    if(file == currentFile){
+      html += `<li class="nav-item">
+             <span class="nav-link active">
+                <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
+            </li>`;
+    }else{
+      html += `<li class="nav-item">
+             <span class="nav-link">
+                <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
+            </li>`;
+    }
+  }
+  fileTabs.innerHTML = html;
+  setTabEvents();
+}
+
+function setTabEvents(){
+  const divs = document.querySelectorAll('.close-tab');
+  divs.forEach( el => {
+    el.addEventListener('click', e=>{
+      let file = el.getAttribute('data-file');
+      console.log(file);
+      helper.removeFromArray(openFiles,file);
+      if(openFiles[openFiles.length-1] !== undefined){
+        onFileClickEvent(null, openFiles[openFiles.length-1]);
+      }else{
+        closeProject();
+      }
+      createTabs();
+    })
+  });
+  const divs2 = document.querySelectorAll('.tab-item');
+  divs2.forEach( el => {
+    el.addEventListener('click', e=>{
+      let file = el.getAttribute('data-file');
+        onFileClickEvent(null, file);
+    })
+  });
 }
 
 function getIcon(fname){

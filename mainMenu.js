@@ -1,7 +1,7 @@
 let db = require('./database');
 
 module.exports =  {
-    createMenu : (webContents, dialog, db) => {
+    createMenu : (webContents, dialog, db, snippetsDialog) => {
      return [
         {
           label: 'File',
@@ -69,15 +69,34 @@ module.exports =  {
         },
        { label: 'Snippets',
          submenu: [
-         {
-           label: 'PHP'
-         },
-         {
-           label: 'SQL'
-         },
-         {
-           label: 'Javascript'
-         }
+           {
+             label: 'PHP',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("PHP")`)
+               snippetsDialog.show();
+             },
+           },
+           {
+             label: 'SQL',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("SQL")`)
+               snippetsDialog.show();
+             },
+           },
+           {
+             label: 'Javascript',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("JAVASCRIPT")`)
+               snippetsDialog.show();
+             },
+           },
+           {
+             label: 'HTML',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("HTML")`)
+               snippetsDialog.show();
+             },
+           }
 
          ]
        },
