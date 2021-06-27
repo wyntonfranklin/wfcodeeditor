@@ -12,8 +12,10 @@ module.exports =  {
         click: () => {
           mainDialog.webContents.executeJavaScript(`createANewFolder()`)
         },},
-      { role: 'copy'},
-      { role: 'paste'},
+      { label: 'Rename',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
+        },},
     ]
   }
 

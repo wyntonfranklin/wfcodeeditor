@@ -19,6 +19,7 @@ let APPLICATION_PATH = "";
 const settings = new Store();
 let recentlyCreatedFile = null;
 let openFiles = [];
+let selectedFileElement = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -202,12 +203,21 @@ saveButton.addEventListener("click", e => {
     saveAFile(getCurrentDirectory()  + "/" + filename, "");
   }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
     saveADirectory(getCurrentDirectory() + "/" + filename);
+  }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
+    renameAFile(selectedFileElement, filename);
   }
   console.log("The file was saved!");
   hideShowModal('hide',"new-file-modal");
   readFiles(currentProject);
 });
 
+function renameAFile(el, filename){
+  let file = el.getAttribute("data-path");
+  let fileType = el.getAttribute("data-type");
+  let dir = path.dirname(file);
+  fs.renameSync(file, path.join(dir, filename));
+  readFiles(currentProject);
+}
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
@@ -216,6 +226,11 @@ function createANewFile(){
 
 function createANewFolder(){
   CURRENT_FILE_OPENER_ACTION = "dir";
+  hideShowModal("show", "new-file-modal");
+}
+
+function renameCurrentFile(){
+  CURRENT_FILE_OPENER_ACTION = "rename";
   hideShowModal("show", "new-file-modal");
 }
 
@@ -354,14 +369,19 @@ let setListeners = () => {
   const divs = document.querySelectorAll('.file-link');
   divs.forEach(el => {
 
+    // on context menu
     el.addEventListener('contextmenu', e=>{
+        selectedFileElement = e.target;
         undoDirectoryStyling();
         helper.addElementClass(e.target, "active");
        ipcRenderer.invoke('show-file-context-menu').then(e=>{
       });
     });
 
+
+    // on double click
     el.addEventListener('dblclick', event => {
+        selectedFileElement = event.target;
         let el = document.getElementById('code-input');
         let file = event.target.getAttribute("data-path");
         let fileType = event.target.getAttribute("data-type");
@@ -382,6 +402,7 @@ let setListeners = () => {
     })
 
     el.addEventListener('click', event => {
+      selectedFileElement = event.target;
       let el = document.getElementById('code-input');
       let file = event.target.getAttribute("data-path");
       let fileType = event.target.getAttribute("data-type");
