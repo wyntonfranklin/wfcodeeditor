@@ -1,0 +1,47 @@
+{
+  "input-tag" : {
+    "name" : "Text Input Tag",
+    "type" : "text",
+    "code": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Your hint here\">"
+  },
+  "file-input-tag" : {
+    "name" : "File Input Tag",
+    "type" : "text",
+    "code": "<input type=\"file\" id=\"name\" name=\"name\" placeholder=\"Your hint here\">"
+  },
+  "number-input-tag" : {
+    "name" : "Number Input Tag",
+    "type" : "text",
+    "code": "<input type=\"number\" id=\"name\" name=\"name\" placeholder=\"Your hint here\">"
+  },
+  "text-area-tag" : {
+    "name" : "Text Area Element",
+    "type" : "text",
+    "code": "<textarea id=\"tarea\" name=\"tarea\" rows=\"4\" cols=\"50\">\n</textarea>"
+  },
+  "list-tag" : {
+    "name" : "List Tag",
+    "type" : "text",
+    "code": "<ul>\n  <li>Coffee</li>\n  <li>Tea</li>\n  <li>Milk</li>\n</ul>"
+  },
+  "select-tag" : {
+    "name" : "Select Tag",
+    "type" : "text",
+    "code": "<select name=\"fruits\" id=\"fruits\">\n  <option value=\"volvo\">Volvo</option>\n  <option value=\"saab\">Saab</option>\n  <option value=\"mercedes\">Mercedes</option>\n  <option value=\"audi\">Audi</option>\n</select>"
+  },
+  "simple-table-tag" : {
+    "name" : "Simple Table Tag",
+    "type" : "text",
+    "code": "<table>\n  <tr>\n    <th>Month</th>\n    <th>Savings</th>\n  </tr>\n  <tr>\n    <td>January</td>\n    <td>$100</td>\n  </tr>\n</table>"
+  },
+  "simple-form" : {
+    "name" : "Form Tag",
+    "type" : "text",
+    "code": "<form action=\"/action_page.php\" method=\"get\">\n  <label for=\"fname\">First name:</label>\n  <input type=\"text\" id=\"fname\" name=\"fname\"><br><br>\n  <label for=\"lname\">Last name:</label>\n  <input type=\"text\" id=\"lname\" name=\"lname\"><br><br>\n  <input type=\"submit\" value=\"Submit\">\n</form>"
+  },
+  "style-link" : {
+    "name" : "Style Link Tag",
+    "type" : "text",
+    "code": "<link rel=\"stylesheet\" href=\"styles.css\">"
+  }
+}

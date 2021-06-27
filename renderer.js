@@ -264,12 +264,12 @@ function createTabs(){
     let file = openFiles[i];
     let fname = path.basename(file);
     if(file == currentFile){
-      html += `<li class="nav-item">
+      html += `<li class="nav-item" title="${file}">
              <span class="nav-link active">
                 <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
             </li>`;
     }else{
-      html += `<li class="nav-item">
+      html += `<li class="nav-item" title="${file}">
              <span class="nav-link">
                 <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
             </li>`;
@@ -352,26 +352,45 @@ function setModalsCloseEvents(){
 
 let setListeners = () => {
   const divs = document.querySelectorAll('.file-link');
+  divs.forEach(el => {
 
-  divs.forEach(el => el.addEventListener('click', event => {
-    let el = document.getElementById('code-input');
-    let file = event.target.getAttribute("data-path");
-    let fileType = event.target.getAttribute("data-type");
-    undoDirectoryStyling();
-    if(fileType === "file"){
-      onFileClickEvent(event, file);
-    }else if(fileType === 'dir'){
-      currentDirectory = file;
-      updatePageTitle(file);
-      currentFile = null;
-      if(helper.exitsInArray(openDir, file)){
-        helper.removeFromArray(openDir, file);
-      }else{
-        openDir.push(file);
-      }
-      readFiles(currentProject)
-    }
-  }));
+    el.addEventListener('contextmenu', e=>{
+        undoDirectoryStyling();
+        helper.addElementClass(e.target, "active");
+       ipcRenderer.invoke('show-file-context-menu').then(e=>{
+      });
+    });
+
+    el.addEventListener('dblclick', event => {
+        let el = document.getElementById('code-input');
+        let file = event.target.getAttribute("data-path");
+        let fileType = event.target.getAttribute("data-type");
+        undoDirectoryStyling();
+        if(fileType === "file"){
+          onFileClickEvent(event, file);
+        }else if(fileType === 'dir'){
+          currentDirectory = file;
+          updatePageTitle(file);
+          currentFile = null;
+          if(helper.exitsInArray(openDir, file)){
+            helper.removeFromArray(openDir, file);
+          }else{
+            openDir.push(file);
+          }
+          readFiles(currentProject)
+        }
+    })
+
+    el.addEventListener('click', event => {
+      let el = document.getElementById('code-input');
+      let file = event.target.getAttribute("data-path");
+      let fileType = event.target.getAttribute("data-type");
+      undoDirectoryStyling();
+      helper.addElementClass(event.target, "active");
+    });
+
+
+  });
 }
 
 

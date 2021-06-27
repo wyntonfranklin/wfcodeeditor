@@ -1,26 +1,32 @@
 {
   "create_function" : {
     "name" : "Create Function",
+    "type" : "text",
     "code": "function mailhelper_run_task($message){\n  $task = new TaskResult();\n  $taskToRun = $message->getTask();\n  switch ($taskToRun){\n    case TaskResult::TASK_CALCULATOR:\n      $task->setOutput(\"All good\");\n      mailhelper_calculate($task, $message);\n      break;\n    default:\n      $task->setOutput(\"Cant find this task $taskToRun\");\n\n  }\n  return $task;\n}"
   },
   "create_if" : {
     "name" : "IF Statement",
+    "type" : "text",
     "code": "if (condition) {\n  \n}"
   },
   "create_if_else" : {
     "name" : "IF ELSE Statement",
+    "type" : "text",
     "code": "if (condition) {\n  \n} else {\n \n}"
   },
   "create_switch_statement" : {
     "name" : "Switch Statement",
+    "type" : "text",
     "code": "switch (n) {\n  case label1:\n     // code to be executed if n=label1;\n    break;\n  case label2:\n    // code to be executed if n=label2;\n    break;\n  case label3:\n    // code to be executed if n=label3;\n    break;\n  default:\n    // code to be executed if n is different from all labels;\n}"
   },
   "while_loop" : {
     "name" : "While Loop",
+    "type" : "text",
     "code": "while (condition is true) {\n   // code to be executed;\n}"
   },
   "create_for_loop" : {
     "name" : "For Loop",
+    "type" : "text",
     "code": "for ($x = 0; $x <= 10; $x++) {\n // do something here \n}"
   }
 }

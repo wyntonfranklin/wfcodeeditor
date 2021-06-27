@@ -10,7 +10,7 @@ console.log(dbPath)
 db.init(dbPath)
 let wc;
 let mainMenu;
-let contextMenu;
+let contextMenu, fileContextMenu;
 let snippetsWindow;
 
 db.loadDatabases();
@@ -23,6 +23,10 @@ ipcMain.handle('read-user-data', (event) => {
 
 ipcMain.handle('show-code-context-menu', (event) => {
   contextMenu.popup();
+})
+
+ipcMain.handle('show-file-context-menu', (event) => {
+  fileContextMenu.popup();
 })
 
 function createWindow () {
@@ -66,9 +70,11 @@ function createWindow () {
     var snippets = snippetsManger.getSnippets(type);
     wc.send('get-code', {'code': snippets[id].code});
     snippetsWindow.hide();
+    mainWindow.focus();
   })
 
   contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow));
+  fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);
