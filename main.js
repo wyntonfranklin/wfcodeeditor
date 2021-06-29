@@ -89,6 +89,10 @@ function createWindow () {
     mainWindow.webContents.executeJavaScript('updateAfterResize()');
   });
 
+  mainWindow.on('blur', function(){
+    mainWindow.webContents.executeJavaScript('onBlurEvents()');
+  });
+
 
 }
 

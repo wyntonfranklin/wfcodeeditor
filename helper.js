@@ -2,6 +2,15 @@ const fs = require("fs")
 var path = require('path');
 
 module.exports = {
+  removeFromObjectArray: (arr, key, value) => {
+    for( var i = 0; i < arr.length; i++){
+
+      if ( arr[i][key] === value) {
+        arr.splice(i, 1);
+      }
+
+    }
+  },
   removeFromArray : (arr, value) => {
     for( var i = 0; i < arr.length; i++){
 
@@ -11,6 +20,24 @@ module.exports = {
       }
 
     }
+  },
+  exitsInObjectArray : (arr, key, value) => {
+    for( var i = 0; i < arr.length; i++){
+
+      if ( arr[i][key] === value) {
+        return true;
+      }
+    }
+    return false;
+  },
+  getObjectFromArrayByKey : (arr, key, value) => {
+    for( var i = 0; i < arr.length; i++){
+
+      if ( arr[i][key] === value) {
+        return arr[i];
+      }
+    }
+    return null;
   },
   exitsInArray : (arr, value) => {
     for( var i = 0; i < arr.length; i++){

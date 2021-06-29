@@ -82,8 +82,8 @@
 
      .panel-container {
        width: 100%;
-       margin-top: 0;
-       padding-right: 0;
+       padding: 0;
+       margin: 0;
      }
 
 
@@ -94,25 +94,41 @@
        overflow-y:scroll;
        margin-bottom: 10px;
        display: inline-block;
+       margin-top: 0;
      }
 
      .right-panel{
        height: 700px;
        display: inline-block;
        overflow: hidden;
+       margin-top: 0;
+     }
+
+     .actions-bar {
+       margin-left: 5px;
+       margin-top: 0;
+       margin-bottom: 0;
+       border-bottom: 1px solid #ccc;
+     }
+
+     .actions-bar .action-item {
+        cursor: pointer;
      }
 
   </style>
 
   <div style="height: 700px;">
 
+    <div id="icons" class="actions-bar" style="">
+        <a id="action-save-file" class="action-item"><img src="./icons/ic_save.png" width="24px"/></a> &nbsp;
+    </div>
     <div class="panel-container" id="panel-container">
 
       <!-- Directory Listing -->
 
       <div id="left-panel" class="left-panel directory-lister-container resize-drag" style="border-right: 1px solid #c8cbcf;">
         <div style="display: inline-block;">
-          <p id="project-name" style="overflow: hidden;white-space: nowrap;">Project Home</p>
+          <p id="project-name" style="overflow: hidden;white-space: nowrap; margin: 0; padding:0">Project Home</p>
           <ul class="directory-lister" id="directory" style="margin-bottom: 10px;">
           </ul>
         </div>
@@ -121,24 +137,15 @@
 
       <!-- Content Pane -->
       <div id="right-panel" class="right-panel">
-        <div style="width: 100%; border-radius: 3px; color:black;">
-          <ul id="file-tabs" class="nav nav-tabs">
+        <div style="width: 100%; border-radius: 3px; color:black; margin-bottom: 3px;">
+          <ul id="file-tabs" class="nav nav-tabs" style="margin-top: 0; padding-top: 0;">
           </ul>
-          <div class="row" style="">
-                <div class="col-8" style="">
-                  <p id="project-title-bar"></p>
-                </div>
-                <div class="col-4">
-
-                  <span id="message-box" style="float: right; display: none;" class="badge badge-secondary"></span>
-                </div>
-          </div>
         </div>
         <div class="form-group">
-          <div id="code-view" style="display: none;" title="code-view">
+          <div id="code-view" style="display: none;">
             <div id="code-input"  class="code-input" style="min-height:650px; height: 100%;"></div>
           </div>
-          <div id="image-view" style="display: none;">
+          <div id="image-view" style="display: none; overflow: auto;">
             <img id="image-viewer" src="" class="logo">
           </div>
         </div>

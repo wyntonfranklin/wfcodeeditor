@@ -42,7 +42,6 @@ let closeModalButton = document.getElementById('close-modal');
 let saveButton = document.getElementById('save-file-btn');
 let fileNameInput = document.getElementById("file-name-input");
 let projectName = document.getElementById("project-name");
-let projectTitleBar = document.getElementById("project-title-bar");
 
 
 let codeView = document.getElementById('code-view');
@@ -62,6 +61,12 @@ editor.getSession().on("change", e => {
 })
 
 
+
+
+document.getElementById("action-save-file").addEventListener('click', e=>{
+  saveCurrentFile();
+  return false;
+});
 
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
@@ -92,13 +97,18 @@ function setSaveButtonAsInActive(){
 
 
 function addOpenFile(file){
-  if(!helper.exitsInArray(openFiles, file)){
-      openFiles.push(file);
+  let statsObj = fs.statSync(file);
+
+  if(!helper.exitsInObjectArray(openFiles, "name", file)) {
+    openFiles.push({
+      name: file,
+      lastmod: statsObj.mtime
+    });
   }
 }
 
 function removeOpenFile(file){
-    helper.removeFromArray(openFiles, file);
+    helper.removeFromObjectArray(openFiles, "name", file);
 }
 
 function onFileClickEvent(e, file){
@@ -277,7 +287,8 @@ let createDirectoryLink = (type, file, styleclass) => {
 function createTabs(){
   let html = '';
   for(let i=0; i<= openFiles.length-1; i++){
-    let file = openFiles[i];
+    var fileObject = openFiles[i];
+    let file = fileObject.name;
     let fname = path.basename(file);
     if(file == currentFile){
       html += `<li class="nav-item" title="${file}">
@@ -301,9 +312,9 @@ function setTabEvents(){
     el.addEventListener('click', e=>{
       let file = el.getAttribute('data-file');
       console.log(file);
-      helper.removeFromArray(openFiles,file);
+      helper.removeFromObjectArray(openFiles,"name",file);
       if(openFiles[openFiles.length-1] !== undefined){
-        onFileClickEvent(null, openFiles[openFiles.length-1]);
+        onFileClickEvent(null, openFiles[openFiles.length-1].name);
       }else{
         closeProject();
       }
@@ -543,6 +554,9 @@ function closeProject(){
   editor.session.setValue("");
   imageViewer.src = "";
   updatePageTitle("");
+  openFiles = [];
+  createTabs();
+
 }
 
 function init(){
@@ -556,13 +570,10 @@ function init(){
 
 function updatePageTitle(title){
   document.title = "A Code Editor - " + title;
-  projectTitleBar.innerHTML =  title;
 }
 
 function setMessageBox(msg){
-  const mBox = document.getElementById("message-box");
-  mBox.innerText = msg;
-  mBox.style.display = "block";
+
 }
 
 function messageLog(log){
@@ -635,4 +646,27 @@ function makeResizable(){
         })
       ]
     })
+}
+
+function onBlurEvents(){
+  checkIfCurrentFileIsEdited();
+}
+
+function checkIfCurrentFileIsEdited(){
+  if(currentFile){
+    if(isFileEdited(currentFile)){
+      // alert("file edited");
+    }
+  }
+}
+
+function isFileEdited(file){
+  let statsObj = fs.statSync(file);
+  let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  if(fileObject !== null){
+    if(fileObject.lastmod !== statsObj.mtime){
+      return true;
+    }
+  }
+  return false;
 }
