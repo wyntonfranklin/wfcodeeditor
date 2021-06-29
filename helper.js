@@ -180,7 +180,10 @@ module.exports = {
     doc.classList.remove(cname);
   },
   getDirectoryName: (directoryPath) => {
-    return path.basename(directoryPath);
+    if(directoryPath){
+      return path.basename(directoryPath);
+    }
+    return "";
   }
 
 }

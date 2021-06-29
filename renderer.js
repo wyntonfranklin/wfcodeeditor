@@ -584,9 +584,16 @@ function updateAfterResize(){
   var rightPanel = document.getElementById('right-panel');
   var containerPanel = document.getElementById('panel-container');
   var leftPanel = document.getElementById('left-panel');
-
-  rightPanel.style.height = window.innerHeight;
-  leftPanel.style.height = window.innerHeight;
+  var appPanel = document.getElementById('app');
+  var codePanel = document.getElementById("code-input");
+  //rightPanel.style.height =(window.innerHeight - 10) +'px'
+  leftPanel.style.height =(window.innerHeight - 10) +'px'
+  //document.body.style.height = (window.innerHeight - 100) +'px'
+//  appPanel.style.height = (window.innerHeight - 100) +'px';
+  //console.log(window.innerHeight);
+  editor.container.style.height =(window.innerHeight - 85) +'px'
+  editor.resize();
+  containerPanel.style.height = (window.innerHeight) +'px'
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
@@ -596,6 +603,7 @@ function makeResizable(){
   var containerPanel = document.getElementById('panel-container');
   interact('.resize-drag')
     .resizable({
+      margin: 50,
       // resize from all edges and corners
       edges: {right: true },
 
@@ -619,7 +627,7 @@ function makeResizable(){
           target.setAttribute('data-x', x)
           target.setAttribute('data-y', y)
           //target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
-           rightPanel.style.width = ((containerPanel.clientWidth -10)-  (Math.round(event.rect.width))) + "px";
+           rightPanel.style.width = (containerPanel.getBoundingClientRect().width - 10)  -  (Math.round(event.rect.width)) + "px";
         }
       },
       modifiers: [
@@ -630,7 +638,7 @@ function makeResizable(){
 
         // minimum size
         interact.modifiers.restrictSize({
-          min: { width: 100, height: 50 }
+          min: { width: 160, height: 50 }
         })
       ],
 

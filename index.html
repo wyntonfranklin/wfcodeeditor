@@ -10,7 +10,7 @@
     <script>
     </script>
   </head>
-  <body>
+  <body style="overflow:hidden;">
   <style>
     .code-input {
       font-size: 17px;
@@ -84,6 +84,7 @@
        width: 100%;
        padding: 0;
        margin: 0;
+       overflow: hidden;
      }
 
 
@@ -93,14 +94,13 @@
        padding: 5px;
        overflow-y:scroll;
        margin-bottom: 10px;
-       display: inline-block;
        margin-top: 0;
+       position: fixed;
      }
 
      .right-panel{
-       height: 700px;
-       display: inline-block;
-       overflow: hidden;
+       position: fixed;
+       right: 8px;
        margin-top: 0;
      }
 
@@ -117,7 +117,7 @@
 
   </style>
 
-  <div style="height: 700px;">
+  <div id="app" style="" style="overflow: hidden">
 
     <div id="icons" class="actions-bar" style="">
         <a id="action-save-file" class="action-item"><img src="./icons/ic_save.png" width="24px"/></a> &nbsp;
@@ -141,9 +141,9 @@
           <ul id="file-tabs" class="nav nav-tabs" style="margin-top: 0; padding-top: 0;">
           </ul>
         </div>
-        <div class="form-group">
+        <div>
           <div id="code-view" style="display: none;">
-            <div id="code-input"  class="code-input" style="min-height:650px; height: 100%;"></div>
+            <div id="code-input"  class="code-input" style="height: 100%;"></div>
           </div>
           <div id="image-view" style="display: none; overflow: auto;">
             <img id="image-viewer" src="" class="logo">
