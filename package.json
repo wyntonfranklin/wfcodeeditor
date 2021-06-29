@@ -22,7 +22,7 @@
     "electron": "^13.1.2",
     "electron-builder": "^22.11.7",
     "nodaemon": "0.0.5",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.8"
   },
   "dependencies": {
     "electron-prompt": "^1.6.2",
