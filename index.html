@@ -27,9 +27,6 @@
      .directory-lister-container {
        -webkit-user-select: none;
        margin-top: 10px;
-       overflow-x:auto;
-       width: 100%;
-       height: 700px;
      }
      .directory-lister {
        list-style-type: none; padding: 0; margin: 0;
@@ -82,15 +79,38 @@
      #file-tabs .nav-item {
         cursor: pointer;
      }
+
+     .panel-container {
+       width: 100%;
+       margin-top: 0;
+       padding-right: 0;
+     }
+
+
+     .left-panel {
+       width: 160px;
+       height: 700px;
+       padding: 5px;
+       overflow-y:scroll;
+       margin-bottom: 10px;
+       display: inline-block;
+     }
+
+     .right-panel{
+       height: 700px;
+       display: inline-block;
+       overflow: hidden;
+     }
+
   </style>
 
-  <div class="container-fluid" style="height: 700px;">
+  <div style="height: 700px;">
 
-    <div class="row">
+    <div class="panel-container" id="panel-container">
 
       <!-- Directory Listing -->
 
-      <div class="col-2 directory-lister-container" style="border-right: 1px solid #c8cbcf;">
+      <div id="left-panel" class="left-panel directory-lister-container resize-drag" style="border-right: 1px solid #c8cbcf;">
         <div style="display: inline-block;">
           <p id="project-name" style="overflow: hidden;white-space: nowrap;">Project Home</p>
           <ul class="directory-lister" id="directory" style="margin-bottom: 10px;">
@@ -100,15 +120,15 @@
 
 
       <!-- Content Pane -->
-      <div class="col-10">
+      <div id="right-panel" class="right-panel">
         <div style="width: 100%; border-radius: 3px; color:black;">
           <ul id="file-tabs" class="nav nav-tabs">
           </ul>
-          <div class="row">
-                <div class="col-6" style="overflow: hidden;">
+          <div class="row" style="">
+                <div class="col-8" style="">
                   <p id="project-title-bar"></p>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
 
                   <span id="message-box" style="float: right; display: none;" class="badge badge-secondary"></span>
                 </div>

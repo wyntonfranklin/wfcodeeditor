@@ -81,6 +81,14 @@ function createWindow () {
     //contextMenu.popup()
   })
 
+  mainWindow.on('resize', function(){
+     mainWindow.webContents.executeJavaScript('updateAfterResize()');
+  });
+
+  mainWindow.on('move', function(){
+    mainWindow.webContents.executeJavaScript('updateAfterResize()');
+  });
+
 
 }
 

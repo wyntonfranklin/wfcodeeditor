@@ -12,6 +12,7 @@ var path = require('path');
 let db = require('./database');
 const extensions = require('./extensions');
 const Store = require('electron-store');
+let interact = require('interactjs')
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
@@ -541,6 +542,7 @@ function loadRecentProjects(){
 function closeProject(){
   editor.session.setValue("");
   imageViewer.src = "";
+  updatePageTitle("");
 }
 
 function init(){
@@ -548,6 +550,8 @@ function init(){
   getProjectDir(dir=>{
     readFiles(dir)
   })
+  makeResizable();
+  updateAfterResize();
 }
 
 function updatePageTitle(title){
@@ -565,3 +569,70 @@ function messageLog(log){
   setMessageBox(log);
 }
 
+function updateAfterResize(){
+  var rightPanel = document.getElementById('right-panel');
+  var containerPanel = document.getElementById('panel-container');
+  var leftPanel = document.getElementById('left-panel');
+
+  rightPanel.style.height = window.innerHeight;
+  leftPanel.style.height = window.innerHeight;
+  rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
+  console.log("resize event");
+}
+
+function makeResizable(){
+  var rightPanel = document.getElementById('right-panel');
+  var containerPanel = document.getElementById('panel-container');
+  interact('.resize-drag')
+    .resizable({
+      // resize from all edges and corners
+      edges: {right: true },
+
+      listeners: {
+        move (event) {
+          var target = event.target
+          var x = (parseFloat(target.getAttribute('data-x')) || 0)
+          var y = (parseFloat(target.getAttribute('data-y')) || 0)
+
+
+          // update the element's style
+          target.style.width = event.rect.width + 'px'
+          target.style.height = event.rect.height + 'px'
+
+          // translate when resizing from top or left edges
+          x += event.deltaRect.left
+          y += event.deltaRect.top
+
+          target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+
+          target.setAttribute('data-x', x)
+          target.setAttribute('data-y', y)
+          //target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
+           rightPanel.style.width = ((containerPanel.clientWidth -10)-  (Math.round(event.rect.width))) + "px";
+        }
+      },
+      modifiers: [
+        // keep the edges inside the parent
+        interact.modifiers.restrictEdges({
+          outer: 'parent'
+        }),
+
+        // minimum size
+        interact.modifiers.restrictSize({
+          min: { width: 100, height: 50 }
+        })
+      ],
+
+      inertia: true
+    })
+    .draggable({
+      listeners: { move: window.dragMoveListener },
+      inertia: true,
+      modifiers: [
+        interact.modifiers.restrictRect({
+          restriction: 'parent',
+          endOnly: true
+        })
+      ]
+    })
+}
