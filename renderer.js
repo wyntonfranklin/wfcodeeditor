@@ -603,7 +603,8 @@ function makeResizable(){
   var containerPanel = document.getElementById('panel-container');
   interact('.resize-drag')
     .resizable({
-      margin: 50,
+      margin: 20,
+      distance: 5,
       // resize from all edges and corners
       edges: {right: true },
 
@@ -663,7 +664,7 @@ function onBlurEvents(){
 function checkIfCurrentFileIsEdited(){
   if(currentFile){
     if(isFileEdited(currentFile)){
-      // alert("file edited");
+      onFileClickEvent(null, currentFile)
     }
   }
 }

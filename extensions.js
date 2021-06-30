@@ -79,6 +79,10 @@ module.exports = {
   sh : {
     type : "code",
     ace : "batchfile"
+  },
+  csv : {
+    type : "code",
+    ace : "text"
   }
 }
 
