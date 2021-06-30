@@ -112,25 +112,29 @@ function removeOpenFile(file){
 }
 
 function onFileClickEvent(e, file){
-  let ext = path.extname(file).replace(/\./g,' ').trim()
-  let fileAction = null;
-  let fileActions = extensions;
-  currentFile = file;
-  updatePageTitle(file);
-  currentDirectory = null;
-  if(extensions.hasOwnProperty(ext)){
+  if(fs.existsSync(file)  ){
+    let ext = path.extname(file).replace(/\./g,' ').trim()
+    let fileAction = null;
+    let fileActions = extensions;
+    currentFile = file;
+    updatePageTitle(file);
+    currentDirectory = null;
+    if(extensions.hasOwnProperty(ext)){
       fileAction = fileActions[ext].type;
       if(fileAction === "code"){
-          appOpenCode(e, file, ext);
+        appOpenCode(e, file, ext);
       }else if(fileAction === "image"){
-          appOpenImage(e, file, ext)
+        appOpenImage(e, file, ext)
       }else{
         setMessageBox("Cant open this file");
       }
       createTabs();
+    }else{
+      console.log(ext);
+      setMessageBox("Cant open this file");
+    }
   }else{
-    console.log(ext);
-    setMessageBox("Cant open this file");
+   // alert("this file no longer exists");
   }
 }
 
@@ -492,7 +496,7 @@ function readFilesFromDir(dir) {
           }
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
-        if(recentlyCreatedFile == file){
+        if(recentlyCreatedFile == file || currentFile == file){
          // recentlyCreatedFile = null;
           fileListing += createDirectoryLink("file", file,"active");
         }else{
@@ -659,12 +663,15 @@ function makeResizable(){
 
 function onBlurEvents(){
   checkIfCurrentFileIsEdited();
+  readFiles(currentProject);
 }
 
 function checkIfCurrentFileIsEdited(){
   if(currentFile){
-    if(isFileEdited(currentFile)){
+    if(fs.existsSync(currentFile) && isFileEdited(currentFile)){
       onFileClickEvent(null, currentFile)
+    }else{
+      fileFolderNoExists();
     }
   }
 }
@@ -678,4 +685,10 @@ function isFileEdited(file){
     }
   }
   return false;
+}
+
+
+function fileFolderNoExists(){
+  helper.removeFromObjectArray(openFiles,"name", currentFile );
+  createTabs();
 }
