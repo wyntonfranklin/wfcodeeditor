@@ -205,35 +205,26 @@ function saveCurrentFile(){
     var sel = editor.getSelection();
     let cpostion = sel.getCursor();
     saveAFile(currentFile, code);
+    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    if(fileObject){
+      fileObject.file.changed = false;
+      openFiles[fileObject.position] = fileObject.file;
+    }
     sel.moveCursorToPosition(cpostion);
     setSaveButtonAsInActive();
+    refreshView();
   }
 }
 
-function saveAFile(filepath,content) {
+function saveAFile(filepath,content, callback) {
   try {
     fs.writeFileSync(filepath, content);
-    getProjectDir(dir=>{
-      let ext = path.extname(filepath).replace(/\./g,' ').trim();
-      recentlyCreatedFile = filepath;
-      onFileClickEvent(null, filepath);
-      readFiles(dir)
-    })
+    if(callback){
+      callback();
+    }
   } catch (err) {
     console.error(err)
   }
-  /*
-  fs.writeFile(filepath, content, function (err) {
-    getProjectDir(dir=>{
-      let ext = path.extname(filepath).replace(/\./g,' ').trim();
-      recentlyCreatedFile = filepath;
-      onFileClickEvent(null, filepath);
-      readFiles(dir)
-    })
-    if (err) {
-      return console.log(err);
-    }
-  });*/
 }
 
 function saveADirectory(path){
@@ -331,21 +322,29 @@ function createTabs(){
   for(let i=0; i<= openFiles.length-1; i++){
     var fileObject = openFiles[i];
     let file = fileObject.name;
-    let fname = path.basename(file);
-    if(file == currentFile){
-      html += `<li class="nav-item save" title="${file}">
-             <span class="nav-link active">
-                <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
-            </li>`;
-    }else{
-      html += `<li class="nav-item" title="${file}">
-             <span class="nav-link">
-                <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
-            </li>`;
+    if(file)
+    {
+      let fname = path.basename(file);
+      if(file == currentFile && fileObject.changed){
+        html += createTabHtml(file, fname, "active save");
+      }else if(file == currentFile){
+        html += createTabHtml(file, fname, "active");
+      }else if(fileObject.changed){
+        html += createTabHtml(file, fname, "save");
+      }else{
+        html += createTabHtml(file, fname, "");
+      }
     }
   }
   fileTabs.innerHTML = html;
   setTabEvents();
+}
+
+function createTabHtml(file, fname, className){
+  return  `<li class="nav-item" title="${file}">
+             <span class="nav-link ${className}">
+                <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
+            </li>`;
 }
 
 function setTabEvents(){
@@ -535,7 +534,7 @@ function readFilesFromDir(dir) {
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
         let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
-        if(currentFile == file || recentlyCreatedFile == file){
+        if(currentFile == file){
          // recentlyCreatedFile = null;
           if(fileObject != null && fileObject.changed){
             fileListing += createDirectoryLink("file", file,"active save");
