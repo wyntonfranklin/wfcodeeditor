@@ -93,6 +93,10 @@ function createWindow () {
     mainWindow.webContents.executeJavaScript('onBlurEvents()');
   });
 
+  ipcMain.handle('file-no-exists', (event) => {
+
+  })
+
 
 }
 
