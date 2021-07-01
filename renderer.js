@@ -21,6 +21,8 @@ const settings = new Store();
 let recentlyCreatedFile = null;
 let openFiles = [];
 let selectedFileElement = null;
+let activeTabEl = null;
+let activeFileBrowserEl = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -56,12 +58,37 @@ let CURRENT_FILE_OPENER_ACTION = null;
 var openDir = [];
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
-editor.getSession().on("change", e => {
+editor.on("input", e => {
+
+  let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+  // file has been edited
+  if(!editor.session.getUndoManager().isClean()){
+    console.log("editting")
+    if(fileObject){
+      fileObject.file.changed = true;
+      fileObject.file.content = editor.getValue();
+      openFiles[fileObject.position] = fileObject.file;
+    }
+    refreshView();
+  }else{
+    if(fileObject){
+     // fileObject.file.changed = false;
+      //openFiles[fileObject.position] = fileObject.file;
+    }
+  }
 
 })
 
 
+document.getElementById("action-add-file").addEventListener('click', e=>{
+  createANewFile();
+  return false;
+});
 
+document.getElementById("action-add-folder").addEventListener('click', e=>{
+  createANewFolder();
+  return false;
+});
 
 document.getElementById("action-save-file").addEventListener('click', e=>{
   saveCurrentFile();
@@ -100,9 +127,12 @@ function addOpenFile(file){
   let statsObj = fs.statSync(file);
 
   if(!helper.exitsInObjectArray(openFiles, "name", file)) {
+    const buffer = fs.readFileSync(file);
     openFiles.push({
       name: file,
-      lastmod: statsObj.mtime
+      lastmod: statsObj.mtime,
+      changed: false,
+      content: buffer.toString(),
     });
   }
 }
@@ -112,7 +142,7 @@ function removeOpenFile(file){
 }
 
 function onFileClickEvent(e, file){
-  let ext = path.extname(file).replace(/\./g,' ').trim()
+  let ext = path.extname(file).replace(/\./g,' ').trim();
   let fileAction = null;
   let fileActions = extensions;
   currentFile = file;
@@ -127,7 +157,7 @@ function onFileClickEvent(e, file){
       }else{
         setMessageBox("Cant open this file");
       }
-      createTabs();
+      refreshView();
   }else{
     console.log(ext);
     setMessageBox("Cant open this file");
@@ -139,10 +169,15 @@ function appOpenCode(event, file, ext){
     helper.addElementClass(event.target, "active");
   }
   addOpenFile(file);
+  let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
   currentFile = file;
   hideAllViews(codeView);
-  const buffer = fs.readFileSync(file);
-  editor.session.setValue(buffer.toString());
+  if(fileObject){
+    editor.session.setValue(fileObject.content);
+  }else{
+    const buffer = fs.readFileSync(file);
+    editor.session.setValue(buffer.toString());
+  }
   assignAceMode(editor, ext);
   setSaveButtonAsInActive();
 }
@@ -284,6 +319,11 @@ let createDirectoryLink = (type, file, styleclass) => {
   return tempFile;
 }
 
+function refreshView(){
+  readFiles(currentProject);
+  createTabs();
+}
+
 function createTabs(){
   let html = '';
   for(let i=0; i<= openFiles.length-1; i++){
@@ -291,7 +331,7 @@ function createTabs(){
     let file = fileObject.name;
     let fname = path.basename(file);
     if(file == currentFile){
-      html += `<li class="nav-item" title="${file}">
+      html += `<li class="nav-item save" title="${file}">
              <span class="nav-link active">
                 <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
             </li>`;
@@ -492,11 +532,20 @@ function readFilesFromDir(dir) {
           }
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
-        if(recentlyCreatedFile == file){
+        let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+        if(currentFile == file || recentlyCreatedFile == file){
          // recentlyCreatedFile = null;
-          fileListing += createDirectoryLink("file", file,"active");
+          if(fileObject != null && fileObject.changed){
+            fileListing += createDirectoryLink("file", file,"active save");
+          }else{
+            fileListing += createDirectoryLink("file", file,"active");
+          }
         }else{
-          fileListing += createDirectoryLink("file", file,"");
+          if(fileObject!= null && fileObject.changed){
+            fileListing += createDirectoryLink("file", file,"save");
+          }else{
+            fileListing += createDirectoryLink("file", file,"");
+          }
         }
         /*if(helper.modesObject()[ext]){
           fileListing += createDirectoryLink("file", file,"");
@@ -664,7 +713,7 @@ function onBlurEvents(){
 function checkIfCurrentFileIsEdited(){
   if(currentFile){
     if(isFileEdited(currentFile)){
-      onFileClickEvent(null, currentFile)
+     // onFileClickEvent(null, currentFile)
     }
   }
 }
