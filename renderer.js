@@ -164,6 +164,8 @@ function onFileClickEvent(e, file){
   }
 }
 
+// all good
+
 function appOpenCode(event, file, ext){
   if(event){
     helper.addElementClass(event.target, "active");
