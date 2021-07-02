@@ -13,6 +13,9 @@ module.exports =  {
                   { defaultPath: '', properties: ['openDirectory'] });
                 if(filename !== undefined){
                   var currentProject = filename[0];
+                  console.log(currentProject, "current");
+                  webContents.send("new-project-start", {project:currentProject});
+                  /**
                   db.saveToProjects({
                     'name' : currentProject
                   })
@@ -22,7 +25,7 @@ module.exports =  {
                   }, function(){
                     console.log(currentProject)
                     webContents.executeJavaScript('openNewProject()');
-                  })
+                  })**/
                 }
               },
               accelerator: 'CTRL+P'
@@ -54,6 +57,12 @@ module.exports =  {
             { label: 'Save as'},
             {
               label : 'Preferences'
+            },
+            {
+              label: 'Close Project',
+              click: () => {
+                webContents.executeJavaScript(`closeProject()`)
+              },
             },
             {role :  'close' }
           ]

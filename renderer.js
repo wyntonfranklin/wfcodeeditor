@@ -115,6 +115,26 @@ ipcRenderer.on('get-code', function (evt, message) {
   editor.focus();
 });
 
+
+ipcRenderer.on('new-project-start', function (evt, message) {
+  let projectPath = message.project;
+  currentProject = projectPath;
+  openProject(null, projectPath);
+});
+
+
+function updateProjectSettings(projectPath){
+  db.saveToProjects({
+    'name' : projectPath
+  })
+  db.saveToSettings({'name': "current-project",},{
+    'name': "current-project",
+    'value': projectPath
+  }, function(){
+  })
+}
+
+
 function setSaveButtonAsActive(){
 
 }
@@ -141,6 +161,18 @@ function addOpenFile(file){
 
 function removeOpenFile(file){
     helper.removeFromObjectArray(openFiles, "name", file);
+}
+
+function onDirectoryClickEvent(e, file){
+  currentDirectory = file;
+  updatePageTitle(file);
+  currentFile = null;
+  if(helper.exitsInArray(openDir, file)){
+    helper.removeFromArray(openDir, file);
+  }else{
+    openDir.push(file);
+  }
+  refreshView();
 }
 
 function onFileClickEvent(e, file){
@@ -228,10 +260,13 @@ function saveAFile(filepath,content, callback) {
   }
 }
 
-function saveADirectory(path){
+function saveADirectory(path, callback){
   fs.mkdir(path, (err) => {
     if (err) {
       throw err;
+    }
+    if(callback){
+      callback(path);
     }
     console.log("Directory is created.");
   });
@@ -240,11 +275,13 @@ function saveADirectory(path){
 saveButton.addEventListener("click", e => {
   let filename = fileNameInput.value;
   if(CURRENT_FILE_OPENER_ACTION == "file"){
-    saveAFile(path.join(getCurrentDirectory(), filename), "",(fpath)=>{
+    saveAFile(path.join(getCurrentSelectedDirectory(), filename), "",(fpath)=>{
       onFileClickEvent(null, fpath);
     });
   }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
-    saveADirectory(path.join(getCurrentDirectory(), filename));
+    saveADirectory(path.join(getCurrentSelectedDirectory(), filename), (fpath)=>{
+      onDirectoryClickEvent(null, fpath);
+    });
   }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
     renameAFile(selectedFileElement, filename);
   }
@@ -296,11 +333,30 @@ function hideShowModal(action, id){
 
 }
 
+function getCurrentSelectedDirectory(){
+  if(selectedFileElement){
+    let file = selectedFileElement.getAttribute("data-path");
+    let stats = fs.statSync(file);
+    if(stats.isDirectory()){
+      return file;
+    }else{
+      return path.dirname(file);
+    }
+  }else{
+    return getCurrentDirectory();
+  }
+}
+
+
 function getCurrentDirectory(){
   if(currentDirectory){
     return currentDirectory;
   }else{
-    return path.dirname(selectedFileElement.getAttribute("data-path"));
+    if(currentFile){
+      return path.dirname(currentFile);
+    }else{
+      return currentProject;
+    }
   }
 }
 
@@ -360,7 +416,7 @@ function setTabEvents(){
       if(openFiles[openFiles.length-1] !== undefined){
         onFileClickEvent(null, openFiles[openFiles.length-1].name);
       }else{
-        closeProject();
+        clearProject();
       }
       createTabs();
     })
@@ -445,15 +501,7 @@ let setListeners = () => {
         if(fileType === "file"){
           onFileClickEvent(event, file);
         }else if(fileType === 'dir'){
-          currentDirectory = file;
-          updatePageTitle(file);
-          currentFile = null;
-          if(helper.exitsInArray(openDir, file)){
-            helper.removeFromArray(openDir, file);
-          }else{
-            openDir.push(file);
-          }
-          readFiles(currentProject)
+          onDirectoryClickEvent(event, file);
         }
     })
 
@@ -572,6 +620,8 @@ let readFiles = (projectDir) => {
     let html = readFilesFromDir(projectDir);
     document.getElementById("directory").innerHTML = html;
     setListeners();
+  }else{
+    document.getElementById("directory").innerHTML = "";
   }
 }
 
@@ -587,6 +637,8 @@ function loadRecentProjects(){
     const divs = document.querySelectorAll('.recent-project');
     divs.forEach( el => {
       el.addEventListener('click', e=>{
+          openProject(e, e.target.getAttribute("data-filepath"));
+          /*
           closeProject();
           currentProject = e.target.getAttribute("data-filepath");
           editor.session.setValue("");
@@ -596,21 +648,46 @@ function loadRecentProjects(){
           readFiles(currentProject);
           hideShowModal('hide','projects-modal');
           updatePageTitle("");
-          setCurrentProjectName(e.target.innerHTML)
+          setCurrentProjectName(e.target.innerHTML)*/
       })
     })
   });
 
 }
 
-function closeProject(){
+function openProject(event, filepath){
+  closeProject();
+  currentProject = filepath;
+  editor.session.setValue("");
+  currentFile = null;
+  currentDirectory = filepath;
+  saveLastProject(filepath);
+  hideShowModal('hide','projects-modal');
+  updatePageTitle("");
+  setCurrentProjectName(path.basename(filepath))
+  refreshView();
+}
+
+
+function clearProject(){
   editor.session.setValue("");
   imageViewer.src = "";
   updatePageTitle("");
   openFiles = [];
-  createTabs();
-
 }
+
+function closeProject(){
+  currentProject = null;
+  currentDirectory = null;
+  editor.session.setValue("");
+  imageViewer.src = "";
+  updatePageTitle("");
+  setCurrentProjectName("")
+  openFiles = [];
+  refreshView();
+}
+
+
 
 function init(){
   setModalsCloseEvents();
@@ -656,7 +733,7 @@ function makeResizable(){
   var containerPanel = document.getElementById('panel-container');
   interact('.resize-drag')
     .resizable({
-      margin: 20,
+      margin: 30,
       distance: 5,
       // resize from all edges and corners
       edges: {right: true },
