@@ -12,6 +12,7 @@ var path = require('path');
 let db = require('./database');
 const extensions = require('./extensions');
 const Store = require('electron-store');
+const openExplorer = require('open-file-explorer');
 let interact = require('interactjs')
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
@@ -65,7 +66,7 @@ editor.on("input", e => {
   if(!editor.session.getUndoManager().isClean()){
     console.log("editting")
     if(fileObject){
-      fileObject.file.changed = true;
+     // fileObject.file.changed = true;
       fileObject.file.content = editor.getValue();
       openFiles[fileObject.position] = fileObject.file;
     }
@@ -133,6 +134,7 @@ function addOpenFile(file){
       lastmod: statsObj.mtime,
       changed: false,
       content: buffer.toString(),
+      ocontent : buffer.toString(),
     });
   }
 }
@@ -172,7 +174,6 @@ function appOpenCode(event, file, ext){
   }
   addOpenFile(file);
   let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
-  currentFile = file;
   hideAllViews(codeView);
   if(fileObject){
     editor.session.setValue(fileObject.content);
@@ -207,7 +208,7 @@ function saveCurrentFile(){
     saveAFile(currentFile, code);
     let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
     if(fileObject){
-      fileObject.file.changed = false;
+      fileObject.file.ocontent = code;
       openFiles[fileObject.position] = fileObject.file;
     }
     sel.moveCursorToPosition(cpostion);
@@ -220,7 +221,7 @@ function saveAFile(filepath,content, callback) {
   try {
     fs.writeFileSync(filepath, content);
     if(callback){
-      callback();
+      callback(filepath);
     }
   } catch (err) {
     console.error(err)
@@ -239,9 +240,11 @@ function saveADirectory(path){
 saveButton.addEventListener("click", e => {
   let filename = fileNameInput.value;
   if(CURRENT_FILE_OPENER_ACTION == "file"){
-    saveAFile(getCurrentDirectory()  + "/" + filename, "");
+    saveAFile(path.join(getCurrentDirectory(), filename), "",(fpath)=>{
+      onFileClickEvent(null, fpath);
+    });
   }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
-    saveADirectory(getCurrentDirectory() + "/" + filename);
+    saveADirectory(path.join(getCurrentDirectory(), filename));
   }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
     renameAFile(selectedFileElement, filename);
   }
@@ -297,7 +300,7 @@ function getCurrentDirectory(){
   if(currentDirectory){
     return currentDirectory;
   }else{
-    return path.dirname(currentFile)
+    return path.dirname(selectedFileElement.getAttribute("data-path"));
   }
 }
 
@@ -325,11 +328,11 @@ function createTabs(){
     if(file)
     {
       let fname = path.basename(file);
-      if(file == currentFile && fileObject.changed){
+      if(file == currentFile && (fileObject.content !== fileObject.ocontent)){
         html += createTabHtml(file, fname, "active save");
       }else if(file == currentFile){
         html += createTabHtml(file, fname, "active");
-      }else if(fileObject.changed){
+      }else if((fileObject.content !== fileObject.ocontent)){
         html += createTabHtml(file, fname, "save");
       }else{
         html += createTabHtml(file, fname, "");
@@ -536,13 +539,13 @@ function readFilesFromDir(dir) {
         let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
         if(currentFile == file){
          // recentlyCreatedFile = null;
-          if(fileObject != null && fileObject.changed){
+          if(fileObject != null && (fileObject.content !== fileObject.ocontent) ){
             fileListing += createDirectoryLink("file", file,"active save");
           }else{
             fileListing += createDirectoryLink("file", file,"active");
           }
         }else{
-          if(fileObject!= null && fileObject.changed){
+          if(fileObject!= null &&  (fileObject.content !== fileObject.ocontent)){
             fileListing += createDirectoryLink("file", file,"save");
           }else{
             fileListing += createDirectoryLink("file", file,"");
@@ -728,4 +731,55 @@ function isFileEdited(file){
     }
   }
   return false;
+}
+
+function openInExplorer(){
+  var pathToOpen = null;
+  if(selectedFileElement){
+    let file = selectedFileElement.getAttribute("data-path")
+    var stats = fs.statSync(file);
+    if(stats.isDirectory()){
+      pathToOpen = file;
+    }else{
+      pathToOpen = path.dirname(file);
+    }
+  }else{
+    pathToOpen = currentProject;
+  }
+  if(pathToOpen){
+    openExplorer(pathToOpen, err => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        //Do Something
+      }
+    });
+  }
+}
+
+function deletedSelectItem(action){
+  if(action == 0) {
+    if (selectedFileElement) {
+      let file = selectedFileElement.getAttribute("data-path")
+      var stats = fs.statSync(file);
+      if (stats.isDirectory()) {
+        try {
+          fs.rmdirSync(file, { recursive: true });
+          console.log("TEST FOLDER DELETE OK");
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        try {
+          fs.unlinkSync(file);
+         // console.log("SYNC DELETE OK");
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      helper.removeFromObjectArray(openFiles, "name", file);
+      refreshView();
+    }
+  }
 }
