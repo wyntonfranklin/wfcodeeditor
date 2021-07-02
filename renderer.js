@@ -82,12 +82,16 @@ editor.on("input", e => {
 
 
 document.getElementById("action-add-file").addEventListener('click', e=>{
-  createANewFile();
+  if(currentProject){
+    createANewFile();
+  }
   return false;
 });
 
 document.getElementById("action-add-folder").addEventListener('click', e=>{
-  createANewFolder();
+  if(currentProject){
+    createANewFolder();
+  }
   return false;
 });
 
@@ -717,11 +721,11 @@ function updateAfterResize(){
   var appPanel = document.getElementById('app');
   var codePanel = document.getElementById("code-input");
   //rightPanel.style.height =(window.innerHeight - 10) +'px'
-  leftPanel.style.height =(window.innerHeight - 10) +'px'
+  leftPanel.style.height =(window.innerHeight - 20) +'px'
   //document.body.style.height = (window.innerHeight - 100) +'px'
 //  appPanel.style.height = (window.innerHeight - 100) +'px';
   //console.log(window.innerHeight);
-  editor.container.style.height =(window.innerHeight - 85) +'px'
+  editor.container.style.height =(window.innerHeight - 115) +'px'
   editor.resize();
   containerPanel.style.height = (window.innerHeight) +'px'
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
