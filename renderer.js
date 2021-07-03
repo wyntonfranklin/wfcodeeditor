@@ -305,6 +305,8 @@ saveButton.addEventListener("click", e => {
       renameAFile(selectedFileElement, filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'copy-file'){
       copyFileToDest(filename);
+    }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
+      editor.find(filename);
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
@@ -392,6 +394,15 @@ function renameCurrentFile(){
   let file = selectedFileElement.getAttribute("data-path");
   setModalTitle('Rename a file');
   fileNameInput.value = path.basename(file);
+  hideShowModal("show", "new-file-modal");
+}
+
+
+function searchAndReplace(){
+  CURRENT_FILE_OPENER_ACTION = "sar";
+  let file = selectedFileElement.getAttribute("data-path");
+  setModalTitle('Search file');
+  //fileNameInput.value = path.basename(file);
   hideShowModal("show", "new-file-modal");
 }
 

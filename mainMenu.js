@@ -86,6 +86,12 @@ module.exports =  {
             { role: 'redo'},
             { role: 'copy'},
             { role: 'paste'},
+            {
+              label: 'Search',
+              click: () => {
+                webContents.executeJavaScript(`searchAndReplace()`)
+              },
+            },
           ]
         },
        { label: 'Snippets',
