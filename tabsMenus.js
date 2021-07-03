@@ -4,51 +4,23 @@ module.exports =  {
   createMenu : (mainDialog) => {
     return [
       {
-        label: 'New..',
-        submenu: [
-          {
-            label : 'New File',
-            click: () => {
-              mainDialog.webContents.executeJavaScript(`createANewFile()`)
-            },
-            accelerator: 'CTRL+N'
-          },
-          { label: 'New Folder',
-            click: () => {
-              mainDialog.webContents.executeJavaScript(`createANewFolder()`)
-            },
-          },
-          { label: 'New PHP File',
-            click: () => {
-              mainDialog.webContents.executeJavaScript(`createAPhpFile()`)
-            },
-          },
-          { label: 'New HTML File',
-            click: () => {
-              mainDialog.webContents.executeJavaScript(`createAHtmlFile()`)
-            },
-          },
-          { label: 'New Javascript File',
-            click: () => {
-              mainDialog.webContents.executeJavaScript(`createAJsFile()`)
-            },
-          },
-        ]
+        label: 'Close tab',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
+        },
       },
       { type: 'separator' },
       { label: 'Rename',
         click: () => {
           mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
-        },},
+        },
+      },
       { label: 'Copy',
         click: () => {
           mainDialog.webContents.executeJavaScript(`copyFileOrFolder()`)
         },
       },
-      { label: 'Paste',
-        click: () => {
-          mainDialog.webContents.executeJavaScript(`pasteBuffer()`)
-        },
+      { role: 'Paste',
       },
       { label: 'Open in Explorer',
         click: () => {

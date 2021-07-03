@@ -7,7 +7,7 @@
 
 const { ipcRenderer, clipboard } = require('electron')
 const helper = require('./helper.js');
-const fs = require("fs")
+const fs = require("fs-extra")
 var path = require('path');
 let db = require('./database');
 const extensions = require('./extensions');
@@ -54,6 +54,7 @@ let imageViewer = document.getElementById('image-viewer');
 let fileTabs = document.getElementById("file-tabs");
 
 let modalTitle = document.getElementById('dialog-title');
+let modalDescription = document.getElementById('modal-description');
 
 let CURRENT_PROJECT_NAME = "";
 
@@ -61,6 +62,7 @@ let ACTIVE_MODAL_ID = "";
 let CURRENT_FILE_OPENER_ACTION = null;
 let CURRENT_FILE_OPENER_TYPE = null;
 var openDir = [];
+let copyPathHolder =  null;
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
 editor.on("input", e => {
@@ -301,12 +303,32 @@ saveButton.addEventListener("click", e => {
       });
     }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
       renameAFile(selectedFileElement, filename);
+    }else if(CURRENT_FILE_OPENER_ACTION == 'copy-file'){
+      copyFileToDest(filename);
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
     readFiles(currentProject);
   }
 });
+
+function copyFileToDest(filename){
+  let copySrc = copyPathHolder;
+  let selectedPath = selectedFileElement.getAttribute('data-path');
+  let fileStats = getFileStats(selectedPath);
+  let baseDir = null;
+  if(fileStats.directory){
+      baseDir = selectedPath;
+  }else{
+    baseDir = path.dirname(selectedPath);
+  }
+  let desPath = path.join(baseDir, filename);
+  try{
+    fs.copyFileSync(copySrc, desPath);
+  }catch (e){
+
+  }
+}
 
 function renameAFile(el, filename){
   let file = el.getAttribute("data-path");
@@ -341,6 +363,15 @@ function createAJsFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
   CURRENT_FILE_OPENER_TYPE = "js";
   setModalTitle('Create a Javascript File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+
+function copyAFile(filepath){
+  copyPathHolder = filepath;
+  CURRENT_FILE_OPENER_ACTION = "copy-file";
+  let dest = selectedFileElement.getAttribute("data-path");
+  setModalTitle('Copy a file',`Copy file ${filepath} to  ${dest}`);
   hideShowModal("show" , "new-file-modal");
 }
 
@@ -585,18 +616,6 @@ function getProjectDir(callback){
   currentProject = cpPath;
   setCurrentProjectName(helper.getDirectoryName(cpPath));
   callback(cpPath);
-  /*
-  db.getSetting({name:"current-project"}, function (err, doc) {
-    if(doc === null){
-      console.log("this is null")
-    }
-    console.log(doc);
-    console.log("show doc")
-    currentProject = doc.value;
-    setCurrentProjectName(helper.getDirectoryName(currentProject));
-     callback( doc.value)
-  });
-   */
 }
 
 function setCurrentProjectName(name){
@@ -615,12 +634,12 @@ function readFilesFromDir(dir) {
       file = path.resolve(dir, file);
       var stats = fs.statSync(file);
       if(stats.isDirectory()){
-          if(currentDirectory == file){
+          if(currentDirectory === file){
             directoryListing += createDirectoryLink("dir", file,"active");
           }else{
             directoryListing += createDirectoryLink("dir", file,"");
           }
-          if( openDir.indexOf( file) != -1){
+          if( openDir.indexOf( file) !== -1){
             directoryListing += openSubDirectory();
             directoryListing += readFilesFromDir(file);
             directoryListing += closeSubDirectory();
@@ -629,22 +648,18 @@ function readFilesFromDir(dir) {
         let ext = path.extname(file).replace(/\./g,' ').trim();
         let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
         if(currentFile == file){
-         // recentlyCreatedFile = null;
           if(fileObject != null && (fileObject.content !== fileObject.ocontent) ){
             fileListing += createDirectoryLink("file", file,"active save");
           }else{
             fileListing += createDirectoryLink("file", file,"active");
           }
         }else{
-          if(fileObject!= null &&  (fileObject.content !== fileObject.ocontent)){
+          if(fileObject != null &&  (fileObject.content !== fileObject.ocontent)){
             fileListing += createDirectoryLink("file", file,"save");
           }else{
             fileListing += createDirectoryLink("file", file,"");
           }
         }
-        /*if(helper.modesObject()[ext]){
-          fileListing += createDirectoryLink("file", file,"");
-        }*/
       }
     })
   return directoryListing + fileListing;
@@ -652,13 +667,11 @@ function readFilesFromDir(dir) {
 
 function openNewProject(){
   getProjectDir( dir =>{
-    console.log(dir)
       readFiles(dir);
   })
 }
 
 let readFiles = (projectDir) => {
-
   if(projectDir){
     let html = readFilesFromDir(projectDir);
     document.getElementById("directory").innerHTML = html;
@@ -681,17 +694,6 @@ function loadRecentProjects(){
     divs.forEach( el => {
       el.addEventListener('click', e=>{
           openProject(e, e.target.getAttribute("data-filepath"));
-          /*
-          closeProject();
-          currentProject = e.target.getAttribute("data-filepath");
-          editor.session.setValue("");
-          currentFile = null;
-          currentDirectory = currentProject;
-          saveLastProject(currentProject);
-          readFiles(currentProject);
-          hideShowModal('hide','projects-modal');
-          updatePageTitle("");
-          setCurrentProjectName(e.target.innerHTML)*/
       })
     })
   });
@@ -760,11 +762,7 @@ function updateAfterResize(){
   var appPanel = document.getElementById('app');
   var codePanel = document.getElementById("code-input");
   var tabsPanel = document.getElementById('file-tabs');
-  //rightPanel.style.height =(window.innerHeight - 10) +'px'
-  leftPanel.style.height =(window.innerHeight - 20) +'px'
-  //document.body.style.height = (window.innerHeight - 100) +'px'
-//  appPanel.style.height = (window.innerHeight - 100) +'px';
-  //console.log(window.innerHeight);
+  leftPanel.style.height =(window.innerHeight - 30) +'px'
   var winHeight = (window.innerHeight - 115);
   if(tabsPanel.clientHeight > 50){
     winHeight +=  50 - tabsPanel.clientHeight;
@@ -909,8 +907,11 @@ function deletedSelectItem(action){
   }
 }
 
-function setModalTitle(title){
+function setModalTitle(title, description){
   modalTitle.innerText = title;
+  if(description){
+    modalDescription.innerText = description;
+  }
 }
 
 function addToOpenDirectory(file){
@@ -925,12 +926,67 @@ function addToOpenDirectory(file){
 function copyFileOrFolder(){
   if(selectedFileElement){
     let filePath = selectedFileElement.getAttribute("data-path");
-    var readerStream = fs.readFileSync(filePath);
-
+    clipboard.writeText(filePath);
   }
 }
 
+function copyADirectory(folderpath){
+  let srcDir = folderpath;
+  let folderName = path.basename(srcDir);
+  let selectedPath = selectedFileElement.getAttribute("data-path");
+  let selectedPathStats = fs.statSync(selectedPath);
+  let destFolder = null;
+  if(selectedPathStats.isDirectory()){
+    destFolder = selectedPath;
+  }else{
+    destFolder = path.dirname(selectedPath);
+  }
+  if (!fs.existsSync(path.join(destFolder, folderName))){
+    fs.mkdirSync(path.join(destFolder, folderName));
+    fs.copy(folderpath, path.join(destFolder, folderName), err => {
+      if (err) return console.error(err)
+      console.log('success!')
+      refreshView();
+    }) // copies file
+  }
+
+}
 
 function pasteBuffer(){
+  const text = clipboard.readText();
+  if(fs.existsSync(text) ){
+    let file = text;
+    let stats = fs.statSync(file);
+    if(!stats.isDirectory()){
+        copyAFile(file);
+    }else{
+      copyADirectory(file);
+    }
+  }
+}
 
+function getFileStats(file){
+  let fileExists = fs.existsSync(file);
+  if(fileExists ){
+    let stats = fs.statSync(file);
+    if(!stats.isDirectory()){
+       return {
+         name : file,
+         directory : false,
+         fileexists : true
+       }
+    }else{
+      return {
+        name : file,
+        directory : true,
+        fileexists : true
+      }
+    }
+  }else{
+    return {
+      name : file,
+      directory : false,
+      fileexists : false
+    }
+  }
 }
