@@ -25,6 +25,7 @@ let openFiles = [];
 let selectedFileElement = null;
 let activeTabEl = null;
 let activeFileBrowserEl = null;
+let selectedTab = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -110,7 +111,6 @@ codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
 
   });
-
 });
 
 
@@ -368,9 +368,15 @@ function createAJsFile(){
 
 
 function copyAFile(filepath){
+  let dest;
   copyPathHolder = filepath;
   CURRENT_FILE_OPENER_ACTION = "copy-file";
-  let dest = selectedFileElement.getAttribute("data-path");
+  dest = selectedFileElement.getAttribute("data-path");
+  let destPathStats = fs.statSync(dest);
+  if(!destPathStats.isDirectory()){
+    dest = path.dirname(dest)
+  }
+  fileNameInput.value = path.basename(filepath);
   setModalTitle('Copy a file',`Copy file ${filepath} to  ${dest}`);
   hideShowModal("show" , "new-file-modal");
 }
@@ -383,7 +389,9 @@ function createANewFolder(){
 
 function renameCurrentFile(){
   CURRENT_FILE_OPENER_ACTION = "rename";
+  let file = selectedFileElement.getAttribute("data-path");
   setModalTitle('Rename a file');
+  fileNameInput.value = path.basename(file);
   hideShowModal("show", "new-file-modal");
 }
 
@@ -403,6 +411,8 @@ function hideShowModal(action, id){
     ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
     el.style.display = "none";
+    fileNameInput.value = "";
+    modalDescription.innerText = "";
   }
 
 }
@@ -485,7 +495,6 @@ function setTabEvents(){
   divs.forEach( el => {
     el.addEventListener('click', e=>{
       let file = el.getAttribute('data-file');
-      console.log(file);
       helper.removeFromObjectArray(openFiles,"name",file);
       if(openFiles[openFiles.length-1] !== undefined){
         onFileClickEvent(null, openFiles[openFiles.length-1].name);
@@ -501,7 +510,13 @@ function setTabEvents(){
       let file = el.getAttribute('data-file');
         onFileClickEvent(null, file);
     })
+    el.addEventListener('contextmenu', e => {
+      selectedTab = e.target;
+      ipcRenderer.invoke('show-tabs-context-menu');
+    })
   });
+
+
 }
 
 function getIcon(fname){
@@ -762,7 +777,7 @@ function updateAfterResize(){
   var appPanel = document.getElementById('app');
   var codePanel = document.getElementById("code-input");
   var tabsPanel = document.getElementById('file-tabs');
-  leftPanel.style.height =(window.innerHeight - 30) +'px'
+  leftPanel.style.height =(window.innerHeight - 40) +'px'
   var winHeight = (window.innerHeight - 115);
   if(tabsPanel.clientHeight > 50){
     winHeight +=  50 - tabsPanel.clientHeight;
@@ -989,4 +1004,37 @@ function getFileStats(file){
       fileexists : false
     }
   }
+}
+
+
+function closeSelectedTab(){
+  let tabFile = selectedTab.getAttribute('data-file');
+  helper.removeFromObjectArray(openFiles,"name",tabFile);
+  if(openFiles[openFiles.length-1] !== undefined){
+    onFileClickEvent(null, openFiles[openFiles.length-1].name);
+  }else{
+    clearProject();
+  }
+  refreshView();
+}
+
+
+function closeAllTabs(){
+  let size = openFiles.length;
+  if(size > 0){
+    let fileObject = openFiles[size-1];
+    if((fileObject.content !== fileObject.ocontent)){
+        alert("this file has unsaved changes");
+    }else{
+      helper.removeFromObjectArray(openFiles,"name",fileObject.name);
+      closeAllTabs();
+      refreshView();
+    }
+  }else{
+    clearProject();
+  }
+}
+
+function closeAllOtherTabs(){
+
 }

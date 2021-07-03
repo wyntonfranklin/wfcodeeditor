@@ -6,40 +6,20 @@ module.exports =  {
       {
         label: 'Close tab',
         click: () => {
-          mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
+          mainDialog.webContents.executeJavaScript(`closeSelectedTab()`)
         },
       },
-      { type: 'separator' },
-      { label: 'Rename',
+      {
+        label: 'Close All Tabs except this',
         click: () => {
           mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
         },
       },
-      { label: 'Copy',
-        click: () => {
-          mainDialog.webContents.executeJavaScript(`copyFileOrFolder()`)
-        },
-      },
-      { role: 'Paste',
-      },
-      { label: 'Open in Explorer',
-        click: () => {
-          mainDialog.webContents.executeJavaScript(`openInExplorer()`)
-        },
-      },
       { type: 'separator' },
-      { label: 'Delete',
+      {
+        label: 'Close All tabs',
         click: () => {
-          let options  = {
-            title: 'Please confirm this delete',
-            buttons: ["Yes","Cancel"],
-            message: "Do you really want to quit?"
-          }
-          dialog.showMessageBox(options).then( result => {
-            console.log(`User selected: ${result.response}`);
-            mainDialog.webContents.executeJavaScript(`deletedSelectItem(${result.response})`)
-          })
-
+          mainDialog.webContents.executeJavaScript(`closeAllTabs()`)
         },
       },
     ]
