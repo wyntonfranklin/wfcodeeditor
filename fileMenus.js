@@ -4,25 +4,55 @@ module.exports =  {
   createMenu : (mainDialog) => {
     return [
       {
-        label: 'New File',
-        click: () => {
-          mainDialog.webContents.executeJavaScript(`createANewFile()`)
-        },
-        accelerator: 'CTRL+N'
+        label: 'New..',
+        submenu: [
+          {
+            label : 'New File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createANewFile()`)
+            },
+            accelerator: 'CTRL+N'
+          },
+          { label: 'New Folder',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createANewFolder()`)
+            },
+          },
+          { label: 'New PHP File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createAPhpFile()`)
+            },
+          },
+          { label: 'New HTML File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createAHtmlFile()`)
+            },
+          },
+          { label: 'New Javascript File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createAJsFile()`)
+            },
+          },
+        ]
       },
-      { label: 'New Folder',
-        click: () => {
-          mainDialog.webContents.executeJavaScript(`createANewFolder()`)
-        },},
+      { type: 'separator' },
       { label: 'Rename',
         click: () => {
           mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
         },},
+      { label: 'Copy',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`copyFileOrFolder()`)
+        },
+      },
+      { role: 'Paste',
+      },
       { label: 'Open in Explorer',
         click: () => {
           mainDialog.webContents.executeJavaScript(`openInExplorer()`)
         },
       },
+      { type: 'separator' },
       { label: 'Delete',
         click: () => {
           let options  = {

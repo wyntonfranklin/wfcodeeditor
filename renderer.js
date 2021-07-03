@@ -5,7 +5,7 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, clipboard } = require('electron')
 const helper = require('./helper.js');
 const fs = require("fs")
 var path = require('path');
@@ -14,6 +14,7 @@ const extensions = require('./extensions');
 const Store = require('electron-store');
 const openExplorer = require('open-file-explorer');
 let interact = require('interactjs')
+let ncp = require("copy-paste");
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
@@ -52,10 +53,13 @@ let imageView = document.getElementById('image-view');
 let imageViewer = document.getElementById('image-viewer');
 let fileTabs = document.getElementById("file-tabs");
 
+let modalTitle = document.getElementById('dialog-title');
+
 let CURRENT_PROJECT_NAME = "";
 
 let ACTIVE_MODAL_ID = "";
 let CURRENT_FILE_OPENER_ACTION = null;
+let CURRENT_FILE_OPENER_TYPE = null;
 var openDir = [];
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
@@ -278,20 +282,30 @@ function saveADirectory(path, callback){
 
 saveButton.addEventListener("click", e => {
   let filename = fileNameInput.value;
-  if(CURRENT_FILE_OPENER_ACTION == "file"){
-    saveAFile(path.join(getCurrentSelectedDirectory(), filename), "",(fpath)=>{
-      onFileClickEvent(null, fpath);
-    });
-  }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
-    saveADirectory(path.join(getCurrentSelectedDirectory(), filename), (fpath)=>{
-      onDirectoryClickEvent(null, fpath);
-    });
-  }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
-    renameAFile(selectedFileElement, filename);
+  if(filename){
+    if(CURRENT_FILE_OPENER_ACTION == "file"){
+      if(CURRENT_FILE_OPENER_TYPE == "any"){
+
+      }else{
+        filename = filename.replace(/\.[^/.]+$/, "");
+        filename += "." + CURRENT_FILE_OPENER_TYPE;
+      }
+      let dirPath = getCurrentSelectedDirectory();
+      addToOpenDirectory(dirPath);
+      saveAFile(path.join(dirPath, filename), "",(fpath)=>{
+        onFileClickEvent(null, fpath);
+      });
+    }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
+      saveADirectory(path.join(getCurrentSelectedDirectory(), filename), (fpath)=>{
+        onDirectoryClickEvent(null, fpath);
+      });
+    }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
+      renameAFile(selectedFileElement, filename);
+    }
+    console.log("The file was saved!");
+    hideShowModal('hide',"new-file-modal");
+    readFiles(currentProject);
   }
-  console.log("The file was saved!");
-  hideShowModal('hide',"new-file-modal");
-  readFiles(currentProject);
 });
 
 function renameAFile(el, filename){
@@ -304,16 +318,41 @@ function renameAFile(el, filename){
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "any";
+  setModalTitle('Create a New File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function createAPhpFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "php";
+  setModalTitle('Create a PHP File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function createAHtmlFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "html";
+  setModalTitle('Create a HTML File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function createAJsFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "js";
+  setModalTitle('Create a Javascript File');
   hideShowModal("show" , "new-file-modal");
 }
 
 function createANewFolder(){
   CURRENT_FILE_OPENER_ACTION = "dir";
+  setModalTitle('Create a New Folder');
   hideShowModal("show", "new-file-modal");
 }
 
 function renameCurrentFile(){
   CURRENT_FILE_OPENER_ACTION = "rename";
+  setModalTitle('Rename a file');
   hideShowModal("show", "new-file-modal");
 }
 
@@ -868,4 +907,30 @@ function deletedSelectItem(action){
       refreshView();
     }
   }
+}
+
+function setModalTitle(title){
+  modalTitle.innerText = title;
+}
+
+function addToOpenDirectory(file){
+  if(!helper.exitsInArray(openDir, file)){
+    openDir.push(file)
+    return true;
+  }
+  return false;
+}
+
+
+function copyFileOrFolder(){
+  if(selectedFileElement){
+    let filePath = selectedFileElement.getAttribute("data-path");
+    var readerStream = fs.readFileSync(filePath);
+
+  }
+}
+
+
+function pasteBuffer(){
+
 }

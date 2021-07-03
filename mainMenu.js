@@ -7,46 +7,57 @@ module.exports =  {
           label: 'File',
           submenu: [
             {
-              label: 'New Project',
-              click: () => {
-                var filename = dialog.showOpenDialogSync(
-                  { defaultPath: '', properties: ['openDirectory'] });
-                if(filename !== undefined){
-                  var currentProject = filename[0];
-                  console.log(currentProject, "current");
-                  webContents.send("new-project-start", {project:currentProject});
-                  /**
-                  db.saveToProjects({
-                    'name' : currentProject
-                  })
-                  db.saveToSettings({'name': "current-project",},{
-                    'name': "current-project",
-                    'value': currentProject
-                  }, function(){
-                    console.log(currentProject)
-                    webContents.executeJavaScript('openNewProject()');
-                  })**/
-                }
-              },
-              accelerator: 'CTRL+P'
+              label: 'New..',
+              submenu: [
+                {
+                  label: 'New Project',
+                  click: () => {
+                    var filename = dialog.showOpenDialogSync(
+                      { defaultPath: '', properties: ['openDirectory'] });
+                    if(filename !== undefined){
+                      var currentProject = filename[0];
+                      console.log(currentProject, "current");
+                      webContents.send("new-project-start", {project:currentProject});
+                    }
+                  },
+                  accelerator: 'CTRL+P'
+                },
+                { label: 'New Folder',
+                  click: () => {
+                    webContents.executeJavaScript(`createANewFolder()`)
+                  },
+                },
+                {
+                  label : 'New File',
+                  click: () => {
+                    webContents.executeJavaScript(`createANewFile()`)
+                  },
+                  accelerator: 'CTRL+N'
+                },
+                { label: 'New PHP File',
+                  click: () => {
+                    webContents.executeJavaScript(`createAPhpFile()`)
+                  },
+                },
+                { label: 'New HTML File',
+                  click: () => {
+                    webContents.executeJavaScript(`createAHtmlFile()`)
+                  },
+                },
+                { label: 'New Javascript File',
+                  click: () => {
+                   webContents.executeJavaScript(`createAJsFile()`)
+                  },
+                },
+              ]
             },
-            {
-              label: 'New File',
-              click: () => {
-                webContents.executeJavaScript(`createANewFile()`)
-              },
-              accelerator: 'CTRL+N'
-            },
-            { label: 'New Folder',
-              click: () => {
-                webContents.executeJavaScript(`createANewFolder()`)
-              },},
             {
               label: 'Recent Projects',
               click: () => {
                 webContents.executeJavaScript(`showRecentProjects()`)
               },
             },
+            { type: 'separator' },
             {
               label: 'Save',
               click: () => {
@@ -58,6 +69,7 @@ module.exports =  {
             {
               label : 'Preferences'
             },
+            { type: 'separator' },
             {
               label: 'Close Project',
               click: () => {
