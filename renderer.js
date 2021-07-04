@@ -66,6 +66,11 @@ var openDir = [];
 let copyPathHolder =  null;
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
+var langTools = ace.require("ace/ext/language_tools");
+editor.setOptions({
+  enableBasicAutocompletion:true,
+  enableLiveAutocompletion: true
+});
 editor.on("input", e => {
 
   let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
@@ -128,6 +133,7 @@ ipcRenderer.on('get-code', function (evt, message) {
 
 ipcRenderer.on('new-project-start', function (evt, message) {
   let projectPath = message.project;
+  closeProject();
   currentProject = projectPath;
   openProject(null, projectPath);
 });
@@ -306,7 +312,7 @@ saveButton.addEventListener("click", e => {
     }else if(CURRENT_FILE_OPENER_ACTION == 'copy-file'){
       copyFileToDest(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
-      editor.find(filename);
+      editor.findAll(filename);
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");

@@ -28,5 +28,10 @@
     "name" : "For Loop",
     "type" : "text",
     "code": "for ($x = 0; $x <= 10; $x++) {\n // do something here \n}"
+  },
+  "db_connection" : {
+    "name" : "MySQL database connection function",
+    "type" : "text",
+    "code": "function get_connection(){\n  $dsn = \"mysql:host=localhost;dbname=you databasename\";\n  $user = \"root\";\n  $passwd = \"\";\n  $conn = new PDO($dsn, $user, $passwd);\n  return $conn;\n}"
   }
 }
