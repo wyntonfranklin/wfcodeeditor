@@ -19,6 +19,7 @@ module.exports =  {
       {
         label: 'Close All tabs',
         click: () => {
+          
           mainDialog.webContents.executeJavaScript(`closeAllTabs()`)
         },
       },

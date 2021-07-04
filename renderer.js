@@ -5,7 +5,7 @@
 // selectively enable features needed in the rendering
 // process.
 
-const { ipcRenderer, clipboard } = require('electron')
+const { ipcRenderer, clipboard,  shell } = require('electron')
 const helper = require('./helper.js');
 const fs = require("fs-extra")
 var path = require('path');
@@ -15,6 +15,8 @@ const Store = require('electron-store');
 const openExplorer = require('open-file-explorer');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
+const open = require('open');
+let ctrlIsPressed = false;
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
@@ -90,7 +92,31 @@ editor.on("input", e => {
     }
   }
 
-})
+});
+
+
+
+
+
+document.getElementById("action-go-to-website").addEventListener('click', e=>{
+  if(currentFile){
+    let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
+    const re = /\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/;
+    var matches = fileObject.content.match(re);
+    for(let i=0; i<=matches.length-1; i++){
+      if(matches[i].indexOf('@route') !== -1){
+          let route = matches[i];
+          route = route.replaceAll("*","");
+          route = route.replace("@route","");
+          if(route){
+            console.log(route);
+            shell.openExternal(route);
+            return route;
+          }
+      }
+    };
+  }
+});
 
 
 document.getElementById("action-add-file").addEventListener('click', e=>{
@@ -117,6 +143,26 @@ codeView.addEventListener('contextmenu', e=>{
 
   });
 });
+
+
+codeView.addEventListener('click', event=>{
+  if(ctrlIsPressed){
+    search();
+    return false;
+  }
+  event.preventDefault();
+});
+
+
+
+codeView.addEventListener('keydown', event=>{
+  if(event.ctrlKey){
+    search();
+    return false;
+  }
+  event.preventDefault();
+});
+
 
 
 closeModalButton.addEventListener('click', e => {
@@ -245,6 +291,7 @@ function hideAllViews(view){
   imageView.style.display = "none";
   view.style.display = "block";
 }
+
 
 
 
@@ -1044,16 +1091,35 @@ function closeAllTabs(){
   if(size > 0){
     let fileObject = openFiles[size-1];
     if((fileObject.content !== fileObject.ocontent)){
-        alert("this file has unsaved changes");
+      ipcRenderer.invoke('show-confirm-dialog',{
+        title: 'Unsaved changes to file',
+        buttons: ["Yes","No"],
+        message: "Save changes to this file"
+      }).then((result)=>{
+        if(result.response ==0){
+          saveAFile(fileObject.name, fileObject.content);
+          removeATab(fileObject);
+          closeAllTabs();
+        }else{
+          removeATab(fileObject);
+          closeAllTabs();
+        }
+      });
     }else{
-      helper.removeFromObjectArray(openFiles,"name",fileObject.name);
+      removeATab(fileObject);
       closeAllTabs();
-      refreshView();
     }
   }else{
     clearProject();
   }
 }
+
+function removeATab(fileObject){
+  helper.removeFromObjectArray(openFiles,"name",fileObject.name);
+  refreshView();
+}
+
+
 
 function closeAllOtherTabs(){
 
@@ -1117,4 +1183,9 @@ function readFilesFromDir(dir, callback) {
     });
     callback(directoryListing + fileListing);
   })
+}
+
+
+function search(){
+  editor.find(editor.getSelectedText());
 }

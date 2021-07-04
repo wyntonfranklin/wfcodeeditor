@@ -1,6 +1,12 @@
 module.exports =  {
-  createMenu : (snippetsWindow) => {
+  createMenu : (snippetsWindow, mainWindow) => {
     return [
+      {
+        label: 'Find',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`search()`)
+        },
+      },
       { role: 'copy'},
       { role: 'paste'},
       {

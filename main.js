@@ -76,9 +76,14 @@ function createWindow () {
     wc.send('get-code', {'code': snippets[id].code});
     snippetsWindow.hide();
     mainWindow.focus();
+  });
+
+  ipcMain.handle('show-confirm-dialog', async (event, options) => {
+    const results = await dialog.showMessageBox(options);
+    return results;
   })
 
-  contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow));
+  contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow, mainWindow));
   fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));
 
