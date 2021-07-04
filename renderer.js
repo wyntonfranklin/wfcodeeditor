@@ -652,6 +652,7 @@ function setCurrentProjectName(name){
   }
 }
 
+/*
 function readFilesFromDir(dir) {
   let fileListing = '';
   let directoryListing = '';
@@ -689,7 +690,7 @@ function readFilesFromDir(dir) {
       }
     })
   return directoryListing + fileListing;
-}
+}*/
 
 function openNewProject(){
   getProjectDir( dir =>{
@@ -699,9 +700,11 @@ function openNewProject(){
 
 let readFiles = (projectDir) => {
   if(projectDir){
-    let html = readFilesFromDir(projectDir);
-    document.getElementById("directory").innerHTML = html;
-    setListeners();
+    document.getElementById("directory").innerHTML = "";
+    readFilesFromDir(projectDir, function(html){
+      document.getElementById("directory").innerHTML = html;
+      setListeners();
+    });
   }else{
     document.getElementById("directory").innerHTML = "";
   }
@@ -1048,4 +1051,64 @@ function closeAllTabs(){
 
 function closeAllOtherTabs(){
 
+}
+
+function readFilesFromDirAsync(dir) {
+  return new Promise(function(resolve, reject) {
+    fs.readdir(dir, function (err, files) {
+      if (err) {
+        reject(err);
+      }
+      resolve(files);
+    });
+  });
+}
+
+
+function readFilesFromDirSync(dir, callback) {
+  let files = fs.readdirSync(dir);
+  callback(files);
+}
+
+
+function readFilesFromDir(dir, callback) {
+  let fileListing = '';
+  let directoryListing = '';
+  readFilesFromDirSync(dir, (files)=>{
+    files.forEach(function (file) {
+      file = path.resolve(dir, file);
+      var stats = fs.statSync(file);
+      if(stats.isDirectory()){
+        if(currentDirectory === file){
+          directoryListing += createDirectoryLink("dir", file,"active");
+        }else{
+          directoryListing += createDirectoryLink("dir", file,"");
+        }
+        if( openDir.indexOf( file) !== -1){
+          readFilesFromDir(file, (html)=>{
+            directoryListing += openSubDirectory();
+            directoryListing += html;
+            directoryListing += closeSubDirectory();
+          });
+        }
+      }else{
+        let ext = path.extname(file).replace(/\./g,' ').trim();
+        let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+        if(currentFile === file){
+          if(fileObject != null && (fileObject.content !== fileObject.ocontent) ){
+            fileListing += createDirectoryLink("file", file,"active save");
+          }else{
+            fileListing += createDirectoryLink("file", file,"active");
+          }
+        }else{
+          if(fileObject != null &&  (fileObject.content !== fileObject.ocontent)){
+            fileListing += createDirectoryLink("file", file,"save");
+          }else{
+            fileListing += createDirectoryLink("file", file,"");
+          }
+        }
+      }
+    });
+    callback(directoryListing + fileListing);
+  })
 }
