@@ -103,8 +103,9 @@ document.getElementById("action-go-to-website").addEventListener('click', e=>{
     let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
     const re = /\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/;
     var matches = fileObject.content.match(re);
-    for(let i=0; i<=matches.length-1; i++){
-      if(matches[i].indexOf('@route') !== -1){
+    if(matches){
+      for(let i=0; i<=matches.length-1; i++){
+        if(matches[i].indexOf('@route') !== -1){
           let route = matches[i];
           route = route.replaceAll("*","");
           route = route.replace("@route","");
@@ -113,8 +114,9 @@ document.getElementById("action-go-to-website").addEventListener('click', e=>{
             shell.openExternal(route);
             return route;
           }
+        }
       }
-    };
+    }
   }
 });
 
@@ -150,7 +152,6 @@ codeView.addEventListener('click', event=>{
     search();
     return false;
   }
-  event.preventDefault();
 });
 
 
@@ -160,7 +161,6 @@ codeView.addEventListener('keydown', event=>{
     search();
     return false;
   }
-  event.preventDefault();
 });
 
 
@@ -559,13 +559,21 @@ function setTabEvents(){
   divs.forEach( el => {
     el.addEventListener('click', e=>{
       let file = el.getAttribute('data-file');
+      closeATab(file, ()=>{
+        if(openFiles[openFiles.length-1] !== undefined){
+          onFileClickEvent(null, openFiles[openFiles.length-1].name);
+        }else{
+          clearProject();
+        }
+        createTabs();
+      })
+      /*
       helper.removeFromObjectArray(openFiles,"name",file);
       if(openFiles[openFiles.length-1] !== undefined){
         onFileClickEvent(null, openFiles[openFiles.length-1].name);
       }else{
         clearProject();
-      }
-      createTabs();
+      }*/
     })
   });
   const divs2 = document.querySelectorAll('.tab-item');
@@ -1090,6 +1098,18 @@ function closeAllTabs(){
   let size = openFiles.length;
   if(size > 0){
     let fileObject = openFiles[size-1];
+    closeATab(fileObject.name, ()=>{
+      createTabs();
+      closeAllTabs();
+    });
+  }else{
+    clearProject();
+  }
+}
+
+function closeATab(file, callback){
+  let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+  if(fileObject){
     if((fileObject.content !== fileObject.ocontent)){
       ipcRenderer.invoke('show-confirm-dialog',{
         title: 'Unsaved changes to file',
@@ -1099,18 +1119,16 @@ function closeAllTabs(){
         if(result.response ==0){
           saveAFile(fileObject.name, fileObject.content);
           removeATab(fileObject);
-          closeAllTabs();
+          callback();
         }else{
           removeATab(fileObject);
-          closeAllTabs();
+          callback();
         }
       });
     }else{
       removeATab(fileObject);
-      closeAllTabs();
+      callback();
     }
-  }else{
-    clearProject();
   }
 }
 
