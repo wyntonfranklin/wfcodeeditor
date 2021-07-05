@@ -137,6 +137,12 @@ module.exports =  {
             {
               role: 'toggleFullScreen'
             },
+            {
+              label: 'Toggle Tasks',
+              click: () => {
+                webContents.executeJavaScript(`toggleTasksView()`)
+              },
+            }
           ]
         }
       ];

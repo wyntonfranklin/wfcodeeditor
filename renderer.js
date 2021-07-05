@@ -141,6 +141,14 @@ document.getElementById("action-add-folder").addEventListener('click', e=>{
   return false;
 });
 
+
+document.getElementById("manage-notes").addEventListener('click', e=>{
+  toggleTasksView();
+  return false;
+});
+
+
+
 document.getElementById("action-save-file").addEventListener('click', e=>{
   saveCurrentFile();
   return false;
@@ -199,6 +207,16 @@ ipcRenderer.on('new-project-start', function (evt, message) {
   currentProject = projectPath;
   openProject(null, projectPath);
 });
+
+
+function toggleTasksView(){
+  let el = document.getElementById("side-bar");
+  if(el.style.display === "none"){
+    el.style.display = "block";
+  }else{
+    el.style.display = "none";
+  }
+}
 
 
 function updateProjectSettings(projectPath){
@@ -875,6 +893,7 @@ function updateAfterResize(){
   var appPanel = document.getElementById('app');
   var codePanel = document.getElementById("code-input");
   var tabsPanel = document.getElementById('file-tabs');
+  var sideBarPanel = document.getElementById('side-bar');
   leftPanel.style.height =(window.innerHeight - 40) +'px'
   var winHeight = (window.innerHeight - 115);
   if(tabsPanel.clientHeight > 50){
@@ -882,7 +901,8 @@ function updateAfterResize(){
   }
   editor.container.style.height =winHeight +'px'
   editor.resize();
-  containerPanel.style.height = (window.innerHeight) +'px'
+  containerPanel.style.height = (window.innerHeight) +'px';
+  sideBarPanel.style.height = (window.innerHeight - 58) +'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }

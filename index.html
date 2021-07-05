@@ -140,6 +140,19 @@
       padding: 5px;
       font-size: 12px;
     }
+
+    .side-bar {
+      display:none;
+      position:fixed;
+      width: 300px;
+      right:0;
+      height: 600px;
+      background: whitesmoke;
+      z-index: 100;
+      box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
+      -webkit-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
+      -moz-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
+    }
   </style>
 
   <div id="app" style="" style="overflow: hidden">
@@ -151,6 +164,9 @@
       <a id="action-go-to-website" title="Go to website" class="action-item"><img src="./icons/ic_world.png" width="24px"/></a>
       <a id="action-resize-picture" title="Resize Views" class="action-item"><img src="./icons/ic_resize.png" width="24px"/></a>
       <a id="action-open-database" title="Open Database Manager" class="action-item"><img src="./icons/ic_database.png" width="24px"/></a>
+      <div style="float: right; margin-right: 5px;">
+        <a id="manage-notes" title="Manage Notes" class="action-item"><img src="./icons/ic_note.png" width="24px"/></a>
+      </div>
     </div>
     <div class="panel-container" id="panel-container">
 
@@ -179,6 +195,10 @@
             <img id="image-viewer" src="" class="logo">
           </div>
         </div>
+      </div>
+
+      <div id="side-bar" class="side-bar" style="display: none;">
+
       </div>
 
     </div>
