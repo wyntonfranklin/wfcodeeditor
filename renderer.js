@@ -140,6 +140,16 @@ document.getElementById("action-save-file").addEventListener('click', e=>{
   return false;
 });
 
+document.getElementById("action-resize-picture").addEventListener('click', e=>{
+  updateAfterResize();
+  return false;
+});
+
+document.getElementById("action-open-database").addEventListener("click", e => {
+  shell.openExternal("C:\\Program Files\\MySQL\\MySQL Workbench 8.0 CE\\MySQLWorkbench.exe");
+  return false;
+});
+
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
 
@@ -1107,6 +1117,29 @@ function closeAllTabs(){
   }
 }
 
+function closeAllOtherTabs(currentSize){
+  let size = currentSize === undefined ? openFiles.length : currentSize;
+  if(size > 0){
+    let fileObject = openFiles[size-1];
+    if(fileObject.name !== selectedTab.getAttribute("data-file")){
+      closeATab(fileObject.name, ()=>{
+        createTabs();
+        closeAllOtherTabs();
+      });
+    }else{
+      size--;
+      closeAllOtherTabs(size);
+    }
+  }else{
+    console.log("last file");
+    let fileObject = openFiles[0];
+    onFileClickEvent(null, fileObject.name);
+     createTabs();
+    //clearProject();
+  }
+}
+
+
 function closeATab(file, callback){
   let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
   if(fileObject){
@@ -1138,10 +1171,6 @@ function removeATab(fileObject){
 }
 
 
-
-function closeAllOtherTabs(){
-
-}
 
 function readFilesFromDirAsync(dir) {
   return new Promise(function(resolve, reject) {

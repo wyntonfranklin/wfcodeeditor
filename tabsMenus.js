@@ -12,14 +12,14 @@ module.exports =  {
       {
         label: 'Close All Tabs except this',
         click: () => {
-          mainDialog.webContents.executeJavaScript(`renameCurrentFile()`)
+          mainDialog.webContents.executeJavaScript(`closeAllOtherTabs()`)
         },
       },
       { type: 'separator' },
       {
         label: 'Close All tabs',
         click: () => {
-          
+
           mainDialog.webContents.executeJavaScript(`closeAllTabs()`)
         },
       },
