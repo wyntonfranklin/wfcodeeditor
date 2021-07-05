@@ -95,6 +95,12 @@ editor.on("input", e => {
 });
 
 
+fileNameInput.addEventListener("keyup", function(e) {
+  if (e.which === 13) {
+    //The keycode for enter key is 13
+    onSaveButtonPressed(e);
+  }
+});
 
 
 
@@ -346,6 +352,11 @@ function saveADirectory(path, callback){
 }
 
 saveButton.addEventListener("click", e => {
+    onSaveButtonPressed(e);
+});
+
+
+function onSaveButtonPressed(e){
   let filename = fileNameInput.value;
   if(filename){
     if(CURRENT_FILE_OPENER_ACTION == "file"){
@@ -375,7 +386,7 @@ saveButton.addEventListener("click", e => {
     hideShowModal('hide',"new-file-modal");
     readFiles(currentProject);
   }
-});
+}
 
 function copyFileToDest(filename){
   let copySrc = copyPathHolder;
@@ -481,6 +492,7 @@ function hideShowModal(action, id){
     ACTIVE_MODAL_ID = id;
     backdropUi.style.display = "block";
     el.style.display = "block";
+    fileNameInput.focus();
   }else{
     ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
