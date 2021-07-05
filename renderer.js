@@ -555,6 +555,7 @@ function createTabs(){
   }
   fileTabs.innerHTML = html;
   setTabEvents();
+  updateAfterResize();
 }
 
 function createTabHtml(file, fname, className){
