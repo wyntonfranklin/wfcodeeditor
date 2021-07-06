@@ -7,7 +7,7 @@ module.exports =  {
     let db = {};
     db.tasks = new Datastore(path);
     db.tasks.loadDatabase();
-    db.tasks.find({}, function (err, docs) {
+    db.tasks.find({}).sort({ content: 1}).exec(function(err, docs) {
         callback(docs);
     });
   },
