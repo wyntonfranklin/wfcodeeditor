@@ -148,10 +148,13 @@
       right:0;
       height: 600px;
       background: whitesmoke;
+      font-size: 12px;
+      padding: 5px;
       z-index: 100;
       box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
       -webkit-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
       -moz-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
+      overflow-y: scroll;
     }
   </style>
 
@@ -198,7 +201,22 @@
       </div>
 
       <div id="side-bar" class="side-bar" style="display: none;">
+        <div style="width:100%; margin-bottom: 5px; margin-top: 1px; vertical-align: middle; display: inline-block">
+          <span id="side-bar-close" style="float: right; cursor: pointer;">&#215; close</span>
+        </div>
+        <div class="input-group mb-3">
+          <input id="task-input" type="text" class="form-control" placeholder="Add note" aria-label="Recipient's username" aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
+          </div>
+        </div>
 
+        <div class="list-group" id="task-layout">
+          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+            <small>Donec id elit non mi porta.</small>
+          </a>
+        </div>
       </div>
 
     </div>

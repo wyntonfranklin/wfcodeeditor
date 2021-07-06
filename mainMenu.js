@@ -142,6 +142,7 @@ module.exports =  {
               click: () => {
                 webContents.executeJavaScript(`toggleTasksView()`)
               },
+              accelerator: 'CTRL+T'
             }
           ]
         }

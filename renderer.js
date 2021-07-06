@@ -13,6 +13,7 @@ let db = require('./database');
 const extensions = require('./extensions');
 const Store = require('electron-store');
 const openExplorer = require('open-file-explorer');
+const taskManager = require('./tasksManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -103,6 +104,21 @@ fileNameInput.addEventListener("keyup", function(e) {
 });
 
 
+document.getElementById("save-task-btn").addEventListener('click', e => {
+    let task = document.getElementById("task-input").value;
+    console.log(task);
+    taskManager.saveTasks({
+      content: task,
+      file : "some file"
+    }, getTasksPath(), function(){
+      loadTaskView();
+    });
+});
+
+function getTasksPath(){
+  return path.join(APPLICATION_PATH,'tasks.db');
+}
+
 
 document.getElementById("action-go-to-website").addEventListener('click', e=>{
   if(currentFile){
@@ -164,6 +180,11 @@ document.getElementById("action-open-database").addEventListener("click", e => {
   return false;
 });
 
+document.getElementById("side-bar-close").addEventListener('click', e=>{
+  closeTasksView();
+  return false;
+});
+
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
 
@@ -212,10 +233,32 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 function toggleTasksView(){
   let el = document.getElementById("side-bar");
   if(el.style.display === "none"){
-    el.style.display = "block";
+    openTaskView();
   }else{
-    el.style.display = "none";
+    closeTasksView();
   }
+}
+
+function closeTasksView(){
+  document.getElementById("side-bar").style.display = "none";
+}
+
+function openTaskView(){
+  loadTaskView();
+  document.getElementById("side-bar").style.display = "block";
+}
+
+function loadTaskView(){
+  taskManager.loadTasks(getTasksPath(), function(docs){
+    let template = "";
+    docs.forEach(( task )=>{
+      template += `  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+            <p class="mb-1">${task.content}</p>
+            <small>Donec id elit non mi porta.</small>
+          </a>`;
+    })
+    document.getElementById('task-layout').innerHTML = template;
+  });
 }
 
 
