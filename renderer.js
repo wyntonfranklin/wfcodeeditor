@@ -105,13 +105,17 @@ fileNameInput.addEventListener("keyup", function(e) {
 
 
 document.getElementById("save-task-btn").addEventListener('click', e => {
-    let task = document.getElementById("task-input").value;
-    console.log(task);
+    let taskEl = document.getElementById("task-input");
+    let task = taskEl.value;
+    const timestamp = Date.now();
     taskManager.saveTasks({
       content: task,
-      file : "some file"
+      file : (currentFile) ? currentFile : "",
+      timestamp: timestamp,
+      project : (currentProject) ? currentProject : "",
     }, getTasksPath(), function(){
       loadTaskView();
+      taskEl.value = "";
     });
 });
 
@@ -252,10 +256,10 @@ function loadTaskView(){
   taskManager.loadTasks(getTasksPath(), function(docs){
     let template = "";
     docs.forEach(( task )=>{
-      template += `  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-            <p class="mb-1">${task.content}</p>
-            <small>Donec id elit non mi porta.</small>
-          </a>`;
+      template += `<a href="#" class="list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<p class="mb-1">${task.content}</p>`;
+      //template  += `<small>Donec id elit non mi porta.</small>`;
+      template +=  `</a>`;
     })
     document.getElementById('task-layout').innerHTML = template;
   });
