@@ -104,19 +104,29 @@ fileNameInput.addEventListener("keyup", function(e) {
 });
 
 
+document.getElementById("task-input").addEventListener("keyup", function(e) {
+  if (e.which === 13) {
+    //The keycode for enter key is 13
+
+  }
+});
+
+
 document.getElementById("save-task-btn").addEventListener('click', e => {
     let taskEl = document.getElementById("task-input");
     let task = taskEl.value;
     const timestamp = Date.now();
-    taskManager.saveTasks({
-      content: task,
-      file : (currentFile) ? currentFile : "",
-      timestamp: timestamp,
-      project : (currentProject) ? currentProject : "",
-    }, getTasksPath(), function(){
-      loadTaskView();
-      taskEl.value = "";
-    });
+    if(task){
+      taskManager.saveTasks({
+        content: task,
+        file : (currentFile) ? currentFile : "",
+        timestamp: timestamp,
+        project : (currentProject) ? currentProject : "",
+      }, getTasksPath(), function(){
+        loadTaskView();
+        taskEl.value = "";
+      });
+    }
 });
 
 function getTasksPath(){
@@ -256,12 +266,24 @@ function loadTaskView(){
   taskManager.loadTasks(getTasksPath(), function(docs){
     let template = "";
     docs.forEach(( task )=>{
-      template += `<a href="#" class="list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<a data-file="${task.file}" href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
       template += `<p class="mb-1">${task.content}</p>`;
       //template  += `<small>Donec id elit non mi porta.</small>`;
       template +=  `</a>`;
     })
     document.getElementById('task-layout').innerHTML = template;
+
+    // listeners
+    const divs = document.querySelectorAll('.task-item');
+    divs.forEach( el => {
+        el.addEventListener('click', (event)=>{
+            var taskFile = el.getAttribute('data-file');
+            if(taskFile){
+              onFileClickEvent(null, taskFile);
+            }
+        });
+    });
+
   });
 }
 
