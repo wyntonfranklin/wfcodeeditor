@@ -19,6 +19,31 @@ module.exports =  {
       callback(newDocs);
     });
   },
+  getTaskFromElement : function(el){
+    let taskObject = JSON.parse(el.getAttribute("data-object"));
+    if(taskObject){
+      return taskObject;
+    }
+    return null;
+  },
+  updateTask : function(path, query, update, callback){
+    let db = {};
+    db.tasks = new Datastore(path);
+    db.tasks.loadDatabase();
+    db.tasks.update(query, update, {}, function (err, numReplaced) {
+        console.log(err);
+        console.log(numReplaced);
+        callback();
+    });
+  },
+  changeTaskContent : function(oldObject, content){
+    return {
+      content: content,
+      file : oldObject.file,
+      timestamp: oldObject.timestamp,
+      project : oldObject.project,
+    }
+  }
 
 }
 

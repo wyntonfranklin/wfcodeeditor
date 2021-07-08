@@ -12,7 +12,7 @@ module.exports =  {
       {
         label: 'Edit this task',
         click: () => {
-          mainDialog.webContents.executeJavaScript(`closeAllOtherTabs()`)
+          mainDialog.webContents.executeJavaScript(`editATask()`)
         },
       },
       { type: 'separator' },

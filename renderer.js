@@ -265,20 +265,23 @@ function closeTasksView(){
 function openTaskView(){
   loadTaskView();
   document.getElementById("side-bar").style.display = "block";
+  document.getElementById("task-input").focus();
 }
 
 function openTaskViewWithSelected(){
   loadTaskView();
   document.getElementById("task-input").value = editor.getSelectedText();
   document.getElementById("side-bar").style.display = "block";
+  document.getElementById("task-input").focus();
 }
 
 function loadTaskView(){
+  document.getElementById("task-input").value = "";
   taskManager.loadTasks(getTasksPath(), currentProject, function(docs){
     let template = "";
     docs.forEach(( task )=>{
       template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
-      template += `<span class="mb-1">${task.content}</span>`;
+      template += `<p class="mb-1">${task.content}</p>`;
       if(task.file){
         var name = path.basename(task.file);
         template += `<span class="badge badge-info">${name}</span>`;
@@ -504,6 +507,17 @@ function onSaveButtonPressed(e){
       copyFileToDest(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
       editor.findAll(filename);
+    }else if(CURRENT_FILE_OPENER_ACTION == 'task'){
+        let tO = taskManager.getTaskFromElement(selectedTaskElement);
+        if(tO){
+          let update = taskManager.changeTaskContent(tO, filename);
+          taskManager.updateTask(getTasksPath(),
+            {_id: tO._id}, update, function(){
+            loadTaskView();
+          });
+        }else{
+          console.log('task no found');
+        }
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
@@ -565,6 +579,15 @@ function createAJsFile(){
   hideShowModal("show" , "new-file-modal");
 }
 
+
+function editATask(){
+  CURRENT_FILE_OPENER_ACTION = "task";
+  CURRENT_FILE_OPENER_TYPE = "task";
+  let taskObject = taskManager.getTaskFromElement(selectedTaskElement);
+  fileNameInput.value = taskObject.content;
+  setModalTitle('Edit this task');
+  hideShowModal("show" , "new-file-modal");
+}
 
 function copyAFile(filepath){
   let dest;
