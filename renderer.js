@@ -29,6 +29,7 @@ let selectedFileElement = null;
 let activeTabEl = null;
 let activeFileBrowserEl = null;
 let selectedTab = null;
+let selectedTaskElement = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -107,32 +108,36 @@ fileNameInput.addEventListener("keyup", function(e) {
 document.getElementById("task-input").addEventListener("keyup", function(e) {
   if (e.which === 13) {
     //The keycode for enter key is 13
-
+    saveTask();
   }
 });
 
 
 document.getElementById("save-task-btn").addEventListener('click', e => {
-    let taskEl = document.getElementById("task-input");
-    let task = taskEl.value;
-    const timestamp = Date.now();
-    if(task){
-      taskManager.saveTasks({
-        content: task,
-        file : (currentFile) ? currentFile : "",
-        timestamp: timestamp,
-        project : (currentProject) ? currentProject : "",
-      }, getTasksPath(), function(){
-        loadTaskView();
-        taskEl.value = "";
-      });
-    }
+    saveTask();
 });
 
 function getTasksPath(){
   return path.join(APPLICATION_PATH,'tasks.db');
 }
 
+
+function saveTask(){
+  let taskEl = document.getElementById("task-input");
+  let task = taskEl.value;
+  const timestamp = Date.now();
+  if(task){
+    taskManager.saveTasks({
+      content: task,
+      file : (currentFile) ? currentFile : "",
+      timestamp: timestamp,
+      project : (currentProject) ? currentProject : "",
+    }, getTasksPath(), function(){
+      loadTaskView();
+      taskEl.value = "";
+    });
+  }
+}
 
 document.getElementById("action-go-to-website").addEventListener('click', e=>{
   if(currentFile){
@@ -262,12 +267,22 @@ function openTaskView(){
   document.getElementById("side-bar").style.display = "block";
 }
 
+function openTaskViewWithSelected(){
+  loadTaskView();
+  document.getElementById("task-input").value = editor.getSelectedText();
+  document.getElementById("side-bar").style.display = "block";
+}
+
 function loadTaskView(){
-  taskManager.loadTasks(getTasksPath(), function(docs){
+  taskManager.loadTasks(getTasksPath(), currentProject, function(docs){
     let template = "";
     docs.forEach(( task )=>{
-      template += `<a data-file="${task.file}" href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
-      template += `<p class="mb-1">${task.content}</p>`;
+      template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<span class="mb-1">${task.content}</span>`;
+      if(task.file){
+        var name = path.basename(task.file);
+        template += `<span class="badge badge-info">${name}</span>`;
+      }
       //template  += `<small>Donec id elit non mi porta.</small>`;
       template +=  `</a>`;
     })
@@ -282,11 +297,32 @@ function loadTaskView(){
               onFileClickEvent(null, taskFile);
             }
         });
+        el.addEventListener('contextmenu', e => {
+          selectedTaskElement = e.currentTarget;
+          console.log(selectedTaskElement);
+          ipcRenderer.invoke('show-tasks-context-menu');
+          e.preventDefault();
+        })
     });
 
   });
 }
 
+
+
+function clearTasksView(){
+  document.getElementById('task-layout').innerHTML = "";
+}
+
+function copyTaskToClipBoard(){
+  if(selectedTaskElement){
+    let taskObject = JSON.parse(selectedTaskElement.getAttribute("data-object"));
+    console.log(taskObject);
+    if(taskObject){
+      clipboard.writeText(taskObject.content);
+    }
+  }
+}
 
 function updateProjectSettings(projectPath){
   db.saveToProjects({
@@ -635,6 +671,9 @@ function refreshView(){
 
 function createTabs(){
   let html = '';
+  if(openFiles.length < 0){
+    clearProject();
+  }
   for(let i=0; i<= openFiles.length-1; i++){
     var fileObject = openFiles[i];
     let file = fileObject.name;
@@ -919,6 +958,9 @@ function clearProject(){
   imageViewer.src = "";
   updatePageTitle("");
   openFiles = [];
+  currentFile = null;
+  selectedFileElement = null;
+  clearTasksView();
 }
 
 function closeProject(){

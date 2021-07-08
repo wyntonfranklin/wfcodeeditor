@@ -156,6 +156,10 @@
       -moz-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
       overflow-y: scroll;
     }
+
+    .task-item {
+      font-size: 15px;
+    }
   </style>
 
   <div id="app" style="" style="overflow: hidden">
@@ -205,17 +209,13 @@
           <span id="side-bar-close" style="float: right; cursor: pointer;">&#215; close</span>
         </div>
         <div class="input-group mb-3">
-          <input id="task-input" type="text" class="form-control" placeholder="Add note" aria-label="Recipient's username" aria-describedby="basic-addon2">
+          <input id="task-input" type="text" class="form-control" placeholder="Add task" aria-label="Recipient's username" aria-describedby="basic-addon2">
           <div class="input-group-append">
             <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
           </div>
         </div>
 
         <div class="list-group" id="task-layout">
-          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-            <small>Donec id elit non mi porta.</small>
-          </a>
         </div>
       </div>
 

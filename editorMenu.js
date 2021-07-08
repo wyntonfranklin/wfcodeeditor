@@ -2,11 +2,18 @@ module.exports =  {
   createMenu : (snippetsWindow, mainWindow) => {
     return [
       {
-        label: 'Add Note',
+        label: 'Add Task',
         click: () => {
           mainWindow.webContents.executeJavaScript(`openTaskView()`)
         },
       },
+      {
+        label: 'Add Selected as Task',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`openTaskViewWithSelected()`)
+        },
+      },
+      { type: 'separator' },
       {
         label: 'Find',
         click: () => {
@@ -15,6 +22,7 @@ module.exports =  {
       },
       { role: 'copy'},
       { role: 'paste'},
+      { type: 'separator' },
       {
         label: 'Snippets',
         submenu: [
