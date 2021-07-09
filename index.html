@@ -139,6 +139,7 @@
       color: white;
       padding: 5px;
       font-size: 12px;
+      z-index: 100;
     }
 
     .side-bar {
@@ -154,7 +155,13 @@
       box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
       -webkit-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
       -moz-box-shadow: -5px -1px 5px 0px rgba(128,118,118,0.75);
+    }
+
+    .side-bar-layout {
       overflow-y: scroll;
+      padding-bottom: 30px;
+      height: 100%;
+      position: relative;
     }
 
     .task-item {
@@ -208,14 +215,23 @@
         <div style="width:100%; margin-bottom: 5px; margin-top: 1px; vertical-align: middle; display: inline-block">
           <span id="side-bar-close" style="float: right; cursor: pointer;">&#215; close</span>
         </div>
-        <div class="input-group mb-3">
-          <input id="task-input" type="text" class="form-control" placeholder="Add task">
-          <div class="input-group-append">
-            <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
+        <div id="side-bar-layout"  class="side-bar-layout">
+          <div class="input-group mb-3">
+            <input id="task-input" type="text" class="form-control" placeholder="Add task">
+            <div class="input-group-append">
+              <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
+            </div>
           </div>
-        </div>
 
-        <div class="list-group" id="task-layout">
+          <div class="form-check">
+            <input id="showtaskbyfile" type="checkbox" class="form-check-input" id="exampleCheck1">
+            <label class="form-check-label" for="exampleCheck1">Show only in current file</label>
+          </div>
+
+          <br>
+
+          <div class="list-group" id="task-layout">
+          </div>
         </div>
       </div>
 

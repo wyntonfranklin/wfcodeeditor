@@ -20,7 +20,7 @@ module.exports =  {
         label: 'Delete task',
         click: () => {
 
-          mainDialog.webContents.executeJavaScript(`closeAllTabs()`)
+          mainDialog.webContents.executeJavaScript(`removeATask()`)
         },
       },
     ]

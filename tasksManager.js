@@ -3,11 +3,11 @@ let Datastore = require('nedb');
 let DBPATH = "";
 module.exports =  {
 
-  loadTasks : function (path, project, callback){
+  loadTasks : function (path, query, callback){
     let db = {};
     db.tasks = new Datastore(path);
     db.tasks.loadDatabase();
-    db.tasks.find({project: project }).sort({ timestamp: -1}).exec(function(err, docs) {
+    db.tasks.find(query).sort({ timestamp: -1}).exec(function(err, docs) {
         callback(docs);
     });
   },
@@ -43,6 +43,14 @@ module.exports =  {
       timestamp: oldObject.timestamp,
       project : oldObject.project,
     }
+  },
+  removeTask : function(path, id, callback){
+    let db = {};
+    db.tasks = new Datastore(path);
+    db.tasks.loadDatabase();
+    db.tasks.remove({ _id: id }, {}, function (err, numRemoved) {
+      callback();
+    });
   }
 
 }

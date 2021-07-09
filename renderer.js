@@ -22,6 +22,7 @@ let ctrlIsPressed = false;
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
 let APPLICATION_PATH = "";
+let SHOW_TASK_BY_FILE = false;
 const settings = new Store();
 let recentlyCreatedFile = null;
 let openFiles = [];
@@ -115,6 +116,16 @@ document.getElementById("task-input").addEventListener("keyup", function(e) {
 
 document.getElementById("save-task-btn").addEventListener('click', e => {
     saveTask();
+});
+
+
+document.getElementById("showtaskbyfile").addEventListener('change', function() {
+  if (this.checked) {
+   SHOW_TASK_BY_FILE = true;
+  } else {
+    SHOW_TASK_BY_FILE = false;
+  }
+  loadTaskView();
 });
 
 function getTasksPath(){
@@ -277,7 +288,11 @@ function openTaskViewWithSelected(){
 
 function loadTaskView(){
   document.getElementById("task-input").value = "";
-  taskManager.loadTasks(getTasksPath(), currentProject, function(docs){
+  var query = {project:currentProject};
+  if(SHOW_TASK_BY_FILE){
+    query = {project:currentProject, file:currentFile};
+  }
+  taskManager.loadTasks(getTasksPath(), query, function(docs){
     let template = "";
     docs.forEach(( task )=>{
       template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
@@ -312,6 +327,12 @@ function loadTaskView(){
 }
 
 
+function isTaskViewOpen(){
+  if(document.getElementById("side-bar").style.display === "block"){
+    return true;
+  }
+  return false;
+}
 
 function clearTasksView(){
   document.getElementById('task-layout').innerHTML = "";
@@ -589,6 +610,13 @@ function editATask(){
   hideShowModal("show" , "new-file-modal");
 }
 
+function removeATask(){
+  var currentTask = taskManager.getTaskFromElement(selectedTaskElement);
+  taskManager.removeTask(getTasksPath(), currentTask._id, function(){
+      loadTaskView();
+  })
+}
+
 function copyAFile(filepath){
   let dest;
   copyPathHolder = filepath;
@@ -690,6 +718,9 @@ let createDirectoryLink = (type, file, styleclass) => {
 function refreshView(){
   readFiles(currentProject);
   createTabs();
+  if(isTaskViewOpen()){
+    loadTaskView();
+  }
 }
 
 function createTabs(){
