@@ -217,6 +217,11 @@ document.getElementById("action-resize-picture").addEventListener('click', e=>{
   return false;
 });
 
+document.getElementById("show-console").addEventListener('click', e=>{
+  document.getElementById('cmd-layout').style.display = 'block';
+  return false;
+});
+
 document.getElementById("action-open-database").addEventListener("click", e => {
   shell.openExternal("C:\\Program Files\\MySQL\\MySQL Workbench 8.0 CE\\MySQLWorkbench.exe");
   return false;
@@ -570,13 +575,19 @@ function runCommand(command){
     command = `cd ${basePath} & ` + command;
   }
   console.log(command);
+  sendToConsole(command);
   showCmdLayout();
   cmd.run(command,
       function(err, data, stderr){
         console.log('examples dir now contains the example file along with : ',data)
-        document.getElementById('cmd-content').innerText = data;
+        sendToConsole(data)
+        sendToConsole("Command Complete")
       }
   );
+}
+
+function sendToConsole(message){
+  document.getElementById('cmd-content').innerText += message + "\r\n";
 }
 
 function copyFileToDest(filename){
