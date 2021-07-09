@@ -229,6 +229,7 @@ document.getElementById("action-open-database").addEventListener("click", e => {
 
 document.getElementById("side-bar-close").addEventListener('click', e=>{
   closeTasksView();
+  //comment
   return false;
 });
 
