@@ -17,6 +17,7 @@ const taskManager = require('./tasksManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
+const cmd=require('node-cmd');
 let ctrlIsPressed = false;
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
@@ -119,6 +120,11 @@ document.getElementById("save-task-btn").addEventListener('click', e => {
 });
 
 
+document.getElementById("cmd-close").addEventListener('click', e => {
+  document.getElementById("cmd-layout").style.display = "none";
+});
+
+
 document.getElementById("showtaskbyfile").addEventListener('change', function() {
   if (this.checked) {
    SHOW_TASK_BY_FILE = true;
@@ -170,6 +176,12 @@ document.getElementById("action-go-to-website").addEventListener('click', e=>{
       }
     }
   }
+});
+
+
+
+document.getElementById("action-run-command").addEventListener('click', e => {
+  runACommand();
 });
 
 
@@ -258,6 +270,10 @@ ipcRenderer.on('new-project-start', function (evt, message) {
   currentProject = projectPath;
   openProject(null, projectPath);
 });
+
+function showCmdLayout(){
+  document.getElementById("cmd-layout").style.display = "block";
+}
 
 
 function toggleTasksView(){
@@ -539,11 +555,28 @@ function onSaveButtonPressed(e){
         }else{
           console.log('task no found');
         }
+    }else if(CURRENT_FILE_OPENER_ACTION == 'runcommand'){
+      runCommand(filename);
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
     readFiles(currentProject);
   }
+}
+
+function runCommand(command){
+  if(currentFile){
+    let basePath = path.dirname(currentFile);
+    command = `cd ${basePath} & ` + command;
+  }
+  console.log(command);
+  showCmdLayout();
+  cmd.run(command,
+      function(err, data, stderr){
+        console.log('examples dir now contains the example file along with : ',data)
+        document.getElementById('cmd-content').innerText = data;
+      }
+  );
 }
 
 function copyFileToDest(filename){
@@ -570,6 +603,12 @@ function renameAFile(el, filename){
   let dir = path.dirname(file);
   fs.renameSync(file, path.join(dir, filename));
   readFiles(currentProject);
+}
+
+function runACommand(){
+  CURRENT_FILE_OPENER_ACTION = "runcommand";
+  setModalTitle('Run a Command');
+  hideShowModal("show" , "new-file-modal");
 }
 
 function createANewFile(){

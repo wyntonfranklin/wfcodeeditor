@@ -33,6 +33,7 @@
     "interactjs": "^1.10.11",
     "micromodal": "^0.4.6",
     "nedb": "^1.8.0",
+    "node-cmd": "^4.0.0",
     "open": "^8.2.1",
     "open-file-explorer": "^1.0.2"
   }

@@ -167,6 +167,19 @@
     .task-item {
       font-size: 15px;
     }
+
+    .cmd-layout {
+      height: 250px;
+      position: fixed;
+      bottom:30px;
+      width: 100%;
+      z-index: 100;
+      font-size: 12px;
+      color:white;
+      overflow-y: scroll;
+      background: #212529;
+      padding: 5px;
+    }
   </style>
 
   <div id="app" style="" style="overflow: hidden">
@@ -178,6 +191,7 @@
       <a id="action-go-to-website" title="Go to website" class="action-item"><img src="./icons/ic_world.png" width="24px"/></a>
       <a id="action-resize-picture" title="Resize Views" class="action-item"><img src="./icons/ic_resize.png" width="24px"/></a>
       <a id="action-open-database" title="Open Database Manager" class="action-item"><img src="./icons/ic_database.png" width="24px"/></a>
+      <a id="action-run-command" title="Run Command" class="action-item"><img src="./icons/ic_command.png" width="24px"/></a>
       <div style="float: right; margin-right: 5px;">
         <a id="manage-notes" title="Manage Notes" class="action-item"><img src="./icons/ic_note.png" width="24px"/></a>
       </div>
@@ -237,6 +251,10 @@
 
     </div>
 
+    <div id="cmd-layout" class="cmd-layout" style="display: none;">
+      <a id="cmd-close" style="float: right; top:0">Close</a>
+      <p id="cmd-content"></p>
+    </div>
     <div class="bottom-bar" style="">
       <span id="welcome-message">Hello World Programmers!</span>
     </div>
