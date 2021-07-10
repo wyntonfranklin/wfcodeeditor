@@ -1033,9 +1033,17 @@ function openNewProject(){
 
 let readFiles = (projectDir) => {
   if(projectDir){
+    let directContent = "";
     document.getElementById("directory").innerHTML = "";
     readFilesFromDir(projectDir, function(html){
-      document.getElementById("directory").innerHTML = html;
+      addToOpenDirectory(projectDir);
+      directContent += createDirectoryLink("dir", projectDir);
+      if( openDir.indexOf(projectDir) !== -1){
+        directContent += openSubDirectory();
+        directContent += html;
+        directContent += closeSubDirectory();
+      }
+      document.getElementById("directory").innerHTML = directContent;
       setListeners();
     });
   }else{
@@ -1185,16 +1193,6 @@ function makeResizable(){
       ],
       inertia: true
     })
-    .draggable({
-      listeners: { move: window.dragMoveListener },
-      inertia: true,
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: 'parent',
-          endOnly: true
-        })
-      ]
-    })
 }
 
 function makeTopResizable(){
@@ -1227,17 +1225,7 @@ function makeTopResizable(){
         })
       ],
       inertia: true
-    })
-    .draggable({
-      listeners: { move: window.dragMoveListener },
-      inertia: true,
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: 'parent',
-          endOnly: true
-        })
-      ]
-    })
+    });
 }
 
 
