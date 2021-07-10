@@ -122,6 +122,7 @@ document.getElementById("save-task-btn").addEventListener('click', e => {
 
 document.getElementById("cmd-close").addEventListener('click', e => {
   document.getElementById("cmd-layout").style.display = "none";
+  updateAfterResize();
 });
 
 
@@ -218,7 +219,7 @@ document.getElementById("action-resize-picture").addEventListener('click', e=>{
 });
 
 document.getElementById("show-console").addEventListener('click', e=>{
-  document.getElementById('cmd-layout').style.display = 'block';
+  toggleCmdLayout();
   return false;
 });
 
@@ -279,8 +280,18 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 
 function showCmdLayout(){
   document.getElementById("cmd-layout").style.display = "block";
+  updateAfterResize();
 }
 
+function toggleCmdLayout(){
+  let cmdEl = document.getElementById("cmd-layout");
+  if(cmdEl.style.display == "block"){
+    cmdEl.style.display = "none";
+  }else{
+    cmdEl.style.display = "block";
+  }
+  updateAfterResize();
+}
 
 function toggleTasksView(){
   let el = document.getElementById("side-bar");
@@ -388,6 +399,18 @@ function setSaveButtonAsActive(){
 
 function setSaveButtonAsInActive(){
 
+}
+
+function runAFile(){
+  if(currentFile){
+    var ext = path.extname(currentFile);
+    var baseName = path.basename(currentFile);
+    if(ext == ".php"){
+      runCommand('php '+ baseName)
+    }else if(ext == ".py"){
+      runCommand('python '+ baseName)
+    }
+  }
 }
 
 
@@ -582,13 +605,13 @@ function runCommand(command){
       function(err, data, stderr){
         console.log('examples dir now contains the example file along with : ',data)
         sendToConsole(data)
-        sendToConsole("Command Complete")
+        sendToConsole("----------------------------------------Command Complete--------------------------------------")
       }
   );
 }
 
 function sendToConsole(message){
-  document.getElementById('cmd-content').innerText += message + "\r\n";
+  document.getElementById('cmd-content').innerText += "\r\n"  + message + "\r\n";
 }
 
 function copyFileToDest(filename){
@@ -618,9 +641,18 @@ function renameAFile(el, filename){
 }
 
 function runACommand(){
-  CURRENT_FILE_OPENER_ACTION = "runcommand";
-  setModalTitle('Run a Command');
-  hideShowModal("show" , "new-file-modal");
+    CURRENT_FILE_OPENER_ACTION = "runcommand";
+    setModalTitle('Run a Command');
+    hideShowModal("show" , "new-file-modal");
+  if(currentFile){
+    var ext = path.extname(currentFile);
+    var baseName = path.basename(currentFile);
+    if(ext == ".php"){
+      fileNameInput.value = 'php '+ baseName;
+    }else if(ext == ".py"){
+      fileNameInput.value = 'python '+ baseName;
+    }
+  }
 }
 
 function createANewFile(){
@@ -1087,6 +1119,7 @@ function init(){
     readFiles(dir)
   })
   makeResizable();
+  makeTopResizable();
   updateAfterResize();
 }
 
@@ -1110,14 +1143,16 @@ function updateAfterResize(){
   var codePanel = document.getElementById("code-input");
   var tabsPanel = document.getElementById('file-tabs');
   var sideBarPanel = document.getElementById('side-bar');
-  leftPanel.style.height =(window.innerHeight - 40) +'px'
+  var cmdPanel = document.getElementById('cmd-layout');
+  var cmdHeight = cmdPanel.clientHeight;
+  leftPanel.style.height =(window.innerHeight - 40) -cmdHeight +'px'
   var winHeight = (window.innerHeight - 115);
   if(tabsPanel.clientHeight > 50){
     winHeight +=  50 - tabsPanel.clientHeight;
   }
-  editor.container.style.height =winHeight +'px'
+  editor.container.style.height = (winHeight - cmdHeight) +'px'
   editor.resize();
-  containerPanel.style.height = (window.innerHeight) +'px';
+  containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
   sideBarPanel.style.height = (window.innerHeight - 58) +'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
@@ -1132,42 +1167,31 @@ function makeResizable(){
       distance: 5,
       // resize from all edges and corners
       edges: {right: true },
-
       listeners: {
         move (event) {
           var target = event.target
           var x = (parseFloat(target.getAttribute('data-x')) || 0)
           var y = (parseFloat(target.getAttribute('data-y')) || 0)
-
-
-          // update the element's style
           target.style.width = event.rect.width + 'px'
           target.style.height = event.rect.height + 'px'
-
-          // translate when resizing from top or left edges
           x += event.deltaRect.left
           y += event.deltaRect.top
-
           target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
-
           target.setAttribute('data-x', x)
           target.setAttribute('data-y', y)
-          //target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
-           rightPanel.style.width = (containerPanel.getBoundingClientRect().width - 10)  -  (Math.round(event.rect.width)) + "px";
-        }
+          updateAfterResize();
+      }
       },
       modifiers: [
         // keep the edges inside the parent
         interact.modifiers.restrictEdges({
           outer: 'parent'
         }),
-
         // minimum size
         interact.modifiers.restrictSize({
           min: { width: 160, height: 50 }
         })
       ],
-
       inertia: true
     })
     .draggable({
@@ -1181,6 +1205,50 @@ function makeResizable(){
       ]
     })
 }
+
+function makeTopResizable(){
+  interact('.resize-drag-top')
+    .resizable({
+      margin: 30,
+      distance: 5,
+      // resize from all edges and corners
+      edges: {top: true },
+      listeners: {
+        move (event) {
+          var target = event.target
+          var x = (parseFloat(target.getAttribute('data-x')) || 0)
+          var y = (parseFloat(target.getAttribute('data-y')) || 0)
+          target.style.height = event.rect.height + 'px'
+          y += event.deltaRect.top
+          target.setAttribute('data-x', x)
+          target.setAttribute('data-y', y)
+          updateAfterResize();
+        }
+      },
+      modifiers: [
+        // keep the edges inside the parent
+        interact.modifiers.restrictEdges({
+          outer: 'parent'
+        }),
+        // minimum size
+        interact.modifiers.restrictSize({
+          min: { width: 160, height: 50 }
+        })
+      ],
+      inertia: true
+    })
+    .draggable({
+      listeners: { move: window.dragMoveListener },
+      inertia: true,
+      modifiers: [
+        interact.modifiers.restrictRect({
+          restriction: 'parent',
+          endOnly: true
+        })
+      ]
+    })
+}
+
 
 function onBlurEvents(){
   checkIfCurrentFileIsEdited();

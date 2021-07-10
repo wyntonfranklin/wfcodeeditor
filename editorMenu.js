@@ -2,6 +2,13 @@ module.exports =  {
   createMenu : (snippetsWindow, mainWindow) => {
     return [
       {
+        label: 'Run this file',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`runAFile()`)
+        },
+      },
+      { type: 'separator' },
+      {
         label: 'Add Task',
         click: () => {
           mainWindow.webContents.executeJavaScript(`openTaskView()`)
