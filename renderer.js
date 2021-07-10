@@ -64,6 +64,7 @@ let modalTitle = document.getElementById('dialog-title');
 let modalDescription = document.getElementById('modal-description');
 
 let CURRENT_PROJECT_NAME = "";
+let cmdContent = "";
 
 let ACTIVE_MODAL_ID = "";
 let CURRENT_FILE_OPENER_ACTION = null;
@@ -594,7 +595,9 @@ function runCommand(command){
 }
 
 function sendToConsole(message){
-  document.getElementById('cmd-content').innerText += "\r\n"  + message + "\r\n";
+  cmdContent += "\r\n" + message + "\r\n";
+  let currentTextEl = document.getElementById('cmd-content');
+  currentTextEl.innerText = cmdContent;
 }
 
 function copyFileToDest(filename){
