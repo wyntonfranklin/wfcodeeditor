@@ -586,10 +586,15 @@ function runCommand(command){
   showCmdLayout();
   cmd.run(command,
       function(err, data, stderr){
-        console.log('examples dir now contains the example file along with : ',data)
-        sendToConsole(data)
-        sendToConsole("----------------------------------------Command Complete--------------------------------------");
-        scrollCmdViewDown();
+        if(err){
+          console.log(err);
+          sendToConsole(err);
+        }else{
+          console.log('examples dir now contains the example file along with : ',data)
+          sendToConsole(data)
+          sendToConsole("----------------------------------------Command Complete--------------------------------------");
+          scrollCmdViewDown();
+        }
       }
   );
 }
