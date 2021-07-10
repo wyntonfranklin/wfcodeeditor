@@ -241,24 +241,6 @@ codeView.addEventListener('contextmenu', e=>{
 });
 
 
-codeView.addEventListener('click', event=>{
-  if(ctrlIsPressed){
-    search();
-    return false;
-  }
-});
-
-
-
-codeView.addEventListener('keydown', event=>{
-  if(event.ctrlKey){
-    search();
-    return false;
-  }
-});
-
-
-
 closeModalButton.addEventListener('click', e => {
   hideShowModal("hide","new-file-modal");
 });
@@ -605,7 +587,8 @@ function runCommand(command){
       function(err, data, stderr){
         console.log('examples dir now contains the example file along with : ',data)
         sendToConsole(data)
-        sendToConsole("----------------------------------------Command Complete--------------------------------------")
+        sendToConsole("----------------------------------------Command Complete--------------------------------------");
+        scrollCmdViewDown();
       }
   );
 }
@@ -1076,6 +1059,11 @@ function loadRecentProjects(){
 
 }
 
+function scrollCmdViewDown(){
+  let cmdView = document.getElementById("cmd-layout-content");
+  cmdView.scrollTo(0,cmdView.scrollHeight);
+}
+
 function openProject(event, filepath){
   closeProject();
   currentProject = filepath;
@@ -1153,7 +1141,7 @@ function updateAfterResize(){
   editor.container.style.height = (winHeight - cmdHeight) +'px'
   editor.resize();
   containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
-  sideBarPanel.style.height = (window.innerHeight - 58) +'px';
+  sideBarPanel.style.height = (window.innerHeight - 58 - cmdHeight) +'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
