@@ -254,6 +254,7 @@
 
           <!-- Tasks layout -->
           <div id="sbl-tasks" style="display: none;" data-name="tasks">
+            <h5>Tasks</h5>
             <div class="input-group mb-3">
               <input id="task-input" type="text" class="form-control" placeholder="Add task">
               <div class="input-group-append">
@@ -272,11 +273,12 @@
 
           <!-- Snippets layout -->
           <div id="sbl-snippets" style="display: none;" data-name="snippets">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Snippet Name">
-            </div>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Snippet Content">
+            <h5>Snippets</h5>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="Search" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">Add</span>
+              </div>
             </div>
             <br>
             <div class="list-group" id="snippets-layout">
@@ -319,7 +321,12 @@
           <span id="modal-description"></span>
           <div class="form-group">
             <label style="display: none;">Filename</label>
-            <input type="text" class="form-control" id="file-name-input" placeholder="Enter filename"></div>
+            <input type="text" class="form-control" id="file-name-input" placeholder="Enter filename">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Description</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+          </div>
         </div>
         <div class="modal-footer">
           <button id="save-file-btn" type="button" class="btn btn-primary">Save changes</button>
