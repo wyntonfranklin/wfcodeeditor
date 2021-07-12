@@ -210,6 +210,7 @@
       &nbsp; &nbsp;  | &nbsp; &nbsp;
       <a id="action-view-command" title="View Command" class="action-item"><img src="./icons/ic_command.png" width="24px"/></a>
       <a id="manage-notes" title="Manage Notes" class="action-item"><img src="./icons/ic_note.png" width="24px"/></a>
+      <a id="manage-code-snippets" title="Manage Code Snippets" class="action-item"><img src="./icons/ic_code.png" width="24px"/></a>
       <a id="manage-bookmarks" title="Manage Bookmarks" class="action-item"><img src="./icons/ic_bookmarks.png" width="24px"/></a>
       <a id="manage-external-apps" title="Manage External Apps" class="action-item"><img src="./icons/ic_computer.png" width="24px"/></a>
       <div style="float: right; margin-right: 5px;">
@@ -249,22 +250,41 @@
           <span id="side-bar-close" style="float: right; cursor: pointer;">&#215; close</span>
         </div>
         <div id="side-bar-layout"  class="side-bar-layout">
-          <div class="input-group mb-3">
-            <input id="task-input" type="text" class="form-control" placeholder="Add task">
-            <div class="input-group-append">
-              <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
+
+
+          <!-- Tasks layout -->
+          <div id="sbl-tasks" style="display: none;" data-name="tasks">
+            <div class="input-group mb-3">
+              <input id="task-input" type="text" class="form-control" placeholder="Add task">
+              <div class="input-group-append">
+                <button id="save-task-btn" class="btn btn-outline-secondary" type="button">Save</button>
+              </div>
+            </div>
+            <div class="form-check">
+              <input id="showtaskbyfile" type="checkbox" class="form-check-input" id="exampleCheck1">
+              <label class="form-check-label" for="exampleCheck1">Show only in current file</label>
+            </div>
+            <br>
+            <div class="list-group" id="task-layout">
             </div>
           </div>
 
-          <div class="form-check">
-            <input id="showtaskbyfile" type="checkbox" class="form-check-input" id="exampleCheck1">
-            <label class="form-check-label" for="exampleCheck1">Show only in current file</label>
+
+          <!-- Snippets layout -->
+          <div id="sbl-snippets" style="display: none;" data-name="snippets">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Snippet Name">
+            </div>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Snippet Content">
+            </div>
+            <br>
+            <div class="list-group" id="snippets-layout">
+            </div>
           </div>
 
-          <br>
 
-          <div class="list-group" id="task-layout">
-          </div>
+
         </div>
       </div>
 
@@ -286,7 +306,7 @@
   </div>
 
   <div id="backdrop" style="display: none;" class="modal-backdrop fade show"></div>
-  <div id="new-file-modal" class="modal fade show" tabindex="-1" role="dialog" style="display: none">
+  <div id="new-file-modal" class="modal fade show draggable-content" tabindex="-1" role="dialog" style="display: none">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">

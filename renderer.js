@@ -18,6 +18,8 @@ let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
 const cmd=require('node-cmd');
+const sideBarManager = require('./sidebarManager');
+
 let ctrlIsPressed = false;
 
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
@@ -208,6 +210,11 @@ document.getElementById("manage-notes").addEventListener('click', e=>{
 });
 
 
+document.getElementById("manage-code-snippets").addEventListener("click", e=>{
+  toggleSnippetsView();
+  return false;
+});
+
 
 document.getElementById("action-save-file").addEventListener('click', e=>{
   saveCurrentFile();
@@ -261,6 +268,16 @@ ipcRenderer.on('new-project-start', function (evt, message) {
   openProject(null, projectPath);
 });
 
+
+function openSideBar(){
+
+}
+
+function toggleSnippetsView(){
+  sideBarManager.toggleSideBar(function(){
+
+  },'snippets')
+}
 function showCmdLayout(){
   document.getElementById("cmd-layout").style.display = "block";
   updateAfterResize();
@@ -277,29 +294,28 @@ function toggleCmdLayout(){
 }
 
 function toggleTasksView(){
-  let el = document.getElementById("side-bar");
-  if(el.style.display === "none"){
+  sideBarManager.toggleSideBar(function(){
     openTaskView();
-  }else{
-    closeTasksView();
-  }
+  },"tasks")
 }
 
 function closeTasksView(){
-  document.getElementById("side-bar").style.display = "none";
+  sideBarManager.closeSideBar();
 }
 
 function openTaskView(){
-  loadTaskView();
-  document.getElementById("side-bar").style.display = "block";
-  document.getElementById("task-input").focus();
+  sideBarManager.openSideBar(function(){
+    loadTaskView();
+    document.getElementById("task-input").focus();
+  }, "tasks");
 }
 
 function openTaskViewWithSelected(){
-  loadTaskView();
-  document.getElementById("task-input").value = editor.getSelectedText();
-  document.getElementById("side-bar").style.display = "block";
-  document.getElementById("task-input").focus();
+  sideBarManager.openSideBar(function(){
+    loadTaskView();
+    document.getElementById("task-input").value = editor.getSelectedText();
+    document.getElementById("task-input").focus();
+  },"tasks")
 }
 
 function loadTaskView(){
@@ -1124,6 +1140,7 @@ function init(){
   })
   makeResizable();
   makeTopResizable();
+  makeDraggable();
   updateAfterResize();
 }
 
@@ -1148,6 +1165,7 @@ function updateAfterResize(){
   var tabsPanel = document.getElementById('file-tabs');
   var sideBarPanel = document.getElementById('side-bar');
   var cmdPanel = document.getElementById('cmd-layout');
+  var newFileModal = document.getElementById("new-file-modal");
   var cmdHeight = cmdPanel.clientHeight;
   leftPanel.style.height =(window.innerHeight - 40) -cmdHeight +'px'
   var winHeight = (window.innerHeight - 115);
@@ -1158,6 +1176,8 @@ function updateAfterResize(){
   editor.resize();
   containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
   sideBarPanel.style.height = (window.innerHeight - 58 - cmdHeight) +'px';
+  newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
+  //newFileModal.style.left = (window.innerWidth/2) + 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
@@ -1233,6 +1253,43 @@ function makeTopResizable(){
     });
 }
 
+
+function makeDraggable(){
+  interact('.draggable-content')
+      .draggable({
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrictRect({
+            restriction: 'parent',
+            endOnly: true
+          })
+        ],
+        autoScroll: true,
+        listeners: {
+          move: dragMoveListener,
+          end (event) {
+
+          }
+        }
+      })
+}
+
+function dragMoveListener (event) {
+  var containerPanel = document.getElementById('panel-container');
+  var target = event.target
+  // keep the dragged position in the data-x/data-y attributes
+  var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+  var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+
+  // translate the element
+  target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+
+  // update the posiion attributes
+  target.setAttribute('data-x', x)
+  target.setAttribute('data-y', y)
+  target.style.width = (containerPanel.clientWidth - x) + 'px';
+  target.style.height = (containerPanel.clientHeight - y) + 'px';
+}
 
 function onBlurEvents(){
   checkIfCurrentFileIsEdited();
