@@ -34,6 +34,7 @@ let activeTabEl = null;
 let activeFileBrowserEl = null;
 let selectedTab = null;
 let selectedTaskElement = null;
+let currentSideBar = null;
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -269,8 +270,11 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 });
 
 
-function openSideBar(){
 
+function openSnippetsView(){
+  sideBarManager.openSideBar(function(){
+
+  },'snippets')
 }
 
 function toggleSnippetsView(){
@@ -294,8 +298,10 @@ function toggleCmdLayout(){
 }
 
 function toggleTasksView(){
-  sideBarManager.toggleSideBar(function(){
-    openTaskView();
+  sideBarManager.toggleSideBar(function(visibility){
+    if(visibility === "visible"){
+      openTaskView();
+    }
   },"tasks")
 }
 

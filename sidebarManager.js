@@ -6,21 +6,42 @@ let bars = [tasksBar, snippetsBar];
 
 module.exports =  {
 
-    toggleSideBar : function (callback, bar){
+    showSideBarContainer : function(){
+        sideBar.style.display = "block";
+    },
+    closeSideBarContainer : function(){
+        sideBar.style.display = "none";
+    },
+    isSideBarOpen : function(){
         if(sideBar.style.display === "none"){
-            if(bar){
-                this.showSideBarLayout(bar);
-            }
-            this.openSideBar(callback);
-        }else{
-            let openBar = this.getOpenBars();
-            if(openBar && openBar.getAttribute("data-name") !== bar){
-                this.closeSideBars();
-                this.showSideBarLayout(bar);
-            }else{
-                this.closeSideBar();
-            }
+            return false;
         }
+        return true;
+    },
+    toggleSideBar : function (callback, bar){
+        let currentBar = this.getBarByName(bar);
+        let openBar = this.getOpenBars();
+        let visibilityStatus = "hidden";
+        if(currentBar.style.display === "none"){
+            this.closeSideBars();
+            currentBar.style.display = "block";
+            visibilityStatus = "visible";
+            this.showSideBarContainer();
+        }else{
+            if(currentBar.getAttribute('data-name') === bar){
+                this.closeSideBarContainer();
+            }
+            currentBar.style.display = "none";
+            visibilityStatus = "hidden";
+        }
+        callback(visibilityStatus);
+    },
+    getBarByName : function(bar){
+      if(bar == "tasks"){
+          return tasksBar;
+      }else if(bar == "snippets"){
+          return snippetsBar;
+      }
     },
     openSideBar : function(callback, bar){
         sideBar.style.display = "block";
@@ -74,6 +95,7 @@ module.exports =  {
         }
     },
     openBar : function(el){
+        this.closeSideBars();
         el.style.display = "block";
     },
     hideBar : function(el){
