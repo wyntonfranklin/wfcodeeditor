@@ -14,6 +14,7 @@ const extensions = require('./extensions');
 const Store = require('electron-store');
 const openExplorer = require('open-file-explorer');
 const taskManager = require('./tasksManager');
+const snippetManager = require('./snippetsManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -65,6 +66,8 @@ let fileTabs = document.getElementById("file-tabs");
 
 let modalTitle = document.getElementById('dialog-title');
 let modalDescription = document.getElementById('modal-description');
+let modalContentView = document.getElementById('modal-description-field');
+let modalContentInput = document.getElementById('model-description-content');
 
 let CURRENT_PROJECT_NAME = "";
 let cmdContent = "";
@@ -143,6 +146,24 @@ function getTasksPath(){
   return path.join(APPLICATION_PATH,'tasks.db');
 }
 
+
+function saveSnippet(){
+  let snippetName = fileNameInput.value;
+  let snippetContent = modalContentInput.value;
+  const timestamp = Date.now();
+  let snippetsDbPath = path.join(APPLICATION_PATH,'snippets.db');
+  if(snippetName && snippetContent){
+    snippetManager.saveSnippet({
+      title: snippetName,
+      snippet : snippetContent,
+      timestamp : timestamp,
+      project : (currentProject) ? currentProject : "",
+      file : (currentFile) ? currentFile : "",
+    }, snippetsDbPath, function(){
+        loadSnippetsView();
+    });
+  }
+}
 
 function saveTask(){
   let taskEl = document.getElementById("task-input");
@@ -243,6 +264,12 @@ document.getElementById("side-bar-close").addEventListener('click', e=>{
   return false;
 });
 
+
+document.getElementById("add-snippet").addEventListener('click', e=>{
+  createANewSnippet();
+  return false;
+});
+
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
 
@@ -273,13 +300,13 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 
 function openSnippetsView(){
   sideBarManager.openSideBar(function(){
-
+    loadSnippetsView();
   },'snippets')
 }
 
 function toggleSnippetsView(){
   sideBarManager.toggleSideBar(function(){
-
+      loadSnippetsView();
   },'snippets')
 }
 function showCmdLayout(){
@@ -323,6 +350,28 @@ function openTaskViewWithSelected(){
     document.getElementById("task-input").focus();
   },"tasks")
 }
+
+function loadSnippetsView(){
+  let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
+  var query = {project:currentProject};
+  snippetManager.loadSnippets(snippetsPath, query, function(docs){
+    let template = "";
+    docs.forEach(( snippet )=>{
+      template += `<a data-file="${snippet.file}" data-object='${JSON.stringify(snippet)}' href="#" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `    <div class="d-flex w-100 justify-content-between">
+                  <h5 class="mb-1">${snippet.title}</h5>
+                </div>`;
+      template += `<p class="mb-1">${snippet.snippet}</p>`;
+      if(snippet.file){
+        var name = path.basename(snippet.file);
+        template += `<span class="badge badge-info">filetype</span>`;
+      }
+      template +=  `</a>`;
+    });
+    document.getElementById('snippets-layout').innerHTML = template;
+  });
+}
+
 
 function loadTaskView(){
   document.getElementById("task-input").value = "";
@@ -591,6 +640,8 @@ function onSaveButtonPressed(e){
         }
     }else if(CURRENT_FILE_OPENER_ACTION == 'runcommand'){
       runCommand(filename);
+    }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
+      saveSnippet();
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
@@ -667,6 +718,13 @@ function runACommand(){
     }
   }
 }
+
+function createANewSnippet(){
+  CURRENT_FILE_OPENER_ACTION = "snippet";
+  setModalTitle('Add a Snippet');
+  hideShowModal("show" , "new-file-modal","show");
+}
+
 
 function createANewFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
@@ -756,19 +814,25 @@ function showRecentProjects(){
 }
 
 
-function hideShowModal(action, id){
+function hideShowModal(action, id, content){
   var el = document.getElementById(id);
   if(action == "show"){
     ACTIVE_MODAL_ID = id;
     backdropUi.style.display = "block";
     el.style.display = "block";
     fileNameInput.focus();
+    if(content){
+      modalContentView.style.display = "block";
+      modalContentInput.value = "";
+    }
   }else{
     ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
     el.style.display = "none";
     fileNameInput.value = "";
     modalDescription.innerText = "";
+    modalContentInput.value = "";
+    modalContentView.style.display = "none";
   }
 
 }
@@ -1183,7 +1247,7 @@ function updateAfterResize(){
   containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
   sideBarPanel.style.height = (window.innerHeight - 58 - cmdHeight) +'px';
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
-  //newFileModal.style.left = (window.innerWidth/2) + 'px';
+  //newFileModal.style.left = (window.innerWidth/2 + 100)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
