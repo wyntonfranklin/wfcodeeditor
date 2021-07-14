@@ -77,6 +77,7 @@ let CURRENT_FILE_OPENER_ACTION = null;
 let CURRENT_FILE_OPENER_TYPE = null;
 var openDir = [];
 let copyPathHolder =  null;
+
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
 var langTools = ace.require("ace/ext/language_tools");
@@ -143,7 +144,7 @@ document.getElementById("showtaskbyfile").addEventListener('change', function() 
 });
 
 function getTasksPath(){
-  return path.join(APPLICATION_PATH,'tasks.db');
+  return path.join(APPLICATION_PATH,'sidebar.db');
 }
 
 
@@ -271,7 +272,7 @@ document.getElementById("add-snippet").addEventListener('click', e=>{
 });
 
 codeView.addEventListener('contextmenu', e=>{
-  ipcRenderer.invoke('show-code-context-menu').then(dbPath=>{
+  ipcRenderer.invoke('show-context-menu','code').then(dbPath=>{
 
   });
 });
@@ -306,7 +307,7 @@ function openSnippetsView(){
 
 function toggleSnippetsView(){
   sideBarManager.toggleSideBar(function(){
-      loadSnippetsView();
+    loadSnippetsView();
   },'snippets')
 }
 function showCmdLayout(){
@@ -369,6 +370,18 @@ function loadSnippetsView(){
       template +=  `</a>`;
     });
     document.getElementById('snippets-layout').innerHTML = template;
+
+    // listeners
+    const divs = document.querySelectorAll('.snippet-item');
+    divs.forEach( el => {
+      el.addEventListener('click', (event)=>{
+        // var taskFile = el.getAttribute('data-file');
+      });
+      el.addEventListener('contextmenu', e => {
+        ipcRenderer.invoke('show-context-menu',"snippets");
+        e.preventDefault();
+      })
+    });
   });
 }
 
@@ -396,18 +409,18 @@ function loadTaskView(){
     // listeners
     const divs = document.querySelectorAll('.task-item');
     divs.forEach( el => {
-        el.addEventListener('click', (event)=>{
-            var taskFile = el.getAttribute('data-file');
-            if(taskFile){
-              onFileClickEvent(null, taskFile);
-            }
-        });
-        el.addEventListener('contextmenu', e => {
-          selectedTaskElement = e.currentTarget;
-          console.log(selectedTaskElement);
-          ipcRenderer.invoke('show-tasks-context-menu');
-          e.preventDefault();
-        })
+      el.addEventListener('click', (event)=>{
+        var taskFile = el.getAttribute('data-file');
+        if(taskFile){
+          onFileClickEvent(null, taskFile);
+        }
+      });
+      el.addEventListener('contextmenu', e => {
+        selectedTaskElement = e.currentTarget;
+        console.log(selectedTaskElement);
+        ipcRenderer.invoke('show-context-menu',"tasks");
+        e.preventDefault();
+      })
     });
 
   });
@@ -484,7 +497,7 @@ function addOpenFile(file){
 }
 
 function removeOpenFile(file){
-    helper.removeFromObjectArray(openFiles, "name", file);
+  helper.removeFromObjectArray(openFiles, "name", file);
 }
 
 function onDirectoryClickEvent(e, file){
@@ -507,15 +520,15 @@ function onFileClickEvent(e, file){
   updatePageTitle(file);
   currentDirectory = null;
   if(extensions.hasOwnProperty(ext)){
-      fileAction = fileActions[ext].type;
-      if(fileAction === "code"){
-          appOpenCode(e, file, ext);
-      }else if(fileAction === "image"){
-          appOpenImage(e, file, ext)
-      }else{
-        setMessageBox("Cant open this file");
-      }
-      refreshView();
+    fileAction = fileActions[ext].type;
+    if(fileAction === "code"){
+      appOpenCode(e, file, ext);
+    }else if(fileAction === "image"){
+      appOpenImage(e, file, ext)
+    }else{
+      setMessageBox("Cant open this file");
+    }
+    refreshView();
   }else{
     console.log(ext);
     setMessageBox("Cant open this file");
@@ -598,7 +611,7 @@ function saveADirectory(path, callback){
 }
 
 saveButton.addEventListener("click", e => {
-    onSaveButtonPressed(e);
+  onSaveButtonPressed(e);
 });
 
 
@@ -628,16 +641,16 @@ function onSaveButtonPressed(e){
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
       editor.findAll(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'task'){
-        let tO = taskManager.getTaskFromElement(selectedTaskElement);
-        if(tO){
-          let update = taskManager.changeTaskContent(tO, filename);
-          taskManager.updateTask(getTasksPath(),
+      let tO = taskManager.getTaskFromElement(selectedTaskElement);
+      if(tO){
+        let update = taskManager.changeTaskContent(tO, filename);
+        taskManager.updateTask(getTasksPath(),
             {_id: tO._id}, update, function(){
-            loadTaskView();
-          });
-        }else{
-          console.log('task no found');
-        }
+              loadTaskView();
+            });
+      }else{
+        console.log('task no found');
+      }
     }else if(CURRENT_FILE_OPENER_ACTION == 'runcommand'){
       runCommand(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
@@ -684,7 +697,7 @@ function copyFileToDest(filename){
   let fileStats = getFileStats(selectedPath);
   let baseDir = null;
   if(fileStats.directory){
-      baseDir = selectedPath;
+    baseDir = selectedPath;
   }else{
     baseDir = path.dirname(selectedPath);
   }
@@ -705,9 +718,9 @@ function renameAFile(el, filename){
 }
 
 function runACommand(){
-    CURRENT_FILE_OPENER_ACTION = "runcommand";
-    setModalTitle('Run a Command');
-    hideShowModal("show" , "new-file-modal");
+  CURRENT_FILE_OPENER_ACTION = "runcommand";
+  setModalTitle('Run a Command');
+  hideShowModal("show" , "new-file-modal");
   if(currentFile){
     var ext = path.extname(currentFile);
     var baseName = path.basename(currentFile);
@@ -767,7 +780,7 @@ function editATask(){
 function removeATask(){
   var currentTask = taskManager.getTaskFromElement(selectedTaskElement);
   taskManager.removeTask(getTasksPath(), currentTask._id, function(){
-      loadTaskView();
+    loadTaskView();
   })
 }
 
@@ -943,11 +956,11 @@ function setTabEvents(){
   divs2.forEach( el => {
     el.addEventListener('click', e=>{
       let file = el.getAttribute('data-file');
-        onFileClickEvent(null, file);
+      onFileClickEvent(null, file);
     })
     el.addEventListener('contextmenu', e => {
       selectedTab = e.target;
-      ipcRenderer.invoke('show-tabs-context-menu');
+      ipcRenderer.invoke('show-context-menu',"tabs");
     })
   });
 
@@ -961,7 +974,7 @@ function getIcon(fname){
     let iconname = `./icons/ic_${extensions[ext].icon}.png`;
     try {
       if(fs.existsSync(iconname)) {
-         return iconname;
+        return iconname;
       } else {
         return defaultIcon;
       }
@@ -974,7 +987,7 @@ function getIcon(fname){
 }
 
 let openSubDirectory = () => {
-   return `<ul class="directory-lister-sub">`;
+  return `<ul class="directory-lister-sub">`;
 }
 
 
@@ -986,8 +999,8 @@ let closeSubDirectory = () => {
 let undoDirectoryStyling = () => {
   const divs = document.querySelectorAll('.file-link');
   divs.forEach( el => {
-   // el.style.backgroundColor = "transparent";
-   // el.classList.remove('active');
+    // el.style.backgroundColor = "transparent";
+    // el.classList.remove('active');
     helper.removeElementClass(el, "active");
   })
 }
@@ -1007,26 +1020,26 @@ let setListeners = () => {
 
     // on context menu
     el.addEventListener('contextmenu', e=>{
-        selectedFileElement = e.target;
-        undoDirectoryStyling();
-        helper.addElementClass(e.target, "active");
-       ipcRenderer.invoke('show-file-context-menu').then(e=>{
+      selectedFileElement = e.target;
+      undoDirectoryStyling();
+      helper.addElementClass(e.target, "active");
+      ipcRenderer.invoke('show-context-menu',"file").then(e=>{
       });
     });
 
 
     // on double click
     el.addEventListener('dblclick', event => {
-        selectedFileElement = event.target;
-        let el = document.getElementById('code-input');
-        let file = event.target.getAttribute("data-path");
-        let fileType = event.target.getAttribute("data-type");
-        undoDirectoryStyling();
-        if(fileType === "file"){
-          onFileClickEvent(event, file);
-        }else if(fileType === 'dir'){
-          onDirectoryClickEvent(event, file);
-        }
+      selectedFileElement = event.target;
+      let el = document.getElementById('code-input');
+      let file = event.target.getAttribute("data-path");
+      let fileType = event.target.getAttribute("data-type");
+      undoDirectoryStyling();
+      if(fileType === "file"){
+        onFileClickEvent(event, file);
+      }else if(fileType === 'dir'){
+        onDirectoryClickEvent(event, file);
+      }
     })
 
     el.addEventListener('click', event => {
@@ -1045,12 +1058,12 @@ let setListeners = () => {
 
 function saveLastProject(filepath){
 
-   /** db.saveToSettings({'name': "current-project",},{
+  /** db.saveToSettings({'name': "current-project",},{
       'name': "current-project",
       'value': filepath
     })
-    **/
-   settings.set("currentproject", filepath);
+   **/
+  settings.set("currentproject", filepath);
 }
 
 function assignAceMode(editor, ext){
@@ -1118,7 +1131,7 @@ function readFilesFromDir(dir) {
 
 function openNewProject(){
   getProjectDir( dir =>{
-      readFiles(dir);
+    readFiles(dir);
   })
 }
 
@@ -1146,7 +1159,7 @@ function loadRecentProjects(){
   let html = '';
   db.getAllProjects({}, function (err, docs) {
     docs.forEach(function(project){
-     // console.log(project.name, "here")
+      // console.log(project.name, "here")
       let projectName = helper.getDirectoryName(project.name);
       html += `<li class="list-group-item list-group-item-action recent-project" data-filepath="${project.name}">${projectName}</li>`;
     });
@@ -1154,7 +1167,7 @@ function loadRecentProjects(){
     const divs = document.querySelectorAll('.recent-project');
     divs.forEach( el => {
       el.addEventListener('click', e=>{
-          openProject(e, e.target.getAttribute("data-filepath"));
+        openProject(e, e.target.getAttribute("data-filepath"));
       })
     })
   });
@@ -1247,7 +1260,7 @@ function updateAfterResize(){
   containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
   sideBarPanel.style.height = (window.innerHeight - 58 - cmdHeight) +'px';
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
-  //newFileModal.style.left = (window.innerWidth/2 + 100)+ 'px';
+  newFileModal.style.left = (appPanel.innerWidth/2)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
@@ -1256,71 +1269,71 @@ function makeResizable(){
   var rightPanel = document.getElementById('right-panel');
   var containerPanel = document.getElementById('panel-container');
   interact('.resize-drag')
-    .resizable({
-      margin: 30,
-      distance: 5,
-      // resize from all edges and corners
-      edges: {right: true },
-      listeners: {
-        move (event) {
-          var target = event.target
-          var x = (parseFloat(target.getAttribute('data-x')) || 0)
-          var y = (parseFloat(target.getAttribute('data-y')) || 0)
-          target.style.width = event.rect.width + 'px'
-          target.style.height = event.rect.height + 'px'
-          x += event.deltaRect.left
-          y += event.deltaRect.top
-          target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
-          target.setAttribute('data-x', x)
-          target.setAttribute('data-y', y)
-          updateAfterResize();
-      }
-      },
-      modifiers: [
-        // keep the edges inside the parent
-        interact.modifiers.restrictEdges({
-          outer: 'parent'
-        }),
-        // minimum size
-        interact.modifiers.restrictSize({
-          min: { width: 160, height: 50 }
-        })
-      ],
-      inertia: true
-    })
+      .resizable({
+        margin: 30,
+        distance: 5,
+        // resize from all edges and corners
+        edges: {right: true },
+        listeners: {
+          move (event) {
+            var target = event.target
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+            target.style.width = event.rect.width + 'px'
+            target.style.height = event.rect.height + 'px'
+            x += event.deltaRect.left
+            y += event.deltaRect.top
+            target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+            updateAfterResize();
+          }
+        },
+        modifiers: [
+          // keep the edges inside the parent
+          interact.modifiers.restrictEdges({
+            outer: 'parent'
+          }),
+          // minimum size
+          interact.modifiers.restrictSize({
+            min: { width: 160, height: 50 }
+          })
+        ],
+        inertia: true
+      })
 }
 
 function makeTopResizable(){
   interact('.resize-drag-top')
-    .resizable({
-      margin: 30,
-      distance: 5,
-      // resize from all edges and corners
-      edges: {top: true },
-      listeners: {
-        move (event) {
-          var target = event.target
-          var x = (parseFloat(target.getAttribute('data-x')) || 0)
-          var y = (parseFloat(target.getAttribute('data-y')) || 0)
-          target.style.height = event.rect.height + 'px'
-          y += event.deltaRect.top
-          target.setAttribute('data-x', x)
-          target.setAttribute('data-y', y)
-          updateAfterResize();
-        }
-      },
-      modifiers: [
-        // keep the edges inside the parent
-        interact.modifiers.restrictEdges({
-          outer: 'parent'
-        }),
-        // minimum size
-        interact.modifiers.restrictSize({
-          min: { width: 160, height: 50 }
-        })
-      ],
-      inertia: true
-    });
+      .resizable({
+        margin: 30,
+        distance: 5,
+        // resize from all edges and corners
+        edges: {top: true },
+        listeners: {
+          move (event) {
+            var target = event.target
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+            target.style.height = event.rect.height + 'px'
+            y += event.deltaRect.top
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+            updateAfterResize();
+          }
+        },
+        modifiers: [
+          // keep the edges inside the parent
+          interact.modifiers.restrictEdges({
+            outer: 'parent'
+          }),
+          // minimum size
+          interact.modifiers.restrictSize({
+            min: { width: 160, height: 50 }
+          })
+        ],
+        inertia: true
+      });
 }
 
 
@@ -1357,8 +1370,8 @@ function dragMoveListener (event) {
   // update the posiion attributes
   target.setAttribute('data-x', x)
   target.setAttribute('data-y', y)
-  target.style.width = (containerPanel.clientWidth - x) + 'px';
-  target.style.height = (containerPanel.clientHeight - y) + 'px';
+  target.style.left = (window.clientWidth - x) + 'px';
+  target.style.top = (window.clientHeight - y) + 'px';
 }
 
 function onBlurEvents(){
@@ -1368,7 +1381,7 @@ function onBlurEvents(){
 function checkIfCurrentFileIsEdited(){
   if(currentFile){
     if(isFileEdited(currentFile)){
-     // onFileClickEvent(null, currentFile)
+      // onFileClickEvent(null, currentFile)
     }
   }
 }
@@ -1424,7 +1437,7 @@ function deletedSelectItem(action){
       } else {
         try {
           fs.unlinkSync(file);
-         // console.log("SYNC DELETE OK");
+          // console.log("SYNC DELETE OK");
         } catch (err) {
           console.error(err);
         }
@@ -1486,7 +1499,7 @@ function pasteBuffer(){
     let file = text;
     let stats = fs.statSync(file);
     if(!stats.isDirectory()){
-        copyAFile(file);
+      copyAFile(file);
     }else{
       copyADirectory(file);
     }
@@ -1498,11 +1511,11 @@ function getFileStats(file){
   if(fileExists ){
     let stats = fs.statSync(file);
     if(!stats.isDirectory()){
-       return {
-         name : file,
-         directory : false,
-         fileexists : true
-       }
+      return {
+        name : file,
+        directory : false,
+        fileexists : true
+      }
     }else{
       return {
         name : file,
@@ -1562,7 +1575,7 @@ function closeAllOtherTabs(currentSize){
     console.log("last file");
     let fileObject = openFiles[0];
     onFileClickEvent(null, fileObject.name);
-     createTabs();
+    createTabs();
     //clearProject();
   }
 }

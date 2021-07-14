@@ -10,7 +10,7 @@ console.log(dbPath)
 db.init(dbPath)
 let wc;
 let mainMenu;
-let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu;
+let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu, snippetsContextMenu;
 let snippetsWindow;
 
 db.loadDatabases();
@@ -19,24 +19,22 @@ db.loadDatabases();
 ipcMain.handle('read-user-data', (event) => {
   const path = app.getPath('userData');
   return path;
+});
+
+ipcMain.handle('show-context-menu', (event, menu) => {
+  if(menu == "code"){
+    contextMenu.popup();
+  }else if(menu == "file"){
+    fileContextMenu.popup();
+  }else if(menu == "tabs"){
+    tabsContextMenu.popup();
+  }else if(menu == "tasks"){
+    tasksContextMenu.popup();
+  }else if(menu == 'snippets'){
+    snippetsContextMenu.popup();
+  }
 })
 
-ipcMain.handle('show-code-context-menu', (event) => {
-  contextMenu.popup();
-})
-
-ipcMain.handle('show-file-context-menu', (event) => {
-  fileContextMenu.popup();
-})
-
-
-ipcMain.handle('show-tabs-context-menu', (event) => {
-  tabsContextMenu.popup();
-})
-
-ipcMain.handle('show-tasks-context-menu', (event) => {
-  tasksContextMenu.popup();
-})
 
 function createWindow () {
   // Create the browser window.
@@ -91,6 +89,7 @@ function createWindow () {
   fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));
   tasksContextMenu = Menu.buildFromTemplate(require('./tasksMenu').createMenu(mainWindow));
+  snippetsContextMenu = Menu.buildFromTemplate(require('./snippetsMenu').createMenu(mainWindow));
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);
