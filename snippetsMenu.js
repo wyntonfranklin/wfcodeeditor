@@ -6,13 +6,13 @@ module.exports =  {
       {
         label: 'Copy to clipboard',
         click: () => {
-          mainDialog.webContents.executeJavaScript(`copyTaskToClipBoard()`)
+          mainDialog.webContents.executeJavaScript(`copySnippetToClipboard()`)
         },
       },
       {
         label: 'Edit this Snippet',
         click: () => {
-          mainDialog.webContents.executeJavaScript(`editATask()`)
+          mainDialog.webContents.executeJavaScript(`editSnippet()`)
         },
       },
       { type: 'separator' },

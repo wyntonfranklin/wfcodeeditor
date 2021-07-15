@@ -3,6 +3,14 @@ let Datastore = require('nedb');
 let DBPATH = "";
 module.exports =  {
 
+  getSnippet : function(path, query, callback){
+    let db = {};
+    db.snippets = new Datastore(path);
+    db.snippets.loadDatabase();
+    db.snippets.findOne(query, function (err, doc) {
+      callback(doc);
+    });
+  },
   loadSnippets : function (path, query, callback){
     let db = {};
     db.snippets = new Datastore(path);
@@ -36,9 +44,10 @@ module.exports =  {
         callback();
     });
   },
-  changeTaskContent : function(oldObject, content){
+  changeSnippetContent : function(oldObject, name, content){
     return {
-      content: content,
+      title : name,
+      snippet: content,
       file : oldObject.file,
       timestamp: oldObject.timestamp,
       project : oldObject.project,

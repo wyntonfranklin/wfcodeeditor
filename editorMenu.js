@@ -20,6 +20,18 @@ module.exports =  {
           mainWindow.webContents.executeJavaScript(`openTaskViewWithSelected()`)
         },
       },
+      {
+        label: 'Add Snippet',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`createASnippet()`)
+        },
+      },
+      {
+        label: 'Add Selected as Snippet',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`AddSelectedAsSnippet()`)
+        },
+      },
       { type: 'separator' },
       {
         label: 'Find',

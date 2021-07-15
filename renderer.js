@@ -36,14 +36,7 @@ let activeFileBrowserEl = null;
 let selectedTab = null;
 let selectedTaskElement = null;
 let currentSideBar = null;
-
-
-ipcRenderer.invoke('read-user-data').then(dbPath=>{
-  APPLICATION_PATH = dbPath;
-  db.init(dbPath);
-  db.loadDatabases();
-  init();
-});
+let currentSnippet;
 
 
 let currentFile = null;
@@ -143,45 +136,8 @@ document.getElementById("showtaskbyfile").addEventListener('change', function() 
   loadTaskView();
 });
 
-function getTasksPath(){
-  return path.join(APPLICATION_PATH,'sidebar.db');
-}
 
 
-function saveSnippet(){
-  let snippetName = fileNameInput.value;
-  let snippetContent = modalContentInput.value;
-  const timestamp = Date.now();
-  let snippetsDbPath = path.join(APPLICATION_PATH,'snippets.db');
-  if(snippetName && snippetContent){
-    snippetManager.saveSnippet({
-      title: snippetName,
-      snippet : snippetContent,
-      timestamp : timestamp,
-      project : (currentProject) ? currentProject : "",
-      file : (currentFile) ? currentFile : "",
-    }, snippetsDbPath, function(){
-        loadSnippetsView();
-    });
-  }
-}
-
-function saveTask(){
-  let taskEl = document.getElementById("task-input");
-  let task = taskEl.value;
-  const timestamp = Date.now();
-  if(task){
-    taskManager.saveTasks({
-      content: task,
-      file : (currentFile) ? currentFile : "",
-      timestamp: timestamp,
-      project : (currentProject) ? currentProject : "",
-    }, getTasksPath(), function(){
-      loadTaskView();
-      taskEl.value = "";
-    });
-  }
-}
 
 document.getElementById("action-go-to-website").addEventListener('click', e=>{
   if(currentFile){
@@ -299,144 +255,29 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 
 
 
-function openSnippetsView(){
-  sideBarManager.openSideBar(function(){
-    loadSnippetsView();
-  },'snippets')
+
+ipcRenderer.invoke('read-user-data').then(dbPath=>{
+  APPLICATION_PATH = dbPath;
+  db.init(dbPath);
+  db.loadDatabases();
+  init();
+});
+
+
+function getTasksPath(){
+  return path.join(APPLICATION_PATH,'sidebar.db');
 }
 
-function toggleSnippetsView(){
-  sideBarManager.toggleSideBar(function(){
-    loadSnippetsView();
-  },'snippets')
-}
-function showCmdLayout(){
-  document.getElementById("cmd-layout").style.display = "block";
-  updateAfterResize();
-}
-
-function toggleCmdLayout(){
-  let cmdEl = document.getElementById("cmd-layout");
-  if(cmdEl.style.display == "block"){
-    cmdEl.style.display = "none";
-  }else{
-    cmdEl.style.display = "block";
+function getApplicationPath(file){
+  if(file){
+    return path.join(APPLICATION_PATH,file);
   }
-  updateAfterResize();
-}
-
-function toggleTasksView(){
-  sideBarManager.toggleSideBar(function(visibility){
-    if(visibility === "visible"){
-      openTaskView();
-    }
-  },"tasks")
-}
-
-function closeTasksView(){
-  sideBarManager.closeSideBar();
-}
-
-function openTaskView(){
-  sideBarManager.openSideBar(function(){
-    loadTaskView();
-    document.getElementById("task-input").focus();
-  }, "tasks");
-}
-
-function openTaskViewWithSelected(){
-  sideBarManager.openSideBar(function(){
-    loadTaskView();
-    document.getElementById("task-input").value = editor.getSelectedText();
-    document.getElementById("task-input").focus();
-  },"tasks")
-}
-
-function loadSnippetsView(){
-  let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
-  var query = {project:currentProject};
-  snippetManager.loadSnippets(snippetsPath, query, function(docs){
-    let template = "";
-    docs.forEach(( snippet )=>{
-      template += `<a data-file="${snippet.file}" data-object='${JSON.stringify(snippet)}' href="#" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
-      template += `    <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">${snippet.title}</h5>
-                </div>`;
-      template += `<p class="mb-1">${snippet.snippet}</p>`;
-      if(snippet.file){
-        var name = path.basename(snippet.file);
-        template += `<span class="badge badge-info">filetype</span>`;
-      }
-      template +=  `</a>`;
-    });
-    document.getElementById('snippets-layout').innerHTML = template;
-
-    // listeners
-    const divs = document.querySelectorAll('.snippet-item');
-    divs.forEach( el => {
-      el.addEventListener('click', (event)=>{
-        // var taskFile = el.getAttribute('data-file');
-      });
-      el.addEventListener('contextmenu', e => {
-        ipcRenderer.invoke('show-context-menu',"snippets");
-        e.preventDefault();
-      })
-    });
-  });
+  return APPLICATION_PATH;
 }
 
 
-function loadTaskView(){
-  document.getElementById("task-input").value = "";
-  var query = {project:currentProject};
-  if(SHOW_TASK_BY_FILE){
-    query = {project:currentProject, file:currentFile};
-  }
-  taskManager.loadTasks(getTasksPath(), query, function(docs){
-    let template = "";
-    docs.forEach(( task )=>{
-      template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
-      template += `<p class="mb-1">${task.content}</p>`;
-      if(task.file){
-        var name = path.basename(task.file);
-        template += `<span class="badge badge-info">${name}</span>`;
-      }
-      //template  += `<small>Donec id elit non mi porta.</small>`;
-      template +=  `</a>`;
-    })
-    document.getElementById('task-layout').innerHTML = template;
-
-    // listeners
-    const divs = document.querySelectorAll('.task-item');
-    divs.forEach( el => {
-      el.addEventListener('click', (event)=>{
-        var taskFile = el.getAttribute('data-file');
-        if(taskFile){
-          onFileClickEvent(null, taskFile);
-        }
-      });
-      el.addEventListener('contextmenu', e => {
-        selectedTaskElement = e.currentTarget;
-        console.log(selectedTaskElement);
-        ipcRenderer.invoke('show-context-menu',"tasks");
-        e.preventDefault();
-      })
-    });
-
-  });
-}
 
 
-function isTaskViewOpen(){
-  if(document.getElementById("side-bar").style.display === "block"){
-    return true;
-  }
-  return false;
-}
-
-function clearTasksView(){
-  document.getElementById('task-layout').innerHTML = "";
-}
 
 function copyTaskToClipBoard(){
   if(selectedTaskElement){
@@ -569,47 +410,6 @@ function hideAllViews(view){
 
 
 
-
-function saveCurrentFile(){
-  if(currentFile){
-    var code = editor.getValue();
-    var sel = editor.getSelection();
-    let cpostion = sel.getCursor();
-    saveAFile(currentFile, code);
-    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
-    if(fileObject){
-      fileObject.file.ocontent = code;
-      openFiles[fileObject.position] = fileObject.file;
-    }
-    sel.moveCursorToPosition(cpostion);
-    setSaveButtonAsInActive();
-    refreshView();
-  }
-}
-
-function saveAFile(filepath,content, callback) {
-  try {
-    fs.writeFileSync(filepath, content);
-    if(callback){
-      callback(filepath);
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-function saveADirectory(path, callback){
-  fs.mkdir(path, (err) => {
-    if (err) {
-      throw err;
-    }
-    if(callback){
-      callback(path);
-    }
-    console.log("Directory is created.");
-  });
-}
-
 saveButton.addEventListener("click", e => {
   onSaveButtonPressed(e);
 });
@@ -655,6 +455,17 @@ function onSaveButtonPressed(e){
       runCommand(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
       saveSnippet();
+    }else if(CURRENT_FILE_OPENER_ACTION == "snippet_edit"){
+      let snt = snippetManager.getSnippetFromElement(currentSnippet);
+      if(snt){
+        let update = snippetManager.changeSnippetContent(snt, fileNameInput.value, modalContentInput.value);
+        snippetManager.updateSnippet(getApplicationPath('snippets.db'),
+            {_id: snt._id}, update, function(){
+              loadSnippetsView();
+            });
+      }else{
+        console.log('snippet no found');
+      }
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
@@ -662,81 +473,7 @@ function onSaveButtonPressed(e){
   }
 }
 
-function runCommand(command){
-  if(currentFile){
-    let basePath = path.dirname(currentFile);
-    command = `cd ${basePath} & ` + command;
-  }
-  console.log(command);
-  sendToConsole(command);
-  showCmdLayout();
-  cmd.run(command,
-      function(err, data, stderr){
-        if(err){
-          console.log(err);
-          sendToConsole(err);
-        }else{
-          console.log('examples dir now contains the example file along with : ',data)
-          sendToConsole(data)
-          sendToConsole("----------------------------------------Command Complete--------------------------------------");
-          scrollCmdViewDown();
-        }
-      }
-  );
-}
-
-function sendToConsole(message){
-  cmdContent += "\r\n" + message + "\r\n";
-  let currentTextEl = document.getElementById('cmd-content');
-  currentTextEl.innerText = cmdContent;
-}
-
-function copyFileToDest(filename){
-  let copySrc = copyPathHolder;
-  let selectedPath = selectedFileElement.getAttribute('data-path');
-  let fileStats = getFileStats(selectedPath);
-  let baseDir = null;
-  if(fileStats.directory){
-    baseDir = selectedPath;
-  }else{
-    baseDir = path.dirname(selectedPath);
-  }
-  let desPath = path.join(baseDir, filename);
-  try{
-    fs.copyFileSync(copySrc, desPath);
-  }catch (e){
-
-  }
-}
-
-function renameAFile(el, filename){
-  let file = el.getAttribute("data-path");
-  let fileType = el.getAttribute("data-type");
-  let dir = path.dirname(file);
-  fs.renameSync(file, path.join(dir, filename));
-  readFiles(currentProject);
-}
-
-function runACommand(){
-  CURRENT_FILE_OPENER_ACTION = "runcommand";
-  setModalTitle('Run a Command');
-  hideShowModal("show" , "new-file-modal");
-  if(currentFile){
-    var ext = path.extname(currentFile);
-    var baseName = path.basename(currentFile);
-    if(ext == ".php"){
-      fileNameInput.value = 'php '+ baseName;
-    }else if(ext == ".py"){
-      fileNameInput.value = 'python '+ baseName;
-    }
-  }
-}
-
-function createANewSnippet(){
-  CURRENT_FILE_OPENER_ACTION = "snippet";
-  setModalTitle('Add a Snippet');
-  hideShowModal("show" , "new-file-modal","show");
-}
+/********************* FILE TASKS **********************/
 
 
 function createANewFile(){
@@ -768,22 +505,6 @@ function createAJsFile(){
 }
 
 
-function editATask(){
-  CURRENT_FILE_OPENER_ACTION = "task";
-  CURRENT_FILE_OPENER_TYPE = "task";
-  let taskObject = taskManager.getTaskFromElement(selectedTaskElement);
-  fileNameInput.value = taskObject.content;
-  setModalTitle('Edit this task');
-  hideShowModal("show" , "new-file-modal");
-}
-
-function removeATask(){
-  var currentTask = taskManager.getTaskFromElement(selectedTaskElement);
-  taskManager.removeTask(getTasksPath(), currentTask._id, function(){
-    loadTaskView();
-  })
-}
-
 function copyAFile(filepath){
   let dest;
   copyPathHolder = filepath;
@@ -812,6 +533,383 @@ function renameCurrentFile(){
   hideShowModal("show", "new-file-modal");
 }
 
+
+function copyFileToDest(filename){
+  let copySrc = copyPathHolder;
+  let selectedPath = selectedFileElement.getAttribute('data-path');
+  let fileStats = getFileStats(selectedPath);
+  let baseDir = null;
+  if(fileStats.directory){
+    baseDir = selectedPath;
+  }else{
+    baseDir = path.dirname(selectedPath);
+  }
+  let desPath = path.join(baseDir, filename);
+  try{
+    fs.copyFileSync(copySrc, desPath);
+  }catch (e){
+
+  }
+}
+
+function renameAFile(el, filename){
+  let file = el.getAttribute("data-path");
+  let fileType = el.getAttribute("data-type");
+  let dir = path.dirname(file);
+  fs.renameSync(file, path.join(dir, filename));
+  readFiles(currentProject);
+}
+
+
+function saveCurrentFile(){
+  if(currentFile){
+    var code = editor.getValue();
+    var sel = editor.getSelection();
+    let cpostion = sel.getCursor();
+    saveAFile(currentFile, code);
+    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    if(fileObject){
+      fileObject.file.ocontent = code;
+      openFiles[fileObject.position] = fileObject.file;
+    }
+    sel.moveCursorToPosition(cpostion);
+    setSaveButtonAsInActive();
+    refreshView();
+  }
+}
+
+function saveAFile(filepath,content, callback) {
+  try {
+    fs.writeFileSync(filepath, content);
+    if(callback){
+      callback(filepath);
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function saveADirectory(path, callback){
+  fs.mkdir(path, (err) => {
+    if (err) {
+      throw err;
+    }
+    if(callback){
+      callback(path);
+    }
+    console.log("Directory is created.");
+  });
+}
+
+
+
+/************************************ SNIPPETS ********************************/
+
+
+function copySnippetToClipboard(){
+  let snippetId = currentSnippet.getAttribute("data-id");
+  snippetManager.getSnippet(getApplicationPath("snippets.db"), {_id: snippetId}, function(doc){
+    clipboard.writeText(doc.snippet);
+  })
+}
+
+
+function editSnippet(){
+  let snippetId = currentSnippet.getAttribute("data-id");
+  CURRENT_FILE_OPENER_ACTION = "snippet_edit";
+  setModalTitle('Edit this snippet');
+  hideShowModal("show" , "new-file-modal","show");
+  snippetManager.getSnippet(getApplicationPath("snippets.db"), {_id: snippetId}, function(doc){
+    modalContentInput.value = doc.snippet;
+    fileNameInput.value = doc.title;
+  })
+}
+
+
+function createANewSnippet(){
+  CURRENT_FILE_OPENER_ACTION = "snippet";
+  setModalTitle('Add a Snippet');
+  hideShowModal("show" , "new-file-modal","show");
+}
+
+
+function createASnippet(){
+  createANewSnippet();
+  openSnippetsView();
+}
+
+
+function AddSelectedAsSnippet(){
+  createANewSnippet();
+  openSnippetsView();
+  modalContentInput.value = editor.getSelectedText();
+}
+
+
+function openSnippetsView(){
+  sideBarManager.openSideBar(function(){
+    loadSnippetsView();
+  },'snippets')
+}
+
+function toggleSnippetsView(){
+  sideBarManager.toggleSideBar(function(){
+    loadSnippetsView();
+  },'snippets')
+}
+
+
+function loadSnippetsView(){
+  let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
+  var query = {project:currentProject};
+  snippetManager.loadSnippets(snippetsPath, query, function(docs){
+    let template = "";
+    docs.forEach(( snippet )=>{
+      template += `<a data-file="${snippet.file}" data-id="${snippet._id}" href="#" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `    <div class="d-flex w-100 justify-content-between">
+                  <h5 class="mb-1">${snippet.title}</h5>
+                </div>`;
+      template += `<p class="mb-1">${snippet.snippet}</p>`;
+      if(snippet.file){
+        var name = path.basename(snippet.file);
+        template += `<span class="badge badge-info">filetype</span>`;
+      }
+      template +=  `</a>`;
+    });
+    document.getElementById('snippets-layout').innerHTML = template;
+
+    // listeners
+    const divs = document.querySelectorAll('.snippet-item');
+    divs.forEach( el => {
+      el.addEventListener('click', (event)=>{
+        currentSnippet = event.currentTarget;
+        // var taskFile = el.getAttribute('data-file');
+      });
+      el.addEventListener('contextmenu', e => {
+        currentSnippet = e.currentTarget;
+        ipcRenderer.invoke('show-context-menu',"snippets");
+        e.preventDefault();
+      })
+    });
+  });
+}
+
+
+function saveSnippet(){
+  let snippetName = fileNameInput.value;
+  let snippetContent = modalContentInput.value;
+  const timestamp = Date.now();
+  let snippetsDbPath = path.join(APPLICATION_PATH,'snippets.db');
+  if(snippetName && snippetContent){
+    snippetManager.saveSnippet({
+      title: snippetName,
+      snippet : snippetContent,
+      timestamp : timestamp,
+      project : (currentProject) ? currentProject : "",
+      file : (currentFile) ? currentFile : "",
+    }, snippetsDbPath, function(){
+      loadSnippetsView();
+    });
+  }
+}
+
+
+function saveEditedSnippet(){
+
+}
+
+
+function deleteASnippet(){
+
+}
+
+/*************************** END SNIPPETS **************************/
+
+
+/****************************** TASKS ***********************/
+
+
+
+function saveTask(){
+  let taskEl = document.getElementById("task-input");
+  let task = taskEl.value;
+  const timestamp = Date.now();
+  if(task){
+    taskManager.saveTasks({
+      content: task,
+      file : (currentFile) ? currentFile : "",
+      timestamp: timestamp,
+      project : (currentProject) ? currentProject : "",
+    }, getTasksPath(), function(){
+      loadTaskView();
+      taskEl.value = "";
+    });
+  }
+}
+
+
+
+function toggleCmdLayout(){
+  let cmdEl = document.getElementById("cmd-layout");
+  if(cmdEl.style.display == "block"){
+    cmdEl.style.display = "none";
+  }else{
+    cmdEl.style.display = "block";
+  }
+  updateAfterResize();
+}
+
+function toggleTasksView(){
+  sideBarManager.toggleSideBar(function(visibility){
+    if(visibility === "visible"){
+      openTaskView();
+    }
+  },"tasks")
+}
+
+function closeTasksView(){
+  sideBarManager.closeSideBar();
+}
+
+function openTaskView(){
+  sideBarManager.openSideBar(function(){
+    loadTaskView();
+    document.getElementById("task-input").focus();
+  }, "tasks");
+}
+
+function openTaskViewWithSelected(){
+  sideBarManager.openSideBar(function(){
+    loadTaskView();
+    document.getElementById("task-input").value = editor.getSelectedText();
+    document.getElementById("task-input").focus();
+  },"tasks")
+}
+
+
+function loadTaskView(){
+  document.getElementById("task-input").value = "";
+  var query = {project:currentProject};
+  if(SHOW_TASK_BY_FILE){
+    query = {project:currentProject, file:currentFile};
+  }
+  taskManager.loadTasks(getTasksPath(), query, function(docs){
+    let template = "";
+    docs.forEach(( task )=>{
+      template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<p class="mb-1">${task.content}</p>`;
+      if(task.file){
+        var name = path.basename(task.file);
+        template += `<span class="badge badge-info">${name}</span>`;
+      }
+      //template  += `<small>Donec id elit non mi porta.</small>`;
+      template +=  `</a>`;
+    })
+    document.getElementById('task-layout').innerHTML = template;
+
+    // listeners
+    const divs = document.querySelectorAll('.task-item');
+    divs.forEach( el => {
+      el.addEventListener('click', (event)=>{
+        var taskFile = el.getAttribute('data-file');
+        if(taskFile){
+          onFileClickEvent(null, taskFile);
+        }
+      });
+      el.addEventListener('contextmenu', e => {
+        selectedTaskElement = e.currentTarget;
+        console.log(selectedTaskElement);
+        ipcRenderer.invoke('show-context-menu',"tasks");
+        e.preventDefault();
+      })
+    });
+
+  });
+}
+
+
+function isTaskViewOpen(){
+  if(document.getElementById("side-bar").style.display === "block"){
+    return true;
+  }
+  return false;
+}
+
+function clearTasksView(){
+  document.getElementById('task-layout').innerHTML = "";
+}
+
+
+function editATask(){
+  CURRENT_FILE_OPENER_ACTION = "task";
+  CURRENT_FILE_OPENER_TYPE = "task";
+  let taskObject = taskManager.getTaskFromElement(selectedTaskElement);
+  fileNameInput.value = taskObject.content;
+  setModalTitle('Edit this task');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function removeATask(){
+  var currentTask = taskManager.getTaskFromElement(selectedTaskElement);
+  taskManager.removeTask(getTasksPath(), currentTask._id, function(){
+    loadTaskView();
+  })
+}
+
+
+/******************** Command ***********************/
+
+function showCmdLayout(){
+  document.getElementById("cmd-layout").style.display = "block";
+  updateAfterResize();
+}
+
+function runCommand(command){
+  if(currentFile){
+    let basePath = path.dirname(currentFile);
+    command = `cd ${basePath} & ` + command;
+  }
+  console.log(command);
+  sendToConsole(command);
+  showCmdLayout();
+  cmd.run(command,
+      function(err, data, stderr){
+        if(err){
+          console.log(err);
+          sendToConsole(err);
+        }else{
+          console.log('examples dir now contains the example file along with : ',data)
+          sendToConsole(data)
+          sendToConsole("----------------------------------------Command Complete--------------------------------------");
+          scrollCmdViewDown();
+        }
+      }
+  );
+}
+
+function sendToConsole(message){
+  cmdContent += "\r\n" + message + "\r\n";
+  let currentTextEl = document.getElementById('cmd-content');
+  currentTextEl.innerText = cmdContent;
+}
+
+
+function runACommand(){
+  CURRENT_FILE_OPENER_ACTION = "runcommand";
+  setModalTitle('Run a Command');
+  hideShowModal("show" , "new-file-modal");
+  if(currentFile){
+    var ext = path.extname(currentFile);
+    var baseName = path.basename(currentFile);
+    if(ext == ".php"){
+      fileNameInput.value = 'php '+ baseName;
+    }else if(ext == ".py"){
+      fileNameInput.value = 'python '+ baseName;
+    }
+  }
+}
+
+/***************************** END COMMANDS ************************/
 
 function searchAndReplace(){
   CURRENT_FILE_OPENER_ACTION = "sar";
