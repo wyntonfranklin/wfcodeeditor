@@ -210,10 +210,6 @@ document.getElementById("show-console").addEventListener('click', e=>{
   return false;
 });
 
-document.getElementById("action-open-database").addEventListener("click", e => {
-  shell.openExternal("C:\\Program Files\\MySQL\\MySQL Workbench 8.0 CE\\MySQLWorkbench.exe");
-  return false;
-});
 
 document.getElementById("side-bar-close").addEventListener('click', e=>{
   closeTasksView();
@@ -278,16 +274,6 @@ function getApplicationPath(file){
 
 
 
-
-function copyTaskToClipBoard(){
-  if(selectedTaskElement){
-    let taskObject = JSON.parse(selectedTaskElement.getAttribute("data-object"));
-    console.log(taskObject);
-    if(taskObject){
-      clipboard.writeText(taskObject.content);
-    }
-  }
-}
 
 function updateProjectSettings(projectPath){
   db.saveToProjects({
@@ -441,16 +427,14 @@ function onSaveButtonPressed(e){
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
       editor.findAll(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'task'){
-      let tO = taskManager.getTaskFromElement(selectedTaskElement);
-      if(tO){
+      let taskId = selectedTaskElement.getAttribute("data-id");
+      taskManager.getTask(getTasksPath(),{_id:taskId}, function(tO){
         let update = taskManager.changeTaskContent(tO, filename);
         taskManager.updateTask(getTasksPath(),
             {_id: tO._id}, update, function(){
               loadTaskView();
             });
-      }else{
-        console.log('task no found');
-      }
+      });
     }else if(CURRENT_FILE_OPENER_ACTION == 'runcommand'){
       runCommand(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
@@ -748,17 +732,6 @@ function saveTask(){
 }
 
 
-
-function toggleCmdLayout(){
-  let cmdEl = document.getElementById("cmd-layout");
-  if(cmdEl.style.display == "block"){
-    cmdEl.style.display = "none";
-  }else{
-    cmdEl.style.display = "block";
-  }
-  updateAfterResize();
-}
-
 function toggleTasksView(){
   sideBarManager.toggleSideBar(function(visibility){
     if(visibility === "visible"){
@@ -796,7 +769,7 @@ function loadTaskView(){
   taskManager.loadTasks(getTasksPath(), query, function(docs){
     let template = "";
     docs.forEach(( task )=>{
-      template += `<a data-file="${task.file}" data-object='${JSON.stringify(task)}' href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<a data-file="${task.file}" data-id="${task._id}" href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
       template += `<p class="mb-1">${task.content}</p>`;
       if(task.file){
         var name = path.basename(task.file);
@@ -818,7 +791,6 @@ function loadTaskView(){
       });
       el.addEventListener('contextmenu', e => {
         selectedTaskElement = e.currentTarget;
-        console.log(selectedTaskElement);
         ipcRenderer.invoke('show-context-menu',"tasks");
         e.preventDefault();
       })
@@ -843,21 +815,47 @@ function clearTasksView(){
 function editATask(){
   CURRENT_FILE_OPENER_ACTION = "task";
   CURRENT_FILE_OPENER_TYPE = "task";
-  let taskObject = taskManager.getTaskFromElement(selectedTaskElement);
-  fileNameInput.value = taskObject.content;
-  setModalTitle('Edit this task');
-  hideShowModal("show" , "new-file-modal");
+  let taskid = selectedTaskElement.getAttribute("data-id");
+  taskManager.getTask(getTasksPath(),{_id: taskid}, function(taskObject){
+    fileNameInput.value = taskObject.content;
+    setModalTitle('Edit this task');
+    hideShowModal("show" , "new-file-modal");
+  });
 }
 
 function removeATask(){
-  var currentTask = taskManager.getTaskFromElement(selectedTaskElement);
-  taskManager.removeTask(getTasksPath(), currentTask._id, function(){
-    loadTaskView();
-  })
+  taskManager.getTask(getTasksPath(),
+      {_id: selectedTaskElement.getAttribute('data-id')}, function(currentTask){
+    taskManager.removeTask(getTasksPath(), currentTask._id, function(){
+      loadTaskView();
+    })
+  });
 }
 
 
+function copyTaskToClipBoard(){
+  if(selectedTaskElement){
+    let taskId = selectedTaskElement.getAttribute("data-id");
+    taskManager.getTask(getTasksPath(),{_id: taskId}, function(taskObject){
+      if(taskObject){
+        clipboard.writeText(taskObject.content);
+      }
+    });
+  }
+}
+
 /******************** Command ***********************/
+
+
+function toggleCmdLayout(){
+  let cmdEl = document.getElementById("cmd-layout");
+  if(cmdEl.style.display == "block"){
+    cmdEl.style.display = "none";
+  }else{
+    cmdEl.style.display = "block";
+  }
+  updateAfterResize();
+}
 
 function showCmdLayout(){
   document.getElementById("cmd-layout").style.display = "block";
@@ -1441,36 +1439,33 @@ function makeDraggable(){
         inertia: true,
         modifiers: [
           interact.modifiers.restrictRect({
-            restriction: 'parent',
+            restriction: '.right-panel',
             endOnly: true
           })
         ],
         autoScroll: true,
         listeners: {
-          move: dragMoveListener,
-          end (event) {
+          move(event) {
+            var containerPanel = document.getElementById('panel-container');
+            var modalPanel = document.getElementById("new-file-modal");
+            var appPanel = document.getElementById('app');
+            var target = event.target
+            // keep the dragged position in the data-x/data-y attributes
+            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+            // translate the element
+            //target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+            console.log((appPanel.clientWidth/2 + x))
 
+            modalPanel.style.left = ( x) + 'px';
+            modalPanel.style.top = (y)+ 'px';
           }
         }
       })
 }
 
-function dragMoveListener (event) {
-  var containerPanel = document.getElementById('panel-container');
-  var target = event.target
-  // keep the dragged position in the data-x/data-y attributes
-  var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-  var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-  // translate the element
-  target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-
-  // update the posiion attributes
-  target.setAttribute('data-x', x)
-  target.setAttribute('data-y', y)
-  target.style.left = (window.clientWidth - x) + 'px';
-  target.style.top = (window.clientHeight - y) + 'px';
-}
 
 function onBlurEvents(){
   checkIfCurrentFileIsEdited();

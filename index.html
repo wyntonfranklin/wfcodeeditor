@@ -205,15 +205,10 @@
         <a id="action-save-file" title="Save current file" class="action-item"><img src="./icons/ic_save.png" width="24px"/></a>
       <a id="action-go-to-website" title="Go to website" class="action-item"><img src="./icons/ic_world.png" width="24px"/></a>
       <a id="action-resize-picture" title="Resize Views" class="action-item"><img src="./icons/ic_resize.png" width="24px"/></a>
-      <a id="action-open-database" title="Open Database Manager" class="action-item"><img src="./icons/ic_database.png" width="24px"/></a>
-      <a id="action-run-command" title="Run Command" class="action-item"><img src="./icons/ic_play.png" width="24px"/></a>
-      &nbsp; &nbsp;  | &nbsp; &nbsp;
-      <a id="action-view-command" title="View Command" class="action-item"><img src="./icons/ic_command.png" width="24px"/></a>
+      <a id="action-run-command" title="Run Command" class="action-item"><img src="./icons/ic_command.png" width="24px"/></a>
       <a id="manage-notes" title="Manage Notes" class="action-item"><img src="./icons/ic_note.png" width="24px"/></a>
       <a id="manage-code-snippets" title="Manage Code Snippets" class="action-item"><img src="./icons/ic_code.png" width="24px"/></a>
-      <a id="manage-bookmarks" title="Manage Bookmarks" class="action-item"><img src="./icons/ic_bookmarks.png" width="24px"/></a>
-      <a id="manage-external-apps" title="Manage External Apps" class="action-item"><img src="./icons/ic_computer.png" width="24px"/></a>
-      <div style="float: right; margin-right: 5px;">
+     <div style="float: right; margin-right: 5px;">
       </div>
     </div>
     <div class="panel-container" id="panel-container">
@@ -309,10 +304,10 @@
   </div>
 
   <div id="backdrop" style="display: none;" class="modal-backdrop fade show"></div>
-  <div id="new-file-modal" class="modal fade show draggable-content" tabindex="-1" role="dialog" style="display: none">
+  <div id="new-file-modal" class="modal fade show" tabindex="-1" role="dialog" style="display: none">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header draggable-content">
           <h5 id="dialog-title" class="modal-title" style="overflow: hidden; width: 70%">Create new File/Folder</h5>
           <button type="button" class="close close-modal-x" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>

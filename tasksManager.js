@@ -3,6 +3,14 @@ let Datastore = require('nedb');
 let DBPATH = "";
 module.exports =  {
 
+  getTask : function(path, query, callback){
+    let db = {};
+    db.tasks = new Datastore(path);
+    db.tasks.loadDatabase();
+    db.tasks.findOne(query, function (err, doc) {
+      callback(doc);
+    });
+  },
   loadTasks : function (path, query, callback){
     let db = {};
     db.tasks = new Datastore(path);
