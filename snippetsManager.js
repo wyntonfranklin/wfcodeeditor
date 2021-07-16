@@ -48,9 +48,9 @@ module.exports =  {
     return {
       title : name,
       snippet: content,
-      file : oldObject.file,
       timestamp: oldObject.timestamp,
       project : oldObject.project,
+      file : oldObject.file,
     }
   },
   removeSnippet : function(path, id, callback){

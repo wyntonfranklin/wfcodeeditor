@@ -440,13 +440,17 @@ function onSaveButtonPressed(e){
     }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
       saveSnippet();
     }else if(CURRENT_FILE_OPENER_ACTION == "snippet_edit"){
-      let snt = snippetManager.getSnippetFromElement(currentSnippet);
-      if(snt){
-        let update = snippetManager.changeSnippetContent(snt, fileNameInput.value, modalContentInput.value);
-        snippetManager.updateSnippet(getApplicationPath('snippets.db'),
-            {_id: snt._id}, update, function(){
-              loadSnippetsView();
-            });
+      let sntId = currentSnippet.getAttribute("data-id");
+      if(sntId){
+        snippetManager.getSnippet(getApplicationPath('snippets.db'), {_id: sntId}, function(snt){
+          console.log(fileNameInput.value);
+          let update = snippetManager.changeSnippetContent(snt, fileNameInput.value, modalContentInput.value);
+          console.log(update);
+          snippetManager.updateSnippet(getApplicationPath('snippets.db'),
+              {_id: snt._id}, update, function(){
+                loadSnippetsView();
+              });
+        })
       }else{
         console.log('snippet no found');
       }
@@ -703,8 +707,13 @@ function saveEditedSnippet(){
 }
 
 
-function deleteASnippet(){
-
+function removeASnippet(){
+  snippetManager.getSnippet(getApplicationPath('snippets.db'),
+      {_id: currentSnippet.getAttribute("data-id")}, function(snippet){
+        snippetManager.removeSnippet(getApplicationPath('snippets.db'), snippet._id, function(){
+          loadSnippetsView();
+        })
+      });
 }
 
 /*************************** END SNIPPETS **************************/
@@ -938,9 +947,9 @@ function hideShowModal(action, id, content){
     ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
     el.style.display = "none";
-    fileNameInput.value = "";
-    modalDescription.innerText = "";
-    modalContentInput.value = "";
+   // fileNameInput.value = "";
+   // modalDescription.innerText = "";
+    //modalContentInput.value = "";
     modalContentView.style.display = "none";
   }
 

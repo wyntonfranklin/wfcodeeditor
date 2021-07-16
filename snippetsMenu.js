@@ -20,7 +20,7 @@ module.exports =  {
         label: 'Delete snippet',
         click: () => {
 
-          mainDialog.webContents.executeJavaScript(`removeATask()`)
+          mainDialog.webContents.executeJavaScript(`removeASnippet()`)
         },
       },
     ]
