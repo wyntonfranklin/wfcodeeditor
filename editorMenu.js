@@ -41,6 +41,11 @@ module.exports =  {
       },
       { role: 'copy'},
       { role: 'paste'},
+      { label: 'Open in Side View',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`openCurrentFileInSideView()`)
+        },
+      },
       { type: 'separator' },
       {
         label: 'Snippets',

@@ -1765,3 +1765,19 @@ function readFilesFromDir(dir, callback) {
 function search(){
   editor.find(editor.getSelectedText());
 }
+
+
+function openSelectedFileInSideView(){
+  openFileInSideView((selectedFileElement.getAttribute("data-path")));
+}
+
+function openCurrentFileInSideView(){
+  openFileInSideView(currentFile);
+}
+
+function openFileInSideView(file){
+  sideBarManager.openSideBar(function(){
+    const buffer = fs.readFileSync(file);
+    document.getElementById("code-preview").innerText = buffer.toString();
+  }, "codeview");
+}

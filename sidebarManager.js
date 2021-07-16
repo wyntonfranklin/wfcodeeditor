@@ -2,7 +2,19 @@
 let sideBar = document.getElementById('side-bar');
 let tasksBar = document.getElementById('sbl-tasks');
 let snippetsBar = document.getElementById('sbl-snippets');
-let bars = [tasksBar, snippetsBar];
+let codeViewBar = document.getElementById('sbl-codeview');
+let bars = [tasksBar, snippetsBar, codeViewBar];
+const sideBars = {
+    tasks : {
+        el : tasksBar,
+    },
+    snippets : {
+        el : snippetsBar,
+    },
+    codeview : {
+        el : codeViewBar,
+    }
+}
 
 module.exports =  {
 
@@ -37,11 +49,7 @@ module.exports =  {
         callback(visibilityStatus);
     },
     getBarByName : function(bar){
-      if(bar == "tasks"){
-          return tasksBar;
-      }else if(bar == "snippets"){
-          return snippetsBar;
-      }
+        return sideBars[bar].el;
     },
     openSideBar : function(callback, bar){
         sideBar.style.display = "block";
@@ -81,18 +89,10 @@ module.exports =  {
         return openEl;
     },
     showSideBarLayout : function(name){
-        if(name === 'tasks'){
-            this.openBar(tasksBar);
-        }else if(name === 'snippets'){
-            this.openBar(snippetsBar);
-        }
+        this.openBar(sideBars[name].el);
     },
     hideSideBarLayout: function(name){
-        if(name === 'tasks'){
-            this.hideBar(tasksBar);
-        }else if(name === 'snippets'){
-            this.hideBar(snippetsBar);
-        }
+        this.hideBar(sideBars[name].el);
     },
     openBar : function(el){
         this.closeSideBars();

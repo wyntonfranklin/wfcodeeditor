@@ -55,6 +55,11 @@ module.exports =  {
           mainDialog.webContents.executeJavaScript(`openInExplorer()`)
         },
       },
+      { label: 'Open in Side View',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openSelectedFileInSideView()`)
+        },
+      },
       { type: 'separator' },
       { label: 'Delete',
         click: () => {
