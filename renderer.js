@@ -1048,13 +1048,6 @@ function setTabEvents(){
         }
         createTabs();
       })
-      /*
-      helper.removeFromObjectArray(openFiles,"name",file);
-      if(openFiles[openFiles.length-1] !== undefined){
-        onFileClickEvent(null, openFiles[openFiles.length-1].name);
-      }else{
-        clearProject();
-      }*/
     })
   });
   const divs2 = document.querySelectorAll('.tab-item');
@@ -1163,11 +1156,6 @@ let setListeners = () => {
 
 function saveLastProject(filepath){
 
-  /** db.saveToSettings({'name': "current-project",},{
-      'name': "current-project",
-      'value': filepath
-    })
-   **/
   settings.set("currentproject", filepath);
 }
 
@@ -1194,45 +1182,6 @@ function setCurrentProjectName(name){
   }
 }
 
-/*
-function readFilesFromDir(dir) {
-  let fileListing = '';
-  let directoryListing = '';
-  const files = fs.readdirSync(dir);
-    files.forEach((file)=>{
-      file = path.resolve(dir, file);
-      var stats = fs.statSync(file);
-      if(stats.isDirectory()){
-          if(currentDirectory === file){
-            directoryListing += createDirectoryLink("dir", file,"active");
-          }else{
-            directoryListing += createDirectoryLink("dir", file,"");
-          }
-          if( openDir.indexOf( file) !== -1){
-            directoryListing += openSubDirectory();
-            directoryListing += readFilesFromDir(file);
-            directoryListing += closeSubDirectory();
-          }
-      }else{
-        let ext = path.extname(file).replace(/\./g,' ').trim();
-        let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
-        if(currentFile == file){
-          if(fileObject != null && (fileObject.content !== fileObject.ocontent) ){
-            fileListing += createDirectoryLink("file", file,"active save");
-          }else{
-            fileListing += createDirectoryLink("file", file,"active");
-          }
-        }else{
-          if(fileObject != null &&  (fileObject.content !== fileObject.ocontent)){
-            fileListing += createDirectoryLink("file", file,"save");
-          }else{
-            fileListing += createDirectoryLink("file", file,"");
-          }
-        }
-      }
-    })
-  return directoryListing + fileListing;
-}*/
 
 function openNewProject(){
   getProjectDir( dir =>{
@@ -1330,6 +1279,7 @@ function init(){
   makeTopResizable();
   makeDraggable();
   updateAfterResize();
+  makeResizableLeft();
 }
 
 function updatePageTitle(title){
@@ -1369,6 +1319,42 @@ function updateAfterResize(){
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
+
+function makeResizableLeft(){
+  interact('.resize-drag-left')
+      .resizable({
+        margin: 30,
+        distance: 5,
+        // resize from all edges and corners
+        edges: {left: true },
+        listeners: {
+          move (event) {
+            var target = event.target
+            var x = (parseFloat(target.getAttribute('data-x')) || 0)
+            var y = (parseFloat(target.getAttribute('data-y')) || 0)
+            target.style.width = event.rect.width + 'px'
+            target.style.height = event.rect.height + 'px'
+            x += event.deltaRect.left
+            y += event.deltaRect.top
+            //target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+          }
+        },
+        modifiers: [
+          // keep the edges inside the parent
+          interact.modifiers.restrictEdges({
+            outer: 'parent'
+          }),
+          // minimum size
+          interact.modifiers.restrictSize({
+            min: { width: 160, height: 100 }
+          })
+        ],
+        inertia: true
+      })
+}
+
 
 function makeResizable(){
   var rightPanel = document.getElementById('right-panel');
