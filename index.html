@@ -7,11 +7,20 @@
     <title>A Code Editor</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/atom-one-dark.min.css">
+    <link rel="stylesheet" href="./css/all.min.css">
     <script>
     </script>
   </head>
   <body style="overflow:hidden;">
   <style>
+    .no-drag {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+    }
     .unselectable {
       -moz-user-select: none;
       -khtml-user-select: none;
@@ -158,14 +167,20 @@
     }
 
     .side-bar-layout {
-      overflow-y: scroll;
       padding-bottom: 30px;
       height: 100%;
       position: relative;
     }
 
+    .sbl-panel {
+      height: 100%; margin-bottom: 100px;
+      padding: 5px;
+    }
+
     .task-item {
       font-size: 15px;
+      word-wrap: break-word;
+      cursor: default;
     }
 
     .cmd-layout {
@@ -208,6 +223,7 @@
       <a id="action-run-command" title="Run Command" class="action-item"><img src="./icons/ic_command.png" width="24px"/></a>
       <a id="manage-notes" title="Manage Notes" class="action-item"><img src="./icons/ic_note.png" width="24px"/></a>
       <a id="manage-code-snippets" title="Manage Code Snippets" class="action-item"><img src="./icons/ic_code.png" width="24px"/></a>
+      <a id="manage-tutorials" title="Learning Center or Tutorials" class="action-item"><img src="./icons/ic_book.png" width="24px"/></a>
      <div style="float: right; margin-right: 5px;">
       </div>
     </div>
@@ -248,7 +264,7 @@
 
 
           <!-- Tasks layout -->
-          <div id="sbl-tasks" style="display: none;" data-name="tasks">
+          <div id="sbl-tasks" style="display: none;" data-name="tasks" class="sbl-panel">
             <h5>Tasks</h5>
             <div class="input-group mb-3">
               <input id="task-input" type="text" class="form-control" placeholder="Add task">
@@ -261,13 +277,13 @@
               <label class="form-check-label" for="exampleCheck1">Show only in current file</label>
             </div>
             <br>
-            <div class="list-group" id="task-layout">
+            <div class="list-group" id="task-layout" style=" overflow-y: scroll; height: 100%">
             </div>
           </div>
 
 
           <!-- Snippets layout -->
-          <div id="sbl-snippets" style="display: none;" data-name="snippets">
+          <div id="sbl-snippets" class="sbl-panel" style="display: none;" data-name="snippets">
             <h5>Snippets</h5>
             <div class="input-group mb-3">
               <input type="text" class="form-control" placeholder="Search" aria-label="Recipient's username" aria-describedby="basic-addon2">
@@ -276,21 +292,41 @@
               </div>
             </div>
             <br>
-            <div class="list-group" id="snippets-layout">
+            <div class="list-group" id="snippets-layout" style="  overflow-y: scroll; height: 100%">
 
             </div>
           </div>
 
 
-          <div id="sbl-codeview" style="display: none;" data-name="codeview">
+          <div id="sbl-codeview" class="sbl-panel" style="display: none;" data-name="codeview">
             <h5>CodeView</h5>
-            <br>
-            <div class="list-group" id="codeview-layout" style="padding: 15px; background: #fff; font-size: 15px">
+            <span id="codeview-badge"  style="font-size: 13px;" class="badge badge-primary">Hello World</span><br><br>
+            <div class="list-group" id="codeview-layout" style="padding: 15px; background: #fff; font-size: 15px; overflow-y: scroll; height: 100%">
                 <div>
-                    <code>
-                        <pre id="code-preview" style="font-size: 15px"></pre>
-                    </code>
+                  <pre><code id="code-preview"  class="hljs" style="font-size: 15px"></code></pre>
                 </div>
+            </div>
+          </div>
+
+
+
+          <div id="sbl-webview" class="sbl-panel" style="display: none;" data-name="webview">
+            <h5 style="overflow: hidden; white-space: normal">Online Tutorials - Learning Center</h5>
+            <span id="webview-badge"  style="font-size: 13px;" class="badge badge-primary">https://app.wftutorials.com/</span><br><br>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="tutorials-home" style="cursor: pointer;"><i class="fa fa-home"></i></span>
+              </div>
+              <input type="text" class="form-control" placeholder="Search">
+              <div class="input-group-append">
+                <span class="input-group-text" id="" style="cursor:pointer;">Search</span>
+              </div>
+            </div>
+            <div class="list-group" id="webview-layout" style="padding: 15px; background: #fff; overflow-y: scroll; height: 100%">
+              <div id="webview-content">
+
+              </div>
+              <iframe id="webview-element" src="" style="height: 100%; display: none;"> </iframe>
             </div>
           </div>
 

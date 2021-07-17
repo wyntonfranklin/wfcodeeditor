@@ -3,6 +3,7 @@ let sideBar = document.getElementById('side-bar');
 let tasksBar = document.getElementById('sbl-tasks');
 let snippetsBar = document.getElementById('sbl-snippets');
 let codeViewBar = document.getElementById('sbl-codeview');
+let webViewBar = document.getElementById('sbl-webview');
 let bars = [tasksBar, snippetsBar, codeViewBar];
 const sideBars = {
     tasks : {
@@ -13,6 +14,9 @@ const sideBars = {
     },
     codeview : {
         el : codeViewBar,
+    },
+    webview : {
+        el : webViewBar,
     }
 }
 
@@ -100,6 +104,11 @@ module.exports =  {
     },
     hideBar : function(el){
         el.style.display = "none";
+    },
+    resizeBars: function(height){
+        bars.forEach((el)=>{
+            el.style.height = height;
+        })
     }
 
 

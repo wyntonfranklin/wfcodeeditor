@@ -46,6 +46,11 @@ module.exports =  {
           mainWindow.webContents.executeJavaScript(`openCurrentFileInSideView()`)
         },
       },
+      { label: 'Open Web View',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`openWebView()`)
+        },
+      },
       { type: 'separator' },
       {
         label: 'Snippets',

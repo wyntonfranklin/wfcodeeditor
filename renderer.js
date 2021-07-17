@@ -9,6 +9,7 @@ const { ipcRenderer, clipboard,  shell } = require('electron')
 const helper = require('./helper.js');
 const fs = require("fs-extra")
 var path = require('path');
+const hljs = require('highlight.js');
 let db = require('./database');
 const extensions = require('./extensions');
 const Store = require('electron-store');
@@ -37,7 +38,8 @@ let selectedTab = null;
 let selectedTaskElement = null;
 let currentSideBar = null;
 let currentSnippet;
-
+let allTutorials = [];
+let tutorialsViewScrollPosition = null;
 
 let currentFile = null;
 let currentDirectory = null;
@@ -220,6 +222,23 @@ document.getElementById("side-bar-close").addEventListener('click', e=>{
 
 document.getElementById("add-snippet").addEventListener('click', e=>{
   createANewSnippet();
+  return false;
+});
+
+
+document.getElementById("manage-tutorials").addEventListener('click', e=>{
+  openWebView();
+  return false;
+});
+
+
+document.getElementById("tutorials-home").addEventListener('click', e=>{
+  showTutorialsView(function(){
+    console.log(tutorialsViewScrollPosition);
+    if(tutorialsViewScrollPosition){
+      document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
+    }
+  });
   return false;
 });
 
@@ -653,14 +672,14 @@ function loadSnippetsView(){
   snippetManager.loadSnippets(snippetsPath, query, function(docs){
     let template = "";
     docs.forEach(( snippet )=>{
-      template += `<a data-file="${snippet.file}" data-id="${snippet._id}" href="#" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<a data-file="${snippet.file}" data-id="${snippet._id}" href="javascript:void(0)" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
       template += `    <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">${snippet.title}</h5>
+                  <h6 class="mb-1">${snippet.title}</h6>
                 </div>`;
       template += `<p class="mb-1">${snippet.snippet}</p>`;
       if(snippet.file){
         var name = path.basename(snippet.file);
-        template += `<span class="badge badge-info">filetype</span>`;
+        template += `<span class="badge badge-info">${name}</span>`;
       }
       template +=  `</a>`;
     });
@@ -792,7 +811,7 @@ function loadTaskView(){
     // listeners
     const divs = document.querySelectorAll('.task-item');
     divs.forEach( el => {
-      el.addEventListener('click', (event)=>{
+      el.addEventListener('dblclick', (event)=>{
         var taskFile = el.getAttribute('data-file');
         if(taskFile){
           onFileClickEvent(null, taskFile);
@@ -1263,7 +1282,8 @@ function closeProject(){
   editor.session.setValue("");
   imageViewer.src = "";
   updatePageTitle("");
-  setCurrentProjectName("")
+  setCurrentProjectName("");
+  sideBarManager.closeSideBars();
   openFiles = [];
   refreshView();
 }
@@ -1304,6 +1324,10 @@ function updateAfterResize(){
   var sideBarPanel = document.getElementById('side-bar');
   var cmdPanel = document.getElementById('cmd-layout');
   var newFileModal = document.getElementById("new-file-modal");
+  let tasksBar = document.getElementById('sbl-tasks');
+  let snippetsBar = document.getElementById('sbl-snippets');
+  let codeViewBar = document.getElementById('sbl-codeview');
+  let webViewBar = document.getElementById('sbl-webview');
   var cmdHeight = cmdPanel.clientHeight;
   leftPanel.style.height =(window.innerHeight - 40) -cmdHeight +'px'
   var winHeight = (window.innerHeight - 115);
@@ -1314,6 +1338,12 @@ function updateAfterResize(){
   editor.resize();
   containerPanel.style.height = (window.innerHeight) - cmdHeight +'px';
   sideBarPanel.style.height = (window.innerHeight - 58 - cmdHeight) +'px';
+
+  tasksBar.style.height = (window.innerHeight - 200) -cmdHeight +'px';
+  snippetsBar.style.height = (window.innerHeight - 200) -cmdHeight +'px';
+  codeViewBar.style.height = (window.innerHeight - 140) -cmdHeight +'px';
+  webViewBar.style.height = (window.innerHeight - 200) - cmdHeight + 'px';
+
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
   newFileModal.style.left = (appPanel.innerWidth/2)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
@@ -1775,9 +1805,76 @@ function openCurrentFileInSideView(){
   openFileInSideView(currentFile);
 }
 
+function openCurrentTabInSideView(){
+  openFileInSideView(selectedTab.getAttribute("data-file"));
+}
+
 function openFileInSideView(file){
+  let ext = path.extname(file).replace(/\./g,' ').trim();
+  if(extensions.hasOwnProperty(ext)) {
+    let fileAction = extensions[ext].type;
+    if (fileAction === "code") {
+      sideBarManager.openSideBar(function(){
+        document.getElementById("codeview-badge").innerText = path.basename(file);
+        const buffer = fs.readFileSync(file);
+        document.getElementById("code-preview").innerHTML = hljs.highlightAuto(buffer.toString()).value;
+      }, "codeview");
+    }
+  }
+}
+
+function openWebView(){
+  showTutorialsView(function(){
+    fetchTutorials();
+  })
+}
+
+function showTutorialsView(callback){
+  document.getElementById("webview-element").style.display = "none";
+  document.getElementById('webview-content').style.display = 'block';
   sideBarManager.openSideBar(function(){
-    const buffer = fs.readFileSync(file);
-    document.getElementById("code-preview").innerText = buffer.toString();
-  }, "codeview");
+    if(callback){
+      callback();
+    }
+  }, "webview");
+}
+
+function fetchTutorials(){
+  fetch("https://app.wftutorials.com/api/Tutorials")
+      .then(response => response.json())
+      .then(data => showTutorials(data))
+}
+
+function showTutorials(data){
+  let template = '';
+  allTutorials = [].concat(allTutorials, data.tutorials);
+  //console.log(allTutorials)
+  let myTutorials = allTutorials;
+  myTutorials.forEach((tutorial)=>{
+    template += `<div class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}">
+                  <img class="card-img-top" src="${tutorial.featuredImage}" alt="Card image cap">
+                  <div class="card-body">
+                    <h5 class="card-title">${tutorial.title}</h5>
+                    <p class="card-text">${tutorial.description}</p>
+                    <span class="badge badge-info">${tutorial.category}</span>
+                  </div>
+                </div>`;
+  })
+  document.getElementById("webview-content").innerHTML = template;
+  // listeners
+  const divs = document.querySelectorAll('.tutorial-item');
+  divs.forEach( el => {
+    el.addEventListener('dblclick', (event) => {
+      let wl = document.getElementById('webview-layout');
+      tutorialsViewScrollPosition =  wl.scrollTop;
+       console.log(wl.scrollTop);
+      var tutorialUrl = el.getAttribute('data-website');
+      if (tutorialUrl) {
+        document.getElementById('webview-content').style.display = 'none';
+        var wv = document.getElementById("webview-element");
+        wv.style.display = "block";
+        wv.setAttribute('src',tutorialUrl);
+      }
+    });
+  });
 }

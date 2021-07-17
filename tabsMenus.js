@@ -4,6 +4,12 @@ module.exports =  {
   createMenu : (mainDialog) => {
     return [
       {
+        label: 'Open In Side View',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openCurrentTabInSideView()`)
+        },
+      },
+      {
         label: 'Close tab',
         click: () => {
           mainDialog.webContents.executeJavaScript(`closeSelectedTab()`)
