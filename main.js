@@ -10,7 +10,8 @@ console.log(dbPath)
 db.init(dbPath)
 let wc;
 let mainMenu;
-let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu, snippetsContextMenu;
+let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
+    snippetsContextMenu, tutorialsContextMenu;
 let snippetsWindow;
 
 db.loadDatabases();
@@ -32,6 +33,8 @@ ipcMain.handle('show-context-menu', (event, menu) => {
     tasksContextMenu.popup();
   }else if(menu == 'snippets'){
     snippetsContextMenu.popup();
+  }else if(menu == 'tutorials'){
+    tutorialsContextMenu.popup();
   }
 })
 
@@ -90,6 +93,7 @@ function createWindow () {
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));
   tasksContextMenu = Menu.buildFromTemplate(require('./tasksMenu').createMenu(mainWindow));
   snippetsContextMenu = Menu.buildFromTemplate(require('./snippetsMenu').createMenu(mainWindow));
+  tutorialsContextMenu = Menu.buildFromTemplate(require('./tutorialMenus').createMenu(mainWindow));
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);

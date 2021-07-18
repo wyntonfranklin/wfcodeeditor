@@ -10,6 +10,12 @@ module.exports =  {
         },
       },
       {
+        label: 'Open in Code View',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openInCodeView()`)
+        },
+      },
+      {
         label: 'Edit this Snippet',
         click: () => {
           mainDialog.webContents.executeJavaScript(`editSnippet()`)

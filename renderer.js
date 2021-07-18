@@ -39,6 +39,7 @@ let selectedTaskElement = null;
 let currentSideBar = null;
 let currentSnippet;
 let allTutorials = [];
+let tutorialsPagination = null;
 let tutorialsViewScrollPosition = null;
 
 let currentFile = null;
@@ -227,14 +228,21 @@ document.getElementById("add-snippet").addEventListener('click', e=>{
 
 
 document.getElementById("manage-tutorials").addEventListener('click', e=>{
-  openWebView();
+  if(allTutorials.length > 0){
+    sideBarManager.toggleSideBar(function(){
+      if(tutorialsViewScrollPosition){
+        document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
+      }
+    },'webview')
+  }else{
+    openWebView();
+  }
   return false;
 });
 
 
 document.getElementById("tutorials-home").addEventListener('click', e=>{
   showTutorialsView(function(){
-    console.log(tutorialsViewScrollPosition);
     if(tutorialsViewScrollPosition){
       document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
     }
@@ -613,6 +621,16 @@ function saveADirectory(path, callback){
 /************************************ SNIPPETS ********************************/
 
 
+function openInCodeView(){
+  let snippetId = currentSnippet.getAttribute("data-id");
+  snippetManager.getSnippet(getApplicationPath("snippets.db"), {_id: snippetId}, function(doc){
+    sideBarManager.openSideBar(function(){
+      setCodeView("Snippet", doc.snippet);
+    }, "codeview");
+  })
+}
+
+
 function copySnippetToClipboard(){
   let snippetId = currentSnippet.getAttribute("data-id");
   snippetManager.getSnippet(getApplicationPath("snippets.db"), {_id: snippetId}, function(doc){
@@ -797,14 +815,14 @@ function loadTaskView(){
   taskManager.loadTasks(getTasksPath(), query, function(docs){
     let template = "";
     docs.forEach(( task )=>{
-      template += `<a data-file="${task.file}" data-id="${task._id}" href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
+      template += `<div data-file="${task.file}" data-id="${task._id}" href="#" class="task-item list-group-item list-group-item-action flex-column align-items-start">`;
       template += `<p class="mb-1">${task.content}</p>`;
       if(task.file){
         var name = path.basename(task.file);
         template += `<span class="badge badge-info">${name}</span>`;
       }
       //template  += `<small>Donec id elit non mi porta.</small>`;
-      template +=  `</a>`;
+      template +=  `</div>`;
     })
     document.getElementById('task-layout').innerHTML = template;
 
@@ -1815,12 +1833,16 @@ function openFileInSideView(file){
     let fileAction = extensions[ext].type;
     if (fileAction === "code") {
       sideBarManager.openSideBar(function(){
-        document.getElementById("codeview-badge").innerText = path.basename(file);
         const buffer = fs.readFileSync(file);
-        document.getElementById("code-preview").innerHTML = hljs.highlightAuto(buffer.toString()).value;
+        setCodeView(path.basename(file), hljs.highlightAuto(buffer.toString()).value)
       }, "codeview");
     }
   }
+}
+
+function setCodeView(title, content){
+  document.getElementById("codeview-badge").innerText = title;
+  document.getElementById("code-preview").innerHTML = hljs.highlightAuto(content).value;
 }
 
 function openWebView(){
@@ -1840,19 +1862,27 @@ function showTutorialsView(callback){
 }
 
 function fetchTutorials(){
-  fetch("https://app.wftutorials.com/api/Tutorials")
-      .then(response => response.json())
-      .then(data => showTutorials(data))
+  if(tutorialsPagination){
+    fetch("https://app.wftutorials.com/api/Tutorials?page="+ (tutorialsPagination.currentPage+2))
+        .then(response => response.json())
+        .then(data => showTutorials(data))
+  }else{
+    fetch("https://app.wftutorials.com/api/Tutorials")
+        .then(response => response.json())
+        .then(data => showTutorials(data))
+  }
 }
 
 function showTutorials(data){
   let template = '';
   allTutorials = [].concat(allTutorials, data.tutorials);
+  console.log(data.meta);
+  tutorialsPagination = data.meta;
   //console.log(allTutorials)
   let myTutorials = allTutorials;
   myTutorials.forEach((tutorial)=>{
     template += `<div class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}">
-                  <img class="card-img-top" src="${tutorial.featuredImage}" alt="Card image cap">
+                  <img class="card-img-top" src="${tutorial.featuredImage}" alt="featured image">
                   <div class="card-body">
                     <h5 class="card-title">${tutorial.title}</h5>
                     <p class="card-text">${tutorial.description}</p>
@@ -1860,10 +1890,21 @@ function showTutorials(data){
                   </div>
                 </div>`;
   })
+  template += `<button id="load-more-tutorials" type="button" class="btn btn-light btn-block mt-3 mb-5">Load More</button>`;
   document.getElementById("webview-content").innerHTML = template;
   // listeners
+  document.getElementById('load-more-tutorials').addEventListener('click', e=>{
+     e.preventDefault();
+     fetchTutorials();
+  });
   const divs = document.querySelectorAll('.tutorial-item');
   divs.forEach( el => {
+    el.addEventListener('contextmenu', e => {
+      let currentTutorial = e.currentTarget;
+      ipcRenderer.invoke('show-context-menu',"tutorials");
+      e.preventDefault();
+    })
+
     el.addEventListener('dblclick', (event) => {
       let wl = document.getElementById('webview-layout');
       tutorialsViewScrollPosition =  wl.scrollTop;
@@ -1874,6 +1915,9 @@ function showTutorials(data){
         var wv = document.getElementById("webview-element");
         wv.style.display = "block";
         wv.setAttribute('src',tutorialUrl);
+        wv.onload = function(){
+          wv.style.display = "block";
+        }
       }
     });
   });
