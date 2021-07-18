@@ -41,6 +41,7 @@ let currentSnippet;
 let allTutorials = [];
 let tutorialsPagination = null;
 let tutorialsViewScrollPosition = null;
+let selectedTutorialElement = null;
 
 let currentFile = null;
 let currentDirectory = null;
@@ -1881,7 +1882,7 @@ function showTutorials(data){
   //console.log(allTutorials)
   let myTutorials = allTutorials;
   myTutorials.forEach((tutorial)=>{
-    template += `<div class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}">
+    template += `<div data-id="${tutorial.id}" class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}">
                   <img class="card-img-top" src="${tutorial.featuredImage}" alt="featured image">
                   <div class="card-body">
                     <h5 class="card-title">${tutorial.title}</h5>
@@ -1900,7 +1901,8 @@ function showTutorials(data){
   const divs = document.querySelectorAll('.tutorial-item');
   divs.forEach( el => {
     el.addEventListener('contextmenu', e => {
-      let currentTutorial = e.currentTarget;
+      selectedTutorialElement = e.currentTarget;
+      console.log(selectedTutorialElement)
       ipcRenderer.invoke('show-context-menu',"tutorials");
       e.preventDefault();
     })
@@ -1921,4 +1923,18 @@ function showTutorials(data){
       }
     });
   });
+}
+
+function openTutorialInBrowser(){
+  if(selectedTutorialElement){
+    let tutorialId = selectedTutorialElement.getAttribute('data-id');
+    if(tutorialId){
+      let tutorialsUrl = `https://app.wftutorials.com/tutorial/${tutorialId}`;
+      shell.openExternal(tutorialsUrl);
+    }
+  }
+}
+
+function openTutorialInWindow(){
+  ipcRenderer.invoke('show-tutorial');
 }

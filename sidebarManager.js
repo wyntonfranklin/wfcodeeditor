@@ -4,7 +4,7 @@ let tasksBar = document.getElementById('sbl-tasks');
 let snippetsBar = document.getElementById('sbl-snippets');
 let codeViewBar = document.getElementById('sbl-codeview');
 let webViewBar = document.getElementById('sbl-webview');
-let bars = [tasksBar, snippetsBar, codeViewBar];
+let bars = [tasksBar, snippetsBar, codeViewBar, webViewBar];
 const sideBars = {
     tasks : {
         el : tasksBar,

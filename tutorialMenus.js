@@ -6,13 +6,13 @@ module.exports =  {
             {
                 label: 'Open in new Window',
                 click: () => {
-                    mainDialog.webContents.executeJavaScript(`copyTaskToClipBoard()`)
+                    mainDialog.webContents.executeJavaScript(`openTutorialInWindow()`)
                 },
             },
             {
                 label: 'Open in Browser',
                 click: () => {
-                    mainDialog.webContents.executeJavaScript(`editATask()`)
+                    mainDialog.webContents.executeJavaScript(`openTutorialInBrowser()`)
                 },
             },
             {

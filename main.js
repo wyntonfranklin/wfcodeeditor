@@ -6,13 +6,12 @@ var Datastore = require('nedb');
 const snippetsManger = require('./snippets');
 let db = require("./database");
 let dbPath = app.getPath('userData');
-console.log(dbPath)
 db.init(dbPath)
 let wc;
 let mainMenu;
 let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
     snippetsContextMenu, tutorialsContextMenu;
-let snippetsWindow;
+let snippetsWindow, tutorialWindow;
 
 db.loadDatabases();
 
@@ -58,7 +57,7 @@ function createWindow () {
     modal: true,
     titleBarStyle: 'hidden',
     show: false,
-  })
+  });
   snippetsWindow.setMenuBarVisibility(false);
   snippetsWindow.loadFile('create-file-layout.html')
   //snippetsWindow.webContents.openDevTools();
@@ -67,6 +66,23 @@ function createWindow () {
     snippetsWindow.hide();
     e.preventDefault();
   })
+
+
+  tutorialWindow = new BrowserWindow({
+    width: 600, height: 600,
+    webPreferences: { nodeIntegration: true,    contextIsolation: false, },
+    parent: mainWindow,
+    modal: false,
+    titleBarStyle: 'hidden',
+    show: false,
+  });
+  tutorialWindow.setMenuBarVisibility(false);
+  tutorialWindow.loadFile('tutorial-layout.html')
+  tutorialWindow.on('close',  (e) => {
+    tutorialWindow.hide();
+    e.preventDefault();
+  })
+
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
@@ -81,6 +97,11 @@ function createWindow () {
     wc.send('get-code', {'code': snippets[id].code});
     snippetsWindow.hide();
     mainWindow.focus();
+  });
+
+  ipcMain.handle('show-tutorial', (event) => {
+    tutorialWindow.show();
+    tutorialWindow.focus();
   });
 
   ipcMain.handle('show-confirm-dialog', async (event, options) => {
