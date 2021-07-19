@@ -5,6 +5,7 @@
 // selectively enable features needed in the rendering
 // process.
 
+const APPLICATION_NAME = "";
 const { ipcRenderer, clipboard,  shell } = require('electron')
 const helper = require('./helper.js');
 const fs = require("fs-extra")
@@ -23,12 +24,11 @@ const cmd=require('node-cmd');
 const sideBarManager = require('./sidebarManager');
 
 let ctrlIsPressed = false;
-
+const settings = new Store();
 let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
 let currentProject = null;
 let APPLICATION_PATH = "";
 let SHOW_TASK_BY_FILE = false;
-const settings = new Store();
 let recentlyCreatedFile = null;
 let openFiles = [];
 let selectedFileElement = null;
@@ -42,6 +42,7 @@ let allTutorials = [];
 let tutorialsPagination = null;
 let tutorialsViewScrollPosition = null;
 let selectedTutorialElement = null;
+let currentTutorialAction = "tutorials";
 
 let currentFile = null;
 let currentDirectory = null;
@@ -227,6 +228,11 @@ document.getElementById("add-snippet").addEventListener('click', e=>{
   return false;
 });
 
+document.getElementById("search-tutorials").addEventListener('click', e=>{
+  searchTutorials();
+  return false;
+});
+
 
 document.getElementById("manage-tutorials").addEventListener('click', e=>{
   if(allTutorials.length > 0){
@@ -243,6 +249,22 @@ document.getElementById("manage-tutorials").addEventListener('click', e=>{
 
 
 document.getElementById("tutorials-home").addEventListener('click', e=>{
+  showTutorialsView(function(){
+    if(currentTutorialAction == "tutorials"){
+      if(tutorialsViewScrollPosition){
+        document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
+      }
+    }else if(currentTutorialAction == "search"){
+      allTutorials = [];
+      tutorialsPagination = null;
+      fetchTutorials();
+    }
+  });
+  return false;
+});
+
+
+document.getElementById("tutorial-view-back").addEventListener('click', e=>{
   showTutorialsView(function(){
     if(tutorialsViewScrollPosition){
       document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
@@ -278,6 +300,13 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 });
 
 
+ipcRenderer.on('open-file', function (evt, message) {
+  onFileClickEvent(null, message.file);
+});
+
+
+
+
 
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
@@ -300,19 +329,6 @@ function getApplicationPath(file){
 }
 
 
-
-
-
-function updateProjectSettings(projectPath){
-  db.saveToProjects({
-    'name' : projectPath
-  })
-  db.saveToSettings({'name': "current-project",},{
-    'name': "current-project",
-    'value': projectPath
-  }, function(){
-  })
-}
 
 
 function setSaveButtonAsActive(){
@@ -1221,11 +1237,42 @@ function setCurrentProjectName(name){
 }
 
 
+/** Open New Project **/
+
 function openNewProject(){
   getProjectDir( dir =>{
     readFiles(dir);
   })
 }
+
+
+/** Read Open Files No Directory **/
+
+function readNonProjectFiles(){
+  let html = "";
+  for(let i=0; i<= openFiles.length-1; i++){
+    var fileObject = openFiles[i];
+    let file = fileObject.name;
+    if(file)
+    {
+      let fname = path.basename(file);
+      if(file == currentFile && (fileObject.content !== fileObject.ocontent)){
+        html += createDirectoryLink("file", file, "save active");
+      }else if(file == currentFile){
+        html += createDirectoryLink("file", file, "active");
+      }else if((fileObject.content !== fileObject.ocontent)){
+        html += createDirectoryLink("file", file, "save");
+      }else{
+        html += createDirectoryLink("file", file, "");
+      }
+    }
+  }
+  document.getElementById("directory").innerHTML = html;
+  setListeners();
+}
+
+
+/** Read Files **/
 
 let readFiles = (projectDir) => {
   if(projectDir){
@@ -1242,16 +1289,20 @@ let readFiles = (projectDir) => {
       document.getElementById("directory").innerHTML = directContent;
       setListeners();
     });
-  }else{
+  }else if(openFiles.length > 0){
+      // show open files
+    readNonProjectFiles();
+  }else {
     document.getElementById("directory").innerHTML = "";
   }
 }
+
+/** Recent Projects **/
 
 function loadRecentProjects(){
   let html = '';
   db.getAllProjects({}, function (err, docs) {
     docs.forEach(function(project){
-      // console.log(project.name, "here")
       let projectName = helper.getDirectoryName(project.name);
       html += `<li class="list-group-item list-group-item-action recent-project" data-filepath="${project.name}">${projectName}</li>`;
     });
@@ -1266,10 +1317,14 @@ function loadRecentProjects(){
 
 }
 
+
+
 function scrollCmdViewDown(){
   let cmdView = document.getElementById("cmd-layout-content");
   cmdView.scrollTo(0,cmdView.scrollHeight);
 }
+
+/* Open Project */
 
 function openProject(event, filepath){
   closeProject();
@@ -1284,6 +1339,8 @@ function openProject(event, filepath){
   refreshView();
 }
 
+
+/** Clear Current Project **/
 
 function clearProject(){
   editor.session.setValue("");
@@ -1304,10 +1361,13 @@ function closeProject(){
   setCurrentProjectName("");
   sideBarManager.closeSideBars();
   openFiles = [];
+  settings.delete("currentproject");
   refreshView();
 }
 
 
+
+/** Initalize Application **/
 
 function init(){
   setModalsCloseEvents();
@@ -1321,9 +1381,12 @@ function init(){
   makeResizableLeft();
 }
 
+
 function updatePageTitle(title){
-  document.title = "A Code Editor - " + title;
+  document.title = "wfCodeEditor - " + title;
 }
+
+/** Messages and Loggin **/
 
 function setMessageBox(msg){
 
@@ -1332,6 +1395,8 @@ function setMessageBox(msg){
 function messageLog(log){
   setMessageBox(log);
 }
+
+/** Window Resize Views and Elements Function **/
 
 function updateAfterResize(){
   var rightPanel = document.getElementById('right-panel');
@@ -1835,7 +1900,7 @@ function openFileInSideView(file){
     if (fileAction === "code") {
       sideBarManager.openSideBar(function(){
         const buffer = fs.readFileSync(file);
-        setCodeView(path.basename(file), hljs.highlightAuto(buffer.toString()).value)
+        setCodeView(path.basename(file),buffer.toString())
       }, "codeview");
     }
   }
@@ -1845,6 +1910,9 @@ function setCodeView(title, content){
   document.getElementById("codeview-badge").innerText = title;
   document.getElementById("code-preview").innerHTML = hljs.highlightAuto(content).value;
 }
+
+/************************************* Tutorials *************************************/
+
 
 function openWebView(){
   showTutorialsView(function(){
@@ -1863,6 +1931,7 @@ function showTutorialsView(callback){
 }
 
 function fetchTutorials(){
+  currentTutorialAction = "tutorials";
   if(tutorialsPagination){
     fetch("https://app.wftutorials.com/api/Tutorials?page="+ (tutorialsPagination.currentPage+2))
         .then(response => response.json())
@@ -1871,6 +1940,21 @@ function fetchTutorials(){
     fetch("https://app.wftutorials.com/api/Tutorials")
         .then(response => response.json())
         .then(data => showTutorials(data))
+  }
+}
+
+function fetchSearchTutorials(){
+  let query = document.getElementById('search-tutorial-query').value;
+  if(query){
+    if(tutorialsPagination){
+      fetch("https://app.wftutorials.com/api/searchtutorials?page="+ (tutorialsPagination.currentPage+2)+'&q='+query)
+          .then(response => response.json())
+          .then(data => showTutorials(data))
+    }else{
+      fetch("https://app.wftutorials.com/api/searchtutorials?q="+ query)
+          .then(response => response.json())
+          .then(data => showTutorials(data))
+    }
   }
 }
 
@@ -1936,5 +2020,24 @@ function openTutorialInBrowser(){
 }
 
 function openTutorialInWindow(){
-  ipcRenderer.invoke('show-tutorial');
+  let tutorialId = selectedTutorialElement.getAttribute('data-id');
+  let tutorialsUrl = `https://app.wftutorials.com/tutorial/mobile/${tutorialId}`;
+  ipcRenderer.invoke('show-tutorial', tutorialsUrl);
+}
+
+function copyTutorialLinkToClipboard(){
+  if(selectedTutorialElement){
+    let tutorialId = selectedTutorialElement.getAttribute('data-id');
+    if(tutorialId){
+      let tutorialsUrl = `https://app.wftutorials.com/tutorial/${tutorialId}`;
+      clipboard.writeText(tutorialsUrl);
+    }
+  }
+}
+
+function searchTutorials(){
+  allTutorials = [];
+  tutorialsPagination = null;
+  currentTutorialAction = "search";
+  fetchSearchTutorials();
 }

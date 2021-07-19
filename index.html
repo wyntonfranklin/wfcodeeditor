@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
-    <title>A Code Editor</title>
+    <title>wfCodeEditor</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/atom-one-dark.min.css">
@@ -315,14 +315,15 @@
 
           <div id="sbl-webview" class="sbl-panel" style="display: none;" data-name="webview">
             <h5 style="overflow: hidden; white-space: normal" title="Learning Center">Online Tutorials</h5>
-            <span id="webview-badge"  style="font-size: 13px;" class="badge badge-primary">https://app.wftutorials.com/</span><br><br>
+            <span id="webview-badge"  style="font-size: 13px;" class="badge badge-primary">https://app.wftutorials.com/</span>
+            <span id="tutorial-view-back" style="float: right;">back</span><br><br>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="tutorials-home" style="cursor: pointer;"><i class="fa fa-home"></i></span>
               </div>
-              <input type="text" class="form-control" placeholder="Search">
+              <input id="search-tutorial-query" type="text" class="form-control" placeholder="Search">
               <div class="input-group-append">
-                <span class="input-group-text" id="" style="cursor:pointer;">Search</span>
+                <span class="input-group-text" id="search-tutorials" style="cursor:pointer;">Search</span>
               </div>
             </div>
             <div class="list-group" id="webview-layout" style="padding: 15px; background: #fff; overflow-y: scroll; height: 100%">

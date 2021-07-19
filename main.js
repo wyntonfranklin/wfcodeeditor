@@ -12,6 +12,7 @@ let mainMenu;
 let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
     snippetsContextMenu, tutorialsContextMenu;
 let snippetsWindow, tutorialWindow;
+let message; // pass messages to different windows
 
 db.loadDatabases();
 
@@ -78,10 +79,19 @@ function createWindow () {
   });
   tutorialWindow.setMenuBarVisibility(false);
   tutorialWindow.loadFile('tutorial-layout.html')
+  tutorialWindow.webContents.openDevTools();
   tutorialWindow.on('close',  (e) => {
     tutorialWindow.hide();
     e.preventDefault();
   })
+
+  tutorialWindow.on('resize', function(){
+    tutorialWindow.webContents.executeJavaScript('updateAfterResize()');
+  });
+
+  tutorialWindow.on('move', function(){
+    tutorialWindow.webContents.executeJavaScript('updateAfterResize()');
+  });
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
@@ -99,7 +109,8 @@ function createWindow () {
     mainWindow.focus();
   });
 
-  ipcMain.handle('show-tutorial', (event) => {
+  ipcMain.handle('show-tutorial', (event, link) => {
+    tutorialWindow.send('get-tutorial-data',{link: link});
     tutorialWindow.show();
     tutorialWindow.focus();
   });

@@ -16,10 +16,9 @@ module.exports =  {
                 },
             },
             {
-                label: 'Copy Link to Cliboard',
+                label: 'Copy Link to Clipboard',
                 click: () => {
-
-                    mainDialog.webContents.executeJavaScript(`removeATask()`)
+                    mainDialog.webContents.executeJavaScript(`copyTutorialLinkToClipboard()`)
                 },
             },
         ]

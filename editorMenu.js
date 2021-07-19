@@ -41,14 +41,9 @@ module.exports =  {
       },
       { role: 'copy'},
       { role: 'paste'},
-      { label: 'Open in Side View',
+      { label: 'Open in Code View',
         click: () => {
           mainWindow.webContents.executeJavaScript(`openCurrentFileInSideView()`)
-        },
-      },
-      { label: 'Open Web View',
-        click: () => {
-          mainWindow.webContents.executeJavaScript(`openWebView()`)
         },
       },
       { type: 'separator' },
@@ -85,7 +80,12 @@ module.exports =  {
           }
 
         ]
-      }
+      },
+      { label: 'View Tutorials',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`openWebView()`)
+        },
+      },
     ]
   }
 

@@ -13,7 +13,7 @@ module.exports =  {
                   label: 'New Project',
                   click: () => {
                     var filename = dialog.showOpenDialogSync(
-                      { defaultPath: '', properties: ['openDirectory'] });
+                      { defaultPath: '', properties: ['openDirectory','createDirectory','promptToCreate'] });
                     if(filename !== undefined){
                       var currentProject = filename[0];
                       console.log(currentProject, "current");
@@ -50,6 +50,29 @@ module.exports =  {
                   },
                 },
               ]
+            },
+            {
+              label: 'Open File',
+              click: () => {
+                var filename = dialog.showOpenDialogSync(
+                    { defaultPath: '', properties: ['openFile'] });
+                if(filename !== undefined){
+                  var currentFilename = filename[0];
+                  webContents.send("open-file", {file:currentFilename});
+                }
+              },
+            },
+            {
+              label: 'Open Project',
+              click: () => {
+                var filename = dialog.showOpenDialogSync(
+                    { defaultPath: '', properties: ['openDirectory'] });
+                if(filename !== undefined){
+                  var currentProject = filename[0];
+                  console.log(currentProject, "current");
+                  webContents.send("new-project-start", {project:currentProject});
+                }
+              },
             },
             {
               label: 'Recent Projects',
