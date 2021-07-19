@@ -261,7 +261,7 @@
 
       <div id="side-bar" class="side-bar resize-drag-left" style="display: none;">
         <div style="width:100%; margin-bottom: 5px; margin-top: 1px; vertical-align: middle; display: inline-block">
-          <span id="side-bar-close" style="float: right; cursor: pointer;">&#215; close</span>
+          <span id="side-bar-close" style="cursor: pointer;">&#8722; Close</span>
         </div>
         <div id="side-bar-layout"  class="side-bar-layout">
 
@@ -289,9 +289,12 @@
           <div id="sbl-snippets" class="sbl-panel" style="display: none;" data-name="snippets">
             <h5>Snippets</h5>
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Search" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="add-snippet" style="cursor: pointer;"><i class="fa fa-plus"></i></span>
+              </div>
+              <input id="snippets-query" type="text" class="form-control" placeholder="Search">
               <div class="input-group-append">
-                <span class="input-group-text" id="add-snippet" style="cursor:pointer;">Add</span>
+                <span class="input-group-text" id="search-snippet" style="cursor:pointer;"><i class="fa fa-search"></i></span>
               </div>
             </div>
             <br>
@@ -301,6 +304,7 @@
           </div>
 
 
+          <!-- Codeview -->
           <div id="sbl-codeview" class="sbl-panel" style="display: none;" data-name="codeview">
             <h5>CodeView</h5>
             <span id="codeview-badge"  style="font-size: 13px;" class="badge badge-primary">Hello World</span><br><br>
@@ -312,11 +316,11 @@
           </div>
 
 
-
+          <!--- Tutorials View -->
           <div id="sbl-webview" class="sbl-panel" style="display: none;" data-name="webview">
             <h5 style="overflow: hidden; white-space: normal" title="Learning Center">Online Tutorials</h5>
             <span id="webview-badge"  style="font-size: 13px;" class="badge badge-primary">https://app.wftutorials.com/</span>
-            <span id="tutorial-view-back" style="float: right;">back</span><br><br>
+            <span id="tutorial-view-back" style="float: right; cursor: pointer;">&#8592; back</span><br><br>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="tutorials-home" style="cursor: pointer;"><i class="fa fa-home"></i></span>

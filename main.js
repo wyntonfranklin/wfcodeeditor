@@ -79,7 +79,7 @@ function createWindow () {
   });
   tutorialWindow.setMenuBarVisibility(false);
   tutorialWindow.loadFile('tutorial-layout.html')
-  tutorialWindow.webContents.openDevTools();
+  //tutorialWindow.webContents.openDevTools();
   tutorialWindow.on('close',  (e) => {
     tutorialWindow.hide();
     e.preventDefault();
@@ -142,6 +142,14 @@ function createWindow () {
 
   mainWindow.on('focus', function(){
     mainWindow.webContents.executeJavaScript('onBlurEvents()');
+  });
+
+  mainWindow.webContents.on('devtools-opened', ()=>{
+    mainWindow.webContents.executeJavaScript('updateAfterResize()');
+  });
+
+  mainWindow.webContents.on('devtools-closed', ()=>{
+    mainWindow.webContents.executeJavaScript('updateAfterResize()');
   });
 
   ipcMain.handle('file-no-exists', (event) => {

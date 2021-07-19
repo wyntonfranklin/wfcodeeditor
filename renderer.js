@@ -76,6 +76,10 @@ let CURRENT_FILE_OPENER_TYPE = null;
 var openDir = [];
 let copyPathHolder =  null;
 
+
+
+/** Set up the Editor **/
+
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
 var langTools = ace.require("ace/ext/language_tools");
@@ -105,6 +109,8 @@ editor.on("input", e => {
 });
 
 
+// Save file on file Name input enter press
+
 fileNameInput.addEventListener("keyup", function(e) {
   if (e.which === 13) {
     //The keycode for enter key is 13
@@ -112,6 +118,17 @@ fileNameInput.addEventListener("keyup", function(e) {
   }
 });
 
+
+// search for tutorials based on query
+document.getElementById("search-tutorial-query").addEventListener("keyup", function(e) {
+  if (e.which === 13) {
+    //The keycode for enter key is 13
+    searchTutorials();
+  }
+});
+
+
+// save task on enter
 
 document.getElementById("task-input").addEventListener("keyup", function(e) {
   if (e.which === 13) {
@@ -144,6 +161,8 @@ document.getElementById("showtaskbyfile").addEventListener('change', function() 
 
 
 
+// go to website based on route comment
+
 document.getElementById("action-go-to-website").addEventListener('click', e=>{
   if(currentFile){
     let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
@@ -167,12 +186,13 @@ document.getElementById("action-go-to-website").addEventListener('click', e=>{
 });
 
 
-
+// run a command based on type of file
 document.getElementById("action-run-command").addEventListener('click', e => {
   runACommand();
 });
 
 
+// Create a new file
 document.getElementById("action-add-file").addEventListener('click', e=>{
   if(currentProject){
     createANewFile();
@@ -180,6 +200,8 @@ document.getElementById("action-add-file").addEventListener('click', e=>{
   return false;
 });
 
+
+// create a new folder
 document.getElementById("action-add-folder").addEventListener('click', e=>{
   if(currentProject){
     createANewFolder();
@@ -187,35 +209,40 @@ document.getElementById("action-add-folder").addEventListener('click', e=>{
   return false;
 });
 
-
+// toggle notes button
 document.getElementById("manage-notes").addEventListener('click', e=>{
   toggleTasksView();
   return false;
 });
 
 
+// toggle snippets button
 document.getElementById("manage-code-snippets").addEventListener("click", e=>{
   toggleSnippetsView();
   return false;
 });
 
 
+// save a file button
 document.getElementById("action-save-file").addEventListener('click', e=>{
   saveCurrentFile();
   return false;
 });
 
+// resize the views if required
 document.getElementById("action-resize-picture").addEventListener('click', e=>{
   updateAfterResize();
   return false;
 });
 
+// toggle console button
 document.getElementById("show-console").addEventListener('click', e=>{
   toggleCmdLayout();
   return false;
 });
 
 
+// close side bars button
 document.getElementById("side-bar-close").addEventListener('click', e=>{
   closeTasksView();
   //comment
@@ -223,17 +250,39 @@ document.getElementById("side-bar-close").addEventListener('click', e=>{
 });
 
 
+// add a snippet button (toggle snippets)
 document.getElementById("add-snippet").addEventListener('click', e=>{
   createANewSnippet();
   return false;
 });
 
+// search snippets
+document.getElementById("search-snippet").addEventListener('click', e=>{
+  let query = document.getElementById('snippets-query').value;
+  console.log(query);
+  if(query){
+    loadSnippetsView({
+      $where: function () {
+       // console.log(this.title);
+        if(this.title.toLowerCase().indexOf(query.toLowerCase()) !== -1){
+          return true;
+        }
+        return false;
+      }
+    });
+  }
+  return false;
+});
+
+// search for a tutorials
 document.getElementById("search-tutorials").addEventListener('click', e=>{
   searchTutorials();
   return false;
 });
 
 
+
+// toggle tutorials button
 document.getElementById("manage-tutorials").addEventListener('click', e=>{
   if(allTutorials.length > 0){
     sideBarManager.toggleSideBar(function(){
@@ -248,11 +297,13 @@ document.getElementById("manage-tutorials").addEventListener('click', e=>{
 });
 
 
+// go home from tutorials button
 document.getElementById("tutorials-home").addEventListener('click', e=>{
   showTutorialsView(function(){
     if(currentTutorialAction == "tutorials"){
       if(tutorialsViewScrollPosition){
         document.getElementById('webview-layout').scrollTop = tutorialsViewScrollPosition;
+        // maybe clear search field
       }
     }else if(currentTutorialAction == "search"){
       allTutorials = [];
@@ -701,22 +752,24 @@ function toggleSnippetsView(){
 }
 
 
-function loadSnippetsView(){
+function loadSnippetsView(query){
   let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
-  var query = {project:currentProject};
-  snippetManager.loadSnippets(snippetsPath, query, function(docs){
+  if(query == undefined){
+    var query = {project:currentProject};
+  }
+  let snipCallback = function(docs){
     let template = "";
-    docs.forEach(( snippet )=>{
-      template += `<a data-file="${snippet.file}" data-id="${snippet._id}" href="javascript:void(0)" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
+    docs.forEach(( snippet )=> {
+      template += `<div data-file="${snippet.file}" data-id="${snippet._id}" href="javascript:void(0)" class="snippet-item list-group-item list-group-item-action flex-column align-items-start">`;
       template += `    <div class="d-flex w-100 justify-content-between">
                   <h6 class="mb-1">${snippet.title}</h6>
                 </div>`;
       template += `<p class="mb-1">${snippet.snippet}</p>`;
-      if(snippet.file){
+      if (snippet.file) {
         var name = path.basename(snippet.file);
         template += `<span class="badge badge-info">${name}</span>`;
       }
-      template +=  `</a>`;
+      template += `</div>`;
     });
     document.getElementById('snippets-layout').innerHTML = template;
 
@@ -733,7 +786,8 @@ function loadSnippetsView(){
         e.preventDefault();
       })
     });
-  });
+  }
+  snippetManager.loadSnippets(snippetsPath, query, snipCallback);
 }
 
 
