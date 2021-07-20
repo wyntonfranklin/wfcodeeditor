@@ -22,6 +22,7 @@ let ncp = require("copy-paste");
 const open = require('open');
 const cmd=require('node-cmd');
 const sideBarManager = require('./sidebarManager');
+const Jimp = require('jimp');
 
 let ctrlIsPressed = false;
 const settings = new Store();
@@ -134,6 +135,14 @@ document.getElementById("task-input").addEventListener("keyup", function(e) {
   if (e.which === 13) {
     //The keycode for enter key is 13
     saveTask();
+  }
+});
+
+// search for snippet on enter
+document.getElementById("snippets-query").addEventListener("keyup", function(e) {
+  if (e.which === 13) {
+    //The keycode for enter key is 13
+    searchSnippets();
   }
 });
 
@@ -258,19 +267,7 @@ document.getElementById("add-snippet").addEventListener('click', e=>{
 
 // search snippets
 document.getElementById("search-snippet").addEventListener('click', e=>{
-  let query = document.getElementById('snippets-query').value;
-  console.log(query);
-  if(query){
-    loadSnippetsView({
-      $where: function () {
-       // console.log(this.title);
-        if(this.title.toLowerCase().indexOf(query.toLowerCase()) !== -1){
-          return true;
-        }
-        return false;
-      }
-    });
-  }
+  searchSnippets();
   return false;
 });
 
@@ -473,14 +470,12 @@ function appOpenCode(event, file, ext){
     editor.session.setValue(buffer.toString());
   }
   assignAceMode(editor, ext);
-  setSaveButtonAsInActive();
 }
 
 function appOpenImage(event, file, ext){
   addOpenFile(file);
   hideAllViews(imageView);
   imageViewer.src = file;
-  setSaveButtonAsInActive();
 }
 
 function hideAllViews(view){
@@ -688,6 +683,22 @@ function saveADirectory(path, callback){
 
 /************************************ SNIPPETS ********************************/
 
+
+function searchSnippets(){
+  let query = document.getElementById('snippets-query').value;
+  console.log(query);
+  if(query){
+    loadSnippetsView({
+      $where: function () {
+        // console.log(this.title);
+        if(this.title.toLowerCase().indexOf(query.toLowerCase()) !== -1){
+          return true;
+        }
+        return false;
+      }
+    });
+  }
+}
 
 function openInCodeView(){
   let snippetId = currentSnippet.getAttribute("data-id");
@@ -1466,6 +1477,7 @@ function updateAfterResize(){
   let snippetsBar = document.getElementById('sbl-snippets');
   let codeViewBar = document.getElementById('sbl-codeview');
   let webViewBar = document.getElementById('sbl-webview');
+  let imageView = document.getElementById("image-viewer");
   var cmdHeight = cmdPanel.clientHeight;
   leftPanel.style.height =(window.innerHeight - 40) -cmdHeight +'px'
   var winHeight = (window.innerHeight - 115);
@@ -1481,12 +1493,38 @@ function updateAfterResize(){
   snippetsBar.style.height = (window.innerHeight - 200) -cmdHeight +'px';
   codeViewBar.style.height = (window.innerHeight - 140) -cmdHeight +'px';
   webViewBar.style.height = (window.innerHeight - 200) - cmdHeight + 'px';
+  //imageView.style.height = (window.innerHeight - 100) + 'px';
+ // imageView.style.width = (window.innerWidth - 10) + 'px';
+  resizeImageView();
 
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
   newFileModal.style.left = (appPanel.innerWidth/2)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
 }
+
+// resize image View is src is active
+function resizeImageView(){
+  let imageContainer = document.getElementById("image-view");
+  let imageView = document.getElementById("image-viewer");
+  if(imageContainer.style.display === 'block'){
+    let path = (imageView.getAttribute('src')) ? imageView.getAttribute("src") : null;
+    if(path){
+      var image = new Jimp(path, function (err, image) {
+        //var w = image.bitmap.width; //  width of the image
+        var h = image.bitmap.height; // height of the image
+        if(h < (window.innerHeight -100) ){
+          imageView.style.height = h + 'px';
+        }else{
+          imageView.style.height = window.innerHeight -100 + 'px';
+        }
+      });
+    }
+  }
+}
+
+
+// drag on left edges
 
 function makeResizableLeft(){
   interact('.resize-drag-left')
@@ -1954,15 +1992,30 @@ function openFileInSideView(file){
     if (fileAction === "code") {
       sideBarManager.openSideBar(function(){
         const buffer = fs.readFileSync(file);
-        setCodeView(path.basename(file),buffer.toString())
+        setCodeView(path.basename(file),buffer.toString(), fileAction)
+      }, "codeview");
+    }else if(fileAction === "image"){
+      sideBarManager.openSideBar(function(){;
+        setCodeView(path.basename(file),file,fileAction)
       }, "codeview");
     }
   }
 }
 
-function setCodeView(title, content){
+function setCodeView(title, content, type){
   document.getElementById("codeview-badge").innerText = title;
-  document.getElementById("code-preview").innerHTML = hljs.highlightAuto(content).value;
+  let codePreview = document.getElementById("code-preview");
+  let imagePreview = document.getElementById("side-image-view");
+  if(type =='image'){
+    imagePreview.setAttribute('src', content);
+    imagePreview.style.display = 'block';
+    codePreview.style.display = 'none';
+  }else{
+    document.getElementById("codeview-badge").innerText = title;
+    codePreview.innerHTML = hljs.highlightAuto(content).value;
+    codePreview.style.display = 'block';
+    imagePreview.style.display = "none";
+  }
 }
 
 /************************************* Tutorials *************************************/
@@ -2020,7 +2073,7 @@ function showTutorials(data){
   //console.log(allTutorials)
   let myTutorials = allTutorials;
   myTutorials.forEach((tutorial)=>{
-    template += `<div data-id="${tutorial.id}" class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}">
+    template += `<div data-id="${tutorial.id}" class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}?noandroid">
                   <img class="card-img-top" src="${tutorial.featuredImage}" alt="featured image">
                   <div class="card-body">
                     <h5 class="card-title">${tutorial.title}</h5>
@@ -2075,7 +2128,7 @@ function openTutorialInBrowser(){
 
 function openTutorialInWindow(){
   let tutorialId = selectedTutorialElement.getAttribute('data-id');
-  let tutorialsUrl = `https://app.wftutorials.com/tutorial/mobile/${tutorialId}`;
+  let tutorialsUrl = `https://app.wftutorials.com/tutorial/mobile/${tutorialId}?noandroid`;
   ipcRenderer.invoke('show-tutorial', tutorialsUrl);
 }
 
