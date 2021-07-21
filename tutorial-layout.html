@@ -7,25 +7,22 @@
     <title>wfCodeEditor</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/atom-one-dark.min.css">
     <script>
     </script>
 </head>
-<body>
+<body style="overflow: hidden">
 <style>
     .snippet-item {
         cursor: pointer;
     }
 </style>
 
-<div class="container-fluid">
+<div style="overflow: hidden">
 
-    <div class="row">
-
-        <div class="col">
-            <iframe id="webview-element" src="" style="height: 100%; display: none;"> </iframe>
-        </div>
-
-    </div>
+    <iframe id="webview-element" src="" style="height: 100%; display: none;"> </iframe>
+    <pre><code id="code-view"  class="hljs" style="font-size: 15px; display: none"></code></pre>
+    <img id="image-view" style="display: none"/>
 
 
 </div>

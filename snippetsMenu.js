@@ -10,7 +10,7 @@ module.exports =  {
         },
       },
       {
-        label: 'Open in Code View',
+        label: 'Open in Side View',
         click: () => {
           mainDialog.webContents.executeJavaScript(`openInCodeView()`)
         },

@@ -154,7 +154,7 @@ document.getElementById("save-task-btn").addEventListener('click', e => {
 
 document.getElementById("cmd-close").addEventListener('click', e => {
   document.getElementById("cmd-layout").style.display = "none";
-  updateAfterResize();
+  updateOnResize();
 });
 
 
@@ -240,7 +240,7 @@ document.getElementById("action-save-file").addEventListener('click', e=>{
 
 // resize the views if required
 document.getElementById("action-resize-picture").addEventListener('click', e=>{
-  updateAfterResize();
+  updateOnResize();
   return false;
 });
 
@@ -697,6 +697,8 @@ function searchSnippets(){
         return false;
       }
     });
+  }else{
+    loadSnippetsView();
   }
 }
 
@@ -982,12 +984,12 @@ function toggleCmdLayout(){
   }else{
     cmdEl.style.display = "block";
   }
-  updateAfterResize();
+  updateOnResize();
 }
 
 function showCmdLayout(){
   document.getElementById("cmd-layout").style.display = "block";
-  updateAfterResize();
+  updateOnResize();
 }
 
 function runCommand(command){
@@ -1144,6 +1146,7 @@ function createTabs(){
   }
   fileTabs.innerHTML = html;
   setTabEvents();
+  updateOnResize();
   updateAfterResize();
 }
 
@@ -1442,7 +1445,7 @@ function init(){
   makeResizable();
   makeTopResizable();
   makeDraggable();
-  updateAfterResize();
+  updateOnResize();
   makeResizableLeft();
 }
 
@@ -1463,7 +1466,13 @@ function messageLog(log){
 
 /** Window Resize Views and Elements Function **/
 
-function updateAfterResize(){
+function resizeAll(){
+  updateOnResize();
+  updateAfterResize();
+}
+
+
+function updateOnResize(){
   var rightPanel = document.getElementById('right-panel');
   var containerPanel = document.getElementById('panel-container');
   var leftPanel = document.getElementById('left-panel');
@@ -1495,15 +1504,22 @@ function updateAfterResize(){
   webViewBar.style.height = (window.innerHeight - 200) - cmdHeight + 'px';
   //imageView.style.height = (window.innerHeight - 100) + 'px';
  // imageView.style.width = (window.innerWidth - 10) + 'px';
-  resizeImageView();
+
 
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
   newFileModal.style.left = (appPanel.innerWidth/2)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
   console.log("resize event");
+
 }
 
-// resize image View is src is active
+function updateAfterResize(){
+  // option resize functions
+  resizeImageView();
+  resizeCodeViewImageView();
+}
+
+// resize image View is src is active or code view and normal views
 function resizeImageView(){
   let imageContainer = document.getElementById("image-view");
   let imageView = document.getElementById("image-viewer");
@@ -1517,6 +1533,27 @@ function resizeImageView(){
           imageView.style.height = h + 'px';
         }else{
           imageView.style.height = window.innerHeight -100 + 'px';
+        }
+      });
+    }
+  }
+}
+
+
+// resize the side view image view
+function resizeCodeViewImageView(){
+  let imageView = document.getElementById("side-image-view");
+  let sideBarPanel = document.getElementById('side-bar')
+  if(imageView.style.display === 'block'){
+    let path = (imageView.getAttribute('src')) ? imageView.getAttribute("src") : null;
+    if(path){
+      var image = new Jimp(path, function (err, image) {
+        //var w = image.bitmap.width; //  width of the image
+        var h = image.bitmap.height; // height of the image
+        if(h < (sideBarPanel.clientHeight -100) ){
+          imageView.style.height = h + 'px';
+        }else{
+          imageView.style.height = sideBarPanel.clientHeight -100 + 'px';
         }
       });
     }
@@ -1583,7 +1620,7 @@ function makeResizable(){
             target.style.transform = 'translate(' + x + 'px,' + y + 'px)'
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
-            updateAfterResize();
+            updateOnResize();
           }
         },
         modifiers: [
@@ -1616,7 +1653,7 @@ function makeTopResizable(){
             y += event.deltaRect.top
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
-            updateAfterResize();
+            updateOnResize();
           }
         },
         modifiers: [
@@ -1974,33 +2011,67 @@ function search(){
 
 
 function openSelectedFileInSideView(){
-  openFileInSideView((selectedFileElement.getAttribute("data-path")));
+  openFileInSideView(selectedFileElement.getAttribute("data-path"));
+}
+
+function openSelectedFileInNewWindow(){
+  openFileInNewWindow(selectedFileElement.getAttribute("data-path"));
 }
 
 function openCurrentFileInSideView(){
   openFileInSideView(currentFile);
 }
 
+
 function openCurrentTabInSideView(){
   openFileInSideView(selectedTab.getAttribute("data-file"));
 }
 
+function openCurrentTabInNewWindow(){
+  openFileInNewWindow(selectedTab.getAttribute("data-file"));
+}
+
 function openFileInSideView(file){
-  let ext = path.extname(file).replace(/\./g,' ').trim();
-  if(extensions.hasOwnProperty(ext)) {
-    let fileAction = extensions[ext].type;
-    if (fileAction === "code") {
-      sideBarManager.openSideBar(function(){
+  // option resize functions
+  if(file){
+    let ext = path.extname(file).replace(/\./g,' ').trim();
+    if(extensions.hasOwnProperty(ext)) {
+      let fileAction = extensions[ext].type;
+      if (fileAction === "code") {
+        sideBarManager.openSideBar(function(){
+          const buffer = fs.readFileSync(file);
+          setCodeView(path.basename(file),buffer.toString(), fileAction)
+        }, "codeview");
+      }else if(fileAction === "image"){
+        sideBarManager.openSideBar(function(){;
+          setCodeView(path.basename(file),file,fileAction)
+        }, "codeview");
+      }
+    }
+    resizeCodeViewImageView();
+  }
+}
+
+
+
+// open content in new window
+function openFileInNewWindow(file){
+  if(file){
+    let ext = path.extname(file).replace(/\./g,' ').trim();
+    if(extensions.hasOwnProperty(ext)) {
+      let fileAction = extensions[ext].type;
+      if (fileAction === "code") {
         const buffer = fs.readFileSync(file);
-        setCodeView(path.basename(file),buffer.toString(), fileAction)
-      }, "codeview");
-    }else if(fileAction === "image"){
-      sideBarManager.openSideBar(function(){;
-        setCodeView(path.basename(file),file,fileAction)
-      }, "codeview");
+        ipcRenderer.invoke('show-tutorial', {content: buffer.toString(), type: 'code'});
+      }else if(fileAction === "image"){
+        ipcRenderer.invoke('show-tutorial', {content: file, type: 'image'});
+      }
     }
   }
 }
+
+
+// set Side or Code View Content
 
 function setCodeView(title, content, type){
   document.getElementById("codeview-badge").innerText = title;
@@ -2129,7 +2200,7 @@ function openTutorialInBrowser(){
 function openTutorialInWindow(){
   let tutorialId = selectedTutorialElement.getAttribute('data-id');
   let tutorialsUrl = `https://app.wftutorials.com/tutorial/mobile/${tutorialId}?noandroid`;
-  ipcRenderer.invoke('show-tutorial', tutorialsUrl);
+  ipcRenderer.invoke('show-tutorial', {content: tutorialsUrl, type: 'link'});
 }
 
 function copyTutorialLinkToClipboard(){

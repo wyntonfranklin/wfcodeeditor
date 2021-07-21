@@ -86,12 +86,25 @@ function createWindow () {
   })
 
   tutorialWindow.on('resize', function(){
-    tutorialWindow.webContents.executeJavaScript('updateAfterResize()');
+    tutorialWindow.webContents.executeJavaScript('updateOnResize()');
   });
 
   tutorialWindow.on('move', function(){
+    tutorialWindow.webContents.executeJavaScript('updateOnResize()');
+  });
+
+  tutorialWindow.on('resized', function(){
     tutorialWindow.webContents.executeJavaScript('updateAfterResize()');
   });
+
+  tutorialWindow.on('maximize', function(){
+    tutorialWindow.webContents.executeJavaScript('resizeAll()');
+  });
+
+  tutorialWindow.on('minimize', function(){
+    tutorialWindow.webContents.executeJavaScript('resizeAll()');
+  });
+
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
@@ -109,8 +122,8 @@ function createWindow () {
     mainWindow.focus();
   });
 
-  ipcMain.handle('show-tutorial', (event, link) => {
-    tutorialWindow.send('get-tutorial-data',{link: link});
+  ipcMain.handle('show-tutorial', (event, message) => {
+    tutorialWindow.send('get-tutorial-data',message);
     tutorialWindow.show();
     tutorialWindow.focus();
   });
@@ -132,12 +145,25 @@ function createWindow () {
     //contextMenu.popup()
   })
 
+  mainWindow.on('maximize', function(){
+    mainWindow.webContents.executeJavaScript('resizeAll()');
+  });
+
+  mainWindow.on('minimize', function(){
+    mainWindow.webContents.executeJavaScript('resizeAll()');
+  });
+
+
   mainWindow.on('resize', function(){
-     mainWindow.webContents.executeJavaScript('updateAfterResize()');
+     mainWindow.webContents.executeJavaScript('updateOnResize()');
+  });
+
+  mainWindow.on('resized', function(){
+    mainWindow.webContents.executeJavaScript('updateAfterResize()');
   });
 
   mainWindow.on('move', function(){
-    mainWindow.webContents.executeJavaScript('updateAfterResize()');
+    mainWindow.webContents.executeJavaScript('updateOnResize()');
   });
 
   mainWindow.on('focus', function(){
@@ -145,11 +171,11 @@ function createWindow () {
   });
 
   mainWindow.webContents.on('devtools-opened', ()=>{
-    mainWindow.webContents.executeJavaScript('updateAfterResize()');
+    mainWindow.webContents.executeJavaScript('updateOnResize()');
   });
 
   mainWindow.webContents.on('devtools-closed', ()=>{
-    mainWindow.webContents.executeJavaScript('updateAfterResize()');
+    mainWindow.webContents.executeJavaScript('updateOnResize()');
   });
 
   ipcMain.handle('file-no-exists', (event) => {

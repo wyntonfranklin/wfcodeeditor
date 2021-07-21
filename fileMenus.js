@@ -60,6 +60,11 @@ module.exports =  {
           mainDialog.webContents.executeJavaScript(`openSelectedFileInSideView()`)
         },
       },
+      { label: 'Open in new Window',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openSelectedFileInNewWindow()`)
+        },
+      },
       { type: 'separator' },
       { label: 'Delete',
         click: () => {

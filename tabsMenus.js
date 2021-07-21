@@ -10,6 +10,13 @@ module.exports =  {
         },
       },
       {
+        label: 'Open In New Window',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openCurrentTabInNewWindow()`)
+        },
+      },
+      { type: 'separator' },
+      {
         label: 'Close tab',
         click: () => {
           mainDialog.webContents.executeJavaScript(`closeSelectedTab()`)
