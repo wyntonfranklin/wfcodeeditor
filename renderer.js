@@ -17,6 +17,7 @@ const Store = require('electron-store');
 const openExplorer = require('open-file-explorer');
 const taskManager = require('./tasksManager');
 const snippetManager = require('./snippetsManager');
+const projectsManager = require('./projectsManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -1279,6 +1280,16 @@ let setListeners = () => {
 function saveLastProject(filepath){
 
   settings.set("currentproject", filepath);
+  const timestamp = Date.now();
+  projectsManager.updateProject(getApplicationPath('projects.db'),{
+    name:filepath,
+    timestamp : timestamp
+  }, {
+    name : filepath
+  }, function(){
+
+  })
+
 }
 
 function assignAceMode(editor, ext){
@@ -1369,7 +1380,7 @@ let readFiles = (projectDir) => {
 
 function loadRecentProjects(){
   let html = '';
-  db.getAllProjects({}, function (err, docs) {
+  projectsManager.loadProjects(getApplicationPath('projects.db'),{}, function (docs) {
     docs.forEach(function(project){
       let projectName = helper.getDirectoryName(project.name);
       html += `<li class="list-group-item list-group-item-action recent-project" data-filepath="${project.name}">${projectName}</li>`;
@@ -1684,21 +1695,18 @@ function makeDraggable(){
         autoScroll: true,
         listeners: {
           move(event) {
-            var containerPanel = document.getElementById('panel-container');
             var modalPanel = document.getElementById("new-file-modal");
-            var appPanel = document.getElementById('app');
+            var projectsPanel = document.getElementById("projects-modal");
             var target = event.target
             // keep the dragged position in the data-x/data-y attributes
             var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
-            // translate the element
-            //target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-            console.log((appPanel.clientWidth/2 + x))
-
-            modalPanel.style.left = ( x) + 'px';
+            modalPanel.style.left = (x) + 'px';
             modalPanel.style.top = (y)+ 'px';
+            projectsPanel.style.left = (x) + 'px';
+            projectsPanel.style.top = (y)+ 'px';
           }
         }
       })

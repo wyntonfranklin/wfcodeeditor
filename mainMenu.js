@@ -165,7 +165,20 @@ module.exports =  {
               click: () => {
                 webContents.executeJavaScript(`toggleTasksView()`)
               },
-              accelerator: 'CTRL+T'
+              accelerator: 'CommandOrControl+Shift+T'
+            },
+            {
+              label: 'Toggle Snippets',
+              click: () => {
+                webContents.executeJavaScript(`toggleSnippetsView()`)
+              },
+              accelerator: 'CommandOrControl+Shift+S'
+            },
+            {
+              label: 'View Online Tutorials',
+              click: () => {
+                webContents.executeJavaScript(`openWebView()`)
+              },
             }
           ]
         }
