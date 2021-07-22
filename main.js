@@ -11,7 +11,7 @@ let wc;
 let mainMenu;
 let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
     snippetsContextMenu, tutorialsContextMenu;
-let snippetsWindow, tutorialWindow;
+let snippetsWindow, tutorialWindow, settingsWindow;
 let message; // pass messages to different windows
 
 db.loadDatabases();
@@ -47,6 +47,7 @@ function createWindow () {
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
+      backgroundColor: '#3b3b3b'
     }
   })
 
@@ -105,14 +106,31 @@ function createWindow () {
     tutorialWindow.webContents.executeJavaScript('resizeAll()');
   });
 
+  settingsWindow = new BrowserWindow({
+    width: 600, height: 600,
+    webPreferences: { nodeIntegration: true, contextIsolation: false, },
+    parent: mainWindow,
+    modal: true,
+    titleBarStyle: 'hidden',
+    show: false,
+  });
+  settingsWindow.setMenuBarVisibility(false);
+  settingsWindow.loadFile('settings_layout.html');
+  settingsWindow.webContents.openDevTools();
+  settingsWindow.on('close',  (e) => {
+    settingsWindow.hide();
+    mainWindow.webContents.executeJavaScript('refreshView()');
+    e.preventDefault();
+  })
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
 
+
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
-  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, db, snippetsWindow) )
+  mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, snippetsWindow, settingsWindow) )
   Menu.setApplicationMenu(mainMenu)
 
   ipcMain.handle('set-code-to-view', (event, id, type) => {

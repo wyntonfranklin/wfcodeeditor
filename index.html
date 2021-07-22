@@ -7,12 +7,11 @@
     <title>wfCodeEditor</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/atom-one-dark.min.css">
     <link rel="stylesheet" href="./css/all.min.css">
     <script>
     </script>
   </head>
-  <body style="overflow:hidden;">
+  <body style="overflow:hidden; background: #3b3b3b">
   <style>
     .no-drag {
       -webkit-user-select: none;
@@ -55,10 +54,6 @@
        height: 700px;
      }
 
-     .active {
-       background-color: #6495ed;
-       font-weight: bold;
-     }
 
      .directory-lister-sub {
        list-style-type: none; padding: 0;
@@ -128,7 +123,7 @@
      }
 
      .actions-bar {
-       margin-left: 5px;
+       margin-left: 0px;
        margin-top: 0;
        margin-bottom: 0;
        border-bottom: 1px solid #ccc;
@@ -157,7 +152,6 @@
       width: 300px;
       right:0;
       height: 600px;
-      background: whitesmoke;
       font-size: 12px;
       padding: 5px;
       z-index: 100;
@@ -215,9 +209,9 @@
       cursor: pointer;
     }
   </style>
-  <div id="app" style="" style="overflow: hidden">
+  <div id="app" style="" style="overflow: hidden;">
 
-    <div id="icons" class="actions-bar" style="">
+    <div id="icons" class="actions-bar">
       <a id="action-add-file" title="Create new file" class="action-item"><img src="./icons/ic_action_file.png" width="24px"/></a>
         <a id="action-add-folder" title="Create new folder" class="action-item"><img src="./icons/ic_action_folder.png" width="24px"/></a>
         <a id="action-save-file" title="Save current file" class="action-item"><img src="./icons/ic_save.png" width="24px"/></a>
@@ -236,7 +230,7 @@
 
       <div id="left-panel" class="left-panel directory-lister-container resize-drag" style="border-right: 1px solid #c8cbcf;">
         <div style="display: inline-block;">
-          <p id="project-name" style="overflow: hidden;white-space: nowrap; margin: 0; padding:0">Project Home</p>
+          <p class="project-title" id="project-name" style="overflow: hidden;white-space: nowrap; margin: 0; padding:0">Project Home</p>
           <ul class="directory-lister" id="directory" style="margin-bottom: 10px;">
           </ul>
         </div>

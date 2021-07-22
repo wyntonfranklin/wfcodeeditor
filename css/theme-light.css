@@ -1,0 +1,19 @@
+.active {
+    background-color: #6495ed;
+    font-weight: bold;
+}
+
+
+
+
+.project-title {
+    color:black;
+}
+
+.actions-bar {
+    background: whitesmoke;
+}
+
+.side-bar {
+    background: whitesmoke!important;
+}

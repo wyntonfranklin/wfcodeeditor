@@ -18,6 +18,8 @@ const openExplorer = require('open-file-explorer');
 const taskManager = require('./tasksManager');
 const snippetManager = require('./snippetsManager');
 const projectsManager = require('./projectsManager');
+const settingsManager = require('./settingsManager');
+
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -360,8 +362,6 @@ ipcRenderer.on('open-file', function (evt, message) {
 
 ipcRenderer.invoke('read-user-data').then(dbPath=>{
   APPLICATION_PATH = dbPath;
-  db.init(dbPath);
-  db.loadDatabases();
   init();
 });
 
@@ -1115,12 +1115,16 @@ let createDirectoryLink = (type, file, styleclass) => {
   return tempFile;
 }
 
+
+// refresh the views
+
 function refreshView(){
   readFiles(currentProject);
   createTabs();
   if(isTaskViewOpen()){
     loadTaskView();
   }
+  setStyling();
 }
 
 function createTabs(){
@@ -1449,6 +1453,7 @@ function closeProject(){
 /** Initalize Application **/
 
 function init(){
+  setStyling();
   setModalsCloseEvents();
   getProjectDir(dir=>{
     readFiles(dir)
@@ -1458,6 +1463,49 @@ function init(){
   makeDraggable();
   updateOnResize();
   makeResizableLeft();
+}
+
+function setStyling(){
+  const bkLight = '#ffffff';
+  const bkDark = '#3b3b3b';
+  document.getElementById("code-input").style.fontSize = settingsManager.get('fontsize', 15) + 'px';
+  let theme = settingsManager.get('theme','light');
+  var sheetToBeRemoved = document.getElementById('code-view-styling');
+  let myTheme = document.getElementById('app-theme');
+  let leftPanel = document.getElementById('left-panel');
+  let mainPanel = document.getElementById('panel-container');
+  let iconsPanel = document.getElementById('icons');
+  if(myTheme){
+    myTheme.parentNode.removeChild(myTheme);
+  }
+  if(sheetToBeRemoved){
+    sheetToBeRemoved.parentNode.removeChild(sheetToBeRemoved);
+  }
+  var sheet = document.createElement('link');
+  myTheme = document.createElement('link');
+  sheet.rel = "stylesheet";
+  myTheme.rel = "stylesheet";
+  sheet.id = "code-view-styling";
+  myTheme.id = "app-theme";
+  if(theme == "light"){
+    document.body.style.background =  bkLight;
+    editor.setTheme("ace/theme/chrome");
+    sheet.setAttribute('href', './css/atom-one-light.min.css');
+    myTheme.setAttribute('href','./css/theme-light.css');
+    leftPanel.style.background = bkLight;
+    mainPanel.style.background =  bkLight;
+    iconsPanel.style.background = bkLight;
+  }else if(theme == "dark"){
+    document.body.style.background =  bkDark;
+    editor.setTheme("ace/theme/monokai");
+    sheet.setAttribute('href', './css/atom-one-dark.min.css');
+    myTheme.setAttribute('href','./css/theme-dark.css');
+    leftPanel.style.background = bkDark;
+    mainPanel.style.background = bkDark;
+    iconsPanel.style.background = bkDark;
+  }
+  document.body.prepend(sheet);
+  document.body.prepend(myTheme);
 }
 
 

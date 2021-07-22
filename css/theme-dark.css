@@ -1,0 +1,34 @@
+/** Background Color: #212121 **/
+.active {
+    background-color: #6495ed;
+    font-weight: bold;
+    color:white;
+}
+
+.directory-parent a {
+    color:white!important;
+}
+
+.project-title {
+    color:white;
+}
+
+.actions-bar {
+    background: #3b3b3b;
+}
+
+.nav-tabs {
+    color: white!important;
+}
+
+.side-bar {
+    background: #3b3b3b!important;
+}
+
+#side-bar-close {
+    color: white!important;
+}
+
+.sbl-panel > h5, .sbl-panel >span {
+    color: white!important;
+}

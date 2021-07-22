@@ -1,7 +1,7 @@
-let db = require('./database');
+
 
 module.exports =  {
-    createMenu : (webContents, dialog, db, snippetsDialog) => {
+    createMenu : (webContents, dialog, snippetsDialog, settingsDialog) => {
      return [
         {
           label: 'File',
@@ -90,7 +90,10 @@ module.exports =  {
             },
             { label: 'Save as'},
             {
-              label : 'Preferences'
+              label : 'Preferences',
+              click: () => {
+                settingsDialog.show();
+              },
             },
             { type: 'separator' },
             {

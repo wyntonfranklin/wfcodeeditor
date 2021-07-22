@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wfCodeEditor</title>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/all.min.css">
+    <link href="./vendor/awn/notifications.css" rel="stylesheet">
+    <script type="text/javascript" src="./vendor/awn/notifications.js"></script>
+</head>
+<body>
+<div style="padding: 10px;">
+    <form>
+        <div class="form-group">
+            <label>Last Opened Project</label>
+            <p id="lasted-opened"></p>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label>Font Size</label>
+            <input type="number" class="form-control" id="fontsize" placeholder="" min="10" max="50">
+        </div>
+        <hr>
+        <div class="form-group">
+            <label>Theme</label>
+            <select class="form-control" id="theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </div>
+
+        <br>
+        <button id="save-settings" type="button" class="btn btn-primary btn-block">Save Changes</button>
+    </form>
+</div>
+<script src="./settings_renderer.js"></script>
+</body>
+</html>
