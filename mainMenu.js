@@ -123,6 +123,12 @@ module.exports =  {
        { label: 'Snippets',
          submenu: [
            {
+             label: 'My Snippets',
+             click: () => {
+               webContents.executeJavaScript(`openSnippetsView()`)
+             },
+           },
+           {
              label: 'PHP',
              click: () => {
                snippetsDialog.webContents.executeJavaScript(`loadSnippets("PHP")`)
@@ -149,7 +155,7 @@ module.exports =  {
                snippetsDialog.webContents.executeJavaScript(`loadSnippets("HTML")`)
                snippetsDialog.show();
              },
-           }
+           },
 
          ]
        },

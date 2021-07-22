@@ -1453,6 +1453,8 @@ function clearProject(){
   currentFile = null;
   selectedFileElement = null;
   clearTasksView();
+  codeView.style.display = 'none';
+
 }
 
 function closeProject(){

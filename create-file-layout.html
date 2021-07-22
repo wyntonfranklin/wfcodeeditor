@@ -2,11 +2,12 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-  <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
-  <title></title>
+  <title>wf Code Editor</title>
   <link href="./css/bootstrap.min.css" rel="stylesheet">
   <link href="./css/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/all.min.css">
+  <link href="./vendor/awn/notifications.css" rel="stylesheet">
+  <script type="text/javascript" src="./vendor/awn/notifications.js"></script>
   <script>
   </script>
 </head>
@@ -22,10 +23,13 @@
   <div class="row">
 
     <div class="col">
+
+      <h5 id="title-bar">PHP SNIPPETS</h5>
+
       <div class="input-group">
-        <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Search snippets">
+        <input type="text" class="form-control" id="search-query" placeholder="Search snippets">
         <div class="input-group-append">
-          <div class="input-group-text">@</div>
+          <div id="search-snippets" class="input-group-text"><i class="fa fa-search"></i></div>
         </div>
       </div>
     </div>
