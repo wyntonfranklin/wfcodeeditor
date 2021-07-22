@@ -14,6 +14,6 @@ lastOpenedEl.innerText = settingsManager.get("currentproject","");
 document.getElementById("save-settings").addEventListener('click', e => {
     settingsManager.set('fontsize', fontSizeEl.value);
     settingsManager.set('theme', themeEl.value);
-    notificationsManager.success();
+    notificationsManager.success("Settings saved!");
 });
 

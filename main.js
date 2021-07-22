@@ -116,10 +116,11 @@ function createWindow () {
   });
   settingsWindow.setMenuBarVisibility(false);
   settingsWindow.loadFile('settings_layout.html');
-  settingsWindow.webContents.openDevTools();
+  //settingsWindow.webContents.openDevTools();
   settingsWindow.on('close',  (e) => {
     settingsWindow.hide();
     mainWindow.webContents.executeJavaScript('refreshView()');
+    mainWindow.focus();
     e.preventDefault();
   })
 

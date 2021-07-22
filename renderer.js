@@ -19,7 +19,7 @@ const taskManager = require('./tasksManager');
 const snippetManager = require('./snippetsManager');
 const projectsManager = require('./projectsManager');
 const settingsManager = require('./settingsManager');
-
+const notificationsManager = require('./notificationsManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -122,6 +122,10 @@ fileNameInput.addEventListener("keyup", function(e) {
   }
 });
 
+// on icons bar click
+document.getElementById('icons').addEventListener('dblclick', e =>{
+  sideBarManager.closeSideBar();
+});
 
 // search for tutorials based on query
 document.getElementById("search-tutorial-query").addEventListener("keyup", function(e) {
@@ -180,19 +184,23 @@ document.getElementById("action-go-to-website").addEventListener('click', e=>{
     let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
     const re = /\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/;
     var matches = fileObject.content.match(re);
-    if(matches){
+    if(matches.length > 0){
       for(let i=0; i<=matches.length-1; i++){
-        if(matches[i].indexOf('@route') !== -1){
-          let route = matches[i];
-          route = route.replaceAll("*","");
-          route = route.replace("@route","");
-          if(route){
-            console.log(route);
-            shell.openExternal(route);
-            return route;
+        if(matches[i] !== undefined){
+          if(matches[i].indexOf('@route') !== -1){
+            let route = matches[i];
+            route = route.replaceAll("*","");
+            route = route.replace("@route","");
+            if(route){
+              shell.openExternal(route);
+              return route;
+            }
           }
         }
       }
+      notificationsManager.info('No routes found');
+    }else{
+      notificationsManager.info('No routes found');
     }
   }
 });
@@ -432,6 +440,9 @@ function onDirectoryClickEvent(e, file){
   refreshView();
 }
 
+
+// When a file is clicked you can call this function
+
 function onFileClickEvent(e, file){
   let ext = path.extname(file).replace(/\./g,' ').trim();
   let fileAction = null;
@@ -450,8 +461,12 @@ function onFileClickEvent(e, file){
     }
     refreshView();
   }else{
-    console.log(ext);
-    setMessageBox("Cant open this file");
+    //console.log(ext);
+    //setMessageBox("Cant open this file");
+    if(!ext){
+      ext = "unknown";
+    }
+    notificationsManager.error(`Cannot open file of type ${ext}`);
   }
 }
 
@@ -549,6 +564,8 @@ function onSaveButtonPressed(e){
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
     readFiles(currentProject);
+  }else{
+
   }
 }
 
@@ -654,6 +671,8 @@ function saveCurrentFile(){
     sel.moveCursorToPosition(cpostion);
     setSaveButtonAsInActive();
     refreshView();
+  }else{
+    notificationsManager.info('Nothing to save');
   }
 }
 
@@ -1282,17 +1301,18 @@ let setListeners = () => {
 
 
 function saveLastProject(filepath){
-
   settings.set("currentproject", filepath);
   const timestamp = Date.now();
-  projectsManager.updateProject(getApplicationPath('projects.db'),{
-    name:filepath,
-    timestamp : timestamp
-  }, {
-    name : filepath
-  }, function(){
+  projectsManager.getProject(getApplicationPath('projects.db'), {name: filepath}, function(doc){
+    if(!doc){
+      projectsManager.saveProject(getApplicationPath('projects.db'),{
+        name:filepath,
+        timestamp : timestamp
+      }, function(){
 
-  })
+      })
+    }
+  });
 
 }
 
@@ -1513,10 +1533,10 @@ function updatePageTitle(title){
   document.title = "wfCodeEditor - " + title;
 }
 
-/** Messages and Loggin **/
+/** Messages and Logging **/
 
 function setMessageBox(msg){
-
+  notificationsManager.error("Cannot open this file");
 }
 
 function messageLog(log){
