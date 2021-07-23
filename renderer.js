@@ -1146,6 +1146,25 @@ function refreshView(){
   setStyling();
 }
 
+function switchPositionOfFilesObjects(file1, file2){
+  let file1Position =null;
+  let file2Position = null;
+  for(let i=0; i<= openFiles.length-1; i++){
+      if(openFiles[i].name == file1){
+        file1Position = i;
+      }
+      if(openFiles[i].name == file2){
+        file2Position = i;
+      }
+  }
+  if(file1Position !== null && file2Position !== null){
+    var temp = openFiles[file2Position];
+    openFiles[file2Position] = openFiles[file1Position];
+    openFiles[file1Position] = temp;
+  }
+
+}
+
 function createTabs(){
   let html = '';
   if(openFiles.length < 0){
@@ -1175,7 +1194,7 @@ function createTabs(){
 }
 
 function createTabHtml(file, fname, className){
-  return  `<li class="nav-item" title="${file}">
+  return  `<li class="nav-item draggable-tabs" title="${file}">
              <span class="nav-link ${className}">
                 <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
             </li>`;
@@ -1207,6 +1226,7 @@ function setTabEvents(){
       ipcRenderer.invoke('show-context-menu',"tabs");
     })
   });
+  makeTabsDraggable();
 
 
 }
@@ -1215,7 +1235,7 @@ function getIcon(fname){
   let ext = path.extname(fname).replace(/\./g,' ').trim()
   let defaultIcon = `./icons/ic_file.png`;
   if(extensions.hasOwnProperty(ext)){
-    let iconname = `./icons/ic_${extensions[ext].icon}.png`;
+    let iconname =path.join(__dirname,`./icons/ic_${extensions[ext].icon}.png`);
     try {
       if(fs.existsSync(iconname)) {
         return iconname;
@@ -1453,7 +1473,7 @@ function clearProject(){
   currentFile = null;
   selectedFileElement = null;
   clearTasksView();
-  codeView.style.display = 'none';
+  codeView.style.display = "none";
 
 }
 
@@ -1751,6 +1771,56 @@ function makeTopResizable(){
       });
 }
 
+
+function makeTabsDraggable(){
+  interact('.draggable-tabs')
+      .draggable({
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrictRect({
+            restriction: '.tabs-holder',
+            endOnly: true
+          })
+        ],
+        autoScroll: true,
+        listeners: {
+          start (event) {
+           // onFileClickEvent(null, event.target.getAttribute('title'));
+          },
+          move(event) {
+            var target = event.target;
+            var box1 = target.getBoundingClientRect();
+            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+            target.setAttribute('data-x', x)
+            target.setAttribute('data-y', y)
+            target.style.left = (x) + 'px';
+            target.style.top = (y) + 'px';
+            const divstabs = document.querySelectorAll('.draggable-tabs');
+            let isSwitched = false;
+            divstabs.forEach( tab => {
+              if(tab.getAttribute('title') !== target.getAttribute('title')){
+                var box2 = tab.getBoundingClientRect();
+                if(intersectRect(box1, box2) && isSwitched==false){
+                  switchPositionOfFilesObjects(tab.getAttribute('title'), target.getAttribute('title'));
+                  isSwitched = true;
+                }
+              }
+            });
+          },
+          end (event) {
+            createTabs();
+          }
+        }
+      })
+}
+
+function intersectRect(a, b) {
+  return (a.left <= b.right &&
+      b.left <= a.right &&
+      a.top <= b.bottom &&
+      b.top <= a.bottom)
+}
 
 function makeDraggable(){
   interact('.draggable-content')

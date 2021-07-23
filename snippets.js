@@ -9,6 +9,8 @@ module.exports = {
       sdata = require("./snippets/sql");
     }else if(type == "HTML"){
       sdata = require("./snippets/html");
+    }else if(type == "JAVASCRIPT"){
+      sdata = require("./snippets/javascript");
     }
     snippets = JSON.parse(JSON.stringify(sdata));
     return snippets;

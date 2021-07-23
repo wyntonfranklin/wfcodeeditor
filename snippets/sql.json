@@ -2,26 +2,31 @@
   "select_query" : {
     "name" : "SELECT QUERY",
     "type" : "text",
+    "tags": "",
     "code": "SELECT column1, column2 FROM table_name"
   },
   "select_where_query" : {
     "name" : "SELECT QUERY WITH WHERE",
     "type" : "text",
+    "tags": "",
     "code": "SELECT column1, column2 FROM table_name WHERE condition"
   },
   "select_where_query_with_and" : {
     "name" : "SELECT QUERY WITH WHERE AND AND",
     "type" : "text",
+    "tags": "",
     "code": "SELECT column1, column2 FROM table_name WHERE condition1 AND condition2 AND condition3"
   },
   "insert_query" : {
     "name" : "INSERT QUERY",
     "type" : "text",
+    "tags": "",
     "code": "INSERT INTO table_name (column1, column2, column3) VALUES (value1, value2, value3);"
   },
   "update_query" : {
     "name" : "UPDATE QUERY",
     "type" : "text",
+    "tags": "",
     "code": "UPDATE table_name\nSET column1 = value1, column2 = value2\nWHERE condition;"
   }
 }

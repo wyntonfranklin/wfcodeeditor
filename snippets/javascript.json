@@ -1,0 +1,27 @@
+{
+  "basic-function": {
+    "name": "Basic Function",
+    "type": "text",
+    "code": "// change the function name.\nfunction myFunctionName() {\n  // do something here\n}\n"
+  },
+  "basic-function-with-argument": {
+    "name": "Basic Function with Argument",
+    "type": "text",
+    "code": "function myFunctionName(param) {\n  // do something here\n  return param;\n}"
+  },
+  "simple-object": {
+    "name": "Simple Object",
+    "type": "text",
+    "code": "const animal = {type:\"dog\", height:\"20\", color:\"brown\"};"
+  },
+  "switch-statement": {
+    "name": "Switch Statement",
+    "type": "text",
+    "code": "switch(expression) {\n  case x:\n    // code block\n    break;\n  case y:\n    // code block\n    break;\n  default:\n    // code block\n}"
+  },
+  "for-loop": {
+    "name": "Simple Object",
+    "type": "text",
+    "code": "const animal = {type:\"dog\", height:\"20\", color:\"brown\"};"
+  }
+}

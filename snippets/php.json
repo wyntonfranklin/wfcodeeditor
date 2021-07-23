@@ -7,6 +7,7 @@
   "create_if" : {
     "name" : "IF Statement",
     "type" : "text",
+    "tags" : "if, if else",
     "code": "if (condition) {\n  \n}"
   },
   "create_if_else" : {

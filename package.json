@@ -1,12 +1,13 @@
 {
-  "name": "a-code-editor",
+  "name": "wfCodeEditor",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "watch": "nodemon --exec electron .",
-    "postinstall": "install-app-deps"
+    "postinstall": "install-app-deps",
+    "build" : "electron-builder --win"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -38,5 +39,12 @@
     "notifyjs": "^3.0.0",
     "open": "^8.2.1",
     "open-file-explorer": "^1.0.2"
+  },
+  "build": {
+    "appId": "com.wftutorials.wfCodeEditor",
+    "copyright": "Copyright wfTutorials.com",
+    "win": {
+      "target": ["portable"]
+    }
   }
 }
