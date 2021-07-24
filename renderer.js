@@ -342,6 +342,10 @@ codeView.addEventListener('contextmenu', e=>{
   });
 });
 
+document.getElementById('cmd-layout-content').addEventListener('contextmenu', e=>{
+  ipcRenderer.invoke('show-context-menu','cmd');
+});
+
 
 closeModalButton.addEventListener('click', e => {
   hideShowModal("hide","new-file-modal");
@@ -408,6 +412,12 @@ function runAFile(){
       runCommand('php '+ baseName)
     }else if(ext == ".py"){
       runCommand('python '+ baseName)
+    }else if(ext == '.html'){
+      shell.openExternal(currentFile);
+    }else if(ext == '.js'){
+      runCommand('node ' + baseName);
+    }else{
+      notificationsManager.info('Cant run this file');
     }
   }
 }
@@ -618,6 +628,20 @@ function createAPythonFile(){
   hideShowModal("show" , "new-file-modal");
 }
 
+function createACssFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "css";
+  setModalTitle('Create a StyleSheet File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function createASqlFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "sql";
+  setModalTitle('Create a SQL File');
+  hideShowModal("show" , "new-file-modal");
+}
+
 
 function copyAFile(filepath){
   let dest;
@@ -670,8 +694,25 @@ function renameAFile(el, filename){
   let file = el.getAttribute("data-path");
   let fileType = el.getAttribute("data-type");
   let dir = path.dirname(file);
-  fs.renameSync(file, path.join(dir, filename));
-  readFiles(currentProject);
+  let fileOpen = false;
+  let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,"name", file);
+  let newFile = path.join(dir, filename);
+  try{
+    fs.renameSync(file, newFile);
+    if(fileObject){
+      let updateFileObject = fileObject.file;
+      updateFileObject.name = newFile;
+      openFiles[fileObject.position] = updateFileObject;
+    }
+    if(currentFile == selectedFileElement.getAttribute('data-path')){
+      currentFile = newFile;
+    }
+    selectedFileElement.setAttribute("data-path", newFile);
+    readFiles(currentProject);
+    createTabs();
+  }catch (e){
+
+  }
 }
 
 
@@ -1047,6 +1088,7 @@ function runCommand(command){
         if(err){
           console.log(err);
           sendToConsole(err);
+          notificationsManager.error('Error encoutered while running this command');
         }else{
           console.log('examples dir now contains the example file along with : ',data)
           sendToConsole(data)
@@ -1075,8 +1117,15 @@ function runACommand(){
       fileNameInput.value = 'php '+ baseName;
     }else if(ext == ".py"){
       fileNameInput.value = 'python '+ baseName;
+    }else{
+      notificationsManager.info('No configuration to run this file type');
     }
   }
+}
+
+function clearCmdBuffer() {
+  document.getElementById('cmd-content').innerText = "";
+  cmdContent = "";
 }
 
 /***************************** END COMMANDS ************************/

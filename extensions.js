@@ -27,7 +27,7 @@ module.exports = {
   md : {
     type : "code",
     ace: "markdown",
-    icon : "markdown"
+    icon : "text"
   },
   cs :
     {

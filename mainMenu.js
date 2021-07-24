@@ -55,6 +55,16 @@ module.exports =  {
                     webContents.executeJavaScript(`createAPythonFile()`)
                   },
                 },
+                { label: 'New CSS File',
+                  click: () => {
+                    webContents.executeJavaScript(`createACssFile()`)
+                  },
+                },
+                { label: 'New SQL File',
+                  click: () => {
+                    webContents.executeJavaScript(`createASqlFile()`)
+                  },
+                },
               ]
             },
             {

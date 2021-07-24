@@ -10,7 +10,7 @@ db.init(dbPath)
 let wc;
 let mainMenu;
 let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
-    snippetsContextMenu, tutorialsContextMenu;
+    snippetsContextMenu, tutorialsContextMenu, cmdContextMenu;
 let snippetsWindow, tutorialWindow, settingsWindow;
 let message; // pass messages to different windows
 
@@ -35,6 +35,8 @@ ipcMain.handle('show-context-menu', (event, menu) => {
     snippetsContextMenu.popup();
   }else if(menu == 'tutorials'){
     tutorialsContextMenu.popup();
+  }else if(menu == 'cmd'){
+    cmdContextMenu.popup();
   }
 })
 
@@ -158,6 +160,7 @@ function createWindow () {
   tasksContextMenu = Menu.buildFromTemplate(require('./tasksMenu').createMenu(mainWindow));
   snippetsContextMenu = Menu.buildFromTemplate(require('./snippetsMenu').createMenu(mainWindow));
   tutorialsContextMenu = Menu.buildFromTemplate(require('./tutorialMenus').createMenu(mainWindow));
+  cmdContextMenu = Menu.buildFromTemplate(require('./cmdMenu').createMenu(mainWindow));
 
   mainWindow.webContents.on('context-menu', (e, params) => {
    // console.log(params.);
