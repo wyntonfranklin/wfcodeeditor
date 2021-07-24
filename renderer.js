@@ -168,8 +168,12 @@ document.getElementById("cmd-close").addEventListener('click', e => {
 document.getElementById("showtaskbyfile").addEventListener('change', function() {
   if (this.checked) {
    SHOW_TASK_BY_FILE = true;
+   settingsManager.set('task-show-current-file',true);
   } else {
     SHOW_TASK_BY_FILE = false;
+    settingsManager.set('task-show-current-file',false);
+    console.log(settingsManager.get('task-show-current-file', true))
+    console.log(SHOW_TASK_BY_FILE);
   }
   loadTaskView();
 });
@@ -444,6 +448,7 @@ function onDirectoryClickEvent(e, file){
 // When a file is clicked you can call this function
 
 function onFileClickEvent(e, file){
+  let fileExceptions = ['zip','exe','gz','pdf','doc','docx','xls','ppt'];
   let ext = path.extname(file).replace(/\./g,' ').trim();
   let fileAction = null;
   let fileActions = extensions;
@@ -457,17 +462,18 @@ function onFileClickEvent(e, file){
     }else if(fileAction === "image"){
       appOpenImage(e, file, ext)
     }else{
-      setMessageBox("Cant open this file");
+      notificationsManager.error(`Cannot open file of type ${ext}`);
     }
-    refreshView();
   }else{
-    //console.log(ext);
-    //setMessageBox("Cant open this file");
-    if(!ext){
-      ext = "unknown";
+    if(helper.exitsInArray(fileExceptions, ext)){
+      notificationsManager.error(`We cant open this file ${ext}`);
+    }else{
+      notificationsManager.info(`Trying to open this file ${ext}`);
+      appOpenCode(null, file, ext);
     }
-    notificationsManager.error(`Cannot open file of type ${ext}`);
+
   }
+  refreshView();
 }
 
 // all good
@@ -482,8 +488,13 @@ function appOpenCode(event, file, ext){
   if(fileObject){
     editor.session.setValue(fileObject.content);
   }else{
-    const buffer = fs.readFileSync(file);
-    editor.session.setValue(buffer.toString());
+    try{
+      const buffer = fs.readFileSync(file);
+      editor.session.setValue(buffer.toString());
+    }catch (e){
+      console.log(e);
+      notificationsManager.error(`Cant open this file ${file}`);
+    }
   }
   assignAceMode(editor, ext);
 }
@@ -597,6 +608,13 @@ function createAJsFile(){
   CURRENT_FILE_OPENER_ACTION = "file";
   CURRENT_FILE_OPENER_TYPE = "js";
   setModalTitle('Create a Javascript File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+function createAPythonFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "py";
+  setModalTitle('Create a Python File');
   hideShowModal("show" , "new-file-modal");
 }
 
@@ -788,7 +806,11 @@ function toggleSnippetsView(){
 function loadSnippetsView(query){
   let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
   if(query == undefined){
-    var query = {project:currentProject};
+    if(settingsManager.get('show-snippets-by-project', false)){
+      var query = {project:currentProject};
+    }else{
+      var query = {};
+    }
   }
   let snipCallback = function(docs){
     let template = "";
@@ -1088,9 +1110,9 @@ function hideShowModal(action, id, content){
     ACTIVE_MODAL_ID = null;
     backdropUi.style.display = "none";
     el.style.display = "none";
-   // fileNameInput.value = "";
-   // modalDescription.innerText = "";
-    //modalContentInput.value = "";
+    fileNameInput.value = "";
+   modalDescription.innerText = "";
+    modalContentInput.value = "";
     modalContentView.style.display = "none";
   }
 
@@ -1194,8 +1216,8 @@ function createTabs(){
 }
 
 function createTabHtml(file, fname, className){
-  return  `<li class="nav-item draggable-tabs" title="${file}">
-             <span class="nav-link ${className}">
+  return  `<li class="nav-item draggable-tabs" title="${file}" style="cursor: pointer;">
+             <span class="nav-link ${className}" style="cursor: pointer;">
                 <span class="tab-item " data-file="${file}">${fname}&nbsp;</span><a data-file="${file}" class="close-tab">&#10006;</a></span>
             </li>`;
 }
@@ -1324,12 +1346,13 @@ function saveLastProject(filepath){
   settings.set("currentproject", filepath);
   const timestamp = Date.now();
   projectsManager.getProject(getApplicationPath('projects.db'), {name: filepath}, function(doc){
-    if(!doc){
-      projectsManager.saveProject(getApplicationPath('projects.db'),{
+    console.log(doc);
+    if(doc == undefined || doc == null){
+      projectsManager.saveProject({
         name:filepath,
         timestamp : timestamp
-      }, function(){
-
+      },getApplicationPath('projects.db'), function(docs){
+          console.log(docs);
       })
     }
   });
@@ -1498,13 +1521,22 @@ function init(){
   setStyling();
   setModalsCloseEvents();
   getProjectDir(dir=>{
-    readFiles(dir)
+    if(fs.existsSync(dir)){
+      readFiles(dir)
+    }else{
+      notificationsManager.error(`Directory doesnt exists ${dir}`);
+    }
   })
   makeResizable();
   makeTopResizable();
   makeDraggable();
   updateOnResize();
   makeResizableLeft();
+
+  // init settings for application
+  let showCurrentFile = settingsManager.get('task-show-current-file',false);
+  document.getElementById("showtaskbyfile").checked = showCurrentFile;
+  SHOW_TASK_BY_FILE = showCurrentFile;
 }
 
 function setStyling(){

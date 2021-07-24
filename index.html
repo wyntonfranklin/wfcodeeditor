@@ -275,8 +275,8 @@
               </div>
             </div>
             <div class="form-check">
-              <input id="showtaskbyfile" type="checkbox" class="form-check-input" id="exampleCheck1">
-              <label class="form-check-label" for="exampleCheck1">Show only in current file</label>
+              <input id="showtaskbyfile" type="checkbox" class="form-check-input" >
+              <label class="form-check-label">Show only in current file</label>
             </div>
             <br>
             <div class="list-group" id="task-layout" style=" overflow-y: scroll; height: 100%">
@@ -371,7 +371,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <span id="modal-description"></span>
+          <p id="modal-description" class="mb-3" style="width: 100%; overflow: hidden; margin-bottom: 5px;"></p>
           <div class="form-group">
             <label style="display: none;">Filename</label>
             <input type="text" class="form-control" id="file-name-input" placeholder="Enter filename">

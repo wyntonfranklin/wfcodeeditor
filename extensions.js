@@ -22,7 +22,7 @@ module.exports = {
   txt : {
     type : "code",
     ace: "text",
-    icon : "text"
+    icon : "txt"
   },
   md : {
     type : "code",
@@ -42,6 +42,7 @@ module.exports = {
   html : {
     type : "code",
     ace: "html",
+    icon : "html"
   },
   json : {
     type : "code",
@@ -50,10 +51,12 @@ module.exports = {
   sql : {
     type : "code",
     ace: "sql",
+    icon : "sql",
   },
   xml : {
     type : "code",
     ace: "xml",
+    icon : "xml",
   },
   yaml : {
     type : "code",
@@ -83,6 +86,11 @@ module.exports = {
   csv : {
     type : "code",
     ace : "text"
+  },
+  pdf : {
+    type : "file",
+    ace : "text",
+    icon : "ic_pdf",
   }
 }
 

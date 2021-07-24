@@ -34,6 +34,7 @@ module.exports =  {
                   },
                   accelerator: 'CTRL+N'
                 },
+                { type: 'separator' },
                 { label: 'New PHP File',
                   click: () => {
                     webContents.executeJavaScript(`createAPhpFile()`)
@@ -47,6 +48,11 @@ module.exports =  {
                 { label: 'New Javascript File',
                   click: () => {
                    webContents.executeJavaScript(`createAJsFile()`)
+                  },
+                },
+                { label: 'New Python File',
+                  click: () => {
+                    webContents.executeJavaScript(`createAPythonFile()`)
                   },
                 },
               ]

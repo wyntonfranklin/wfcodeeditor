@@ -18,17 +18,15 @@
         <div class="col">
             <form>
                 <div class="form-group">
-                    <label>Last Opened Project</label>
+                    <label><strong>Last Opened Project</strong></label>
                     <p id="lasted-opened"></p>
                 </div>
-                <hr>
                 <div class="form-group">
-                    <label>Font Size</label>
+                    <label><strong>Font Size</strong></label>
                     <input type="number" class="form-control" id="fontsize" placeholder="" min="10" max="50">
                 </div>
-                <hr>
                 <div class="form-group">
-                    <label>Theme</label>
+                    <label><strong>Theme</strong></label>
                     <select class="form-control" id="theme">
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
@@ -36,9 +34,15 @@
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="snippets-by-project">
-                    <label>Show Snippets by Project only</label>
+                    <input type="checkbox" class="form-check-input" id="tasks-by-file">
+                    <label>Show tasks by File only (Tasks)</label>
                 </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="snippets-by-project">
+                    <label>Show Snippets by Project only (Snippets)</label>
+                </div>
+
                 <br>
                 <button id="save-settings" type="button" class="btn btn-primary btn-block">Save Changes</button>
             </form>
