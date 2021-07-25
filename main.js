@@ -75,7 +75,8 @@ function createWindow () {
 
 
   tutorialWindow = new BrowserWindow({
-    width: 600, height: 600,
+    width: settingsManager.get('tutswidth', 600),
+    height: settingsManager.get('tutsheight', 600),
     webPreferences: { nodeIntegration: true,    contextIsolation: false, },
     parent: mainWindow,
     modal: false,
@@ -201,6 +202,8 @@ function createWindow () {
     // on close events
     settingsManager.set('mwheight', mainWindow.getBounds().height);
     settingsManager.set('mwwidth',mainWindow.getBounds().width);
+    settingsManager.set('tutsheight', tutorialWindow.getBounds().height);
+    settingsManager.set('tutswidth', tutorialWindow.getBounds().width);
     mainWindow.webContents.executeJavaScript('onCloseEvent()');
   });
 

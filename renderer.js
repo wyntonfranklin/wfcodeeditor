@@ -87,6 +87,7 @@ let copyPathHolder =  null;
 var editor = ace.edit("code-input");
 editor.setTheme("ace/theme/monokai");
 var langTools = ace.require("ace/ext/language_tools");
+var EditSession = ace.createEditSession("");
 editor.setOptions({
   enableBasicAutocompletion:true,
   enableLiveAutocompletion: true
@@ -100,9 +101,10 @@ editor.on("input", e => {
     if(fileObject){
      // fileObject.file.changed = true;
       fileObject.file.content = editor.getValue();
+      fileObject.file.session = editor.getSession();
       openFiles[fileObject.position] = fileObject.file;
     }
-    refreshView();
+    refreshViewWhileEditing();
   }else{
     if(fileObject){
      // fileObject.file.changed = false;
@@ -508,7 +510,14 @@ function appOpenCode(event, file, ext){
   let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
   hideAllViews(codeView);
   if(fileObject){
-    editor.session.setValue(fileObject.content);
+    if(fileObject.session){
+      console.log('has session');
+      editor.setSession(fileObject.session);
+      //editor.session.setValue(fileObject.content);
+    }else{
+      //var ses = new EditSession(fileObject.content);
+      editor.setSession(ace.createEditSession(fileObject.content));
+    }
   }else{
     try{
       const buffer = fs.readFileSync(file);
@@ -518,6 +527,7 @@ function appOpenCode(event, file, ext){
       notificationsManager.error(`Cant open this file ${file}`);
     }
   }
+  editor.focus();
   assignAceMode(editor, ext);
 }
 
@@ -593,6 +603,8 @@ function onSaveButtonPressed(e){
       }else{
         console.log('snippet no found');
       }
+    }else if(CURRENT_FILE_OPENER_ACTION == "saveas"){
+      saveFileAsAction(filename);
     }
     console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
@@ -603,6 +615,25 @@ function onSaveButtonPressed(e){
 }
 
 /********************* FILE TASKS **********************/
+
+function saveFileAsAction(filename){
+  let file = selectedFileElement.getAttribute('data-path');
+  let newFile = path.join(getCurrentDirectory(), filename);
+  let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  let ext = path.extname(file).replace(/\./g,' ').trim();
+  if(extensions.hasOwnProperty(ext)){
+      let fileAction = extensions[ext].type;
+      if(fileAction == "code"){
+        let code = editor.getValue();
+        saveAFile(newFile, code, function(){
+          refreshView();
+        });
+      }else if(fileAction == "image"){
+
+      }
+
+  }
+}
 
 
 function createANewFile(){
@@ -672,6 +703,7 @@ function copyAFile(filepath){
 function createANewFolder(){
   CURRENT_FILE_OPENER_ACTION = "dir";
   setModalTitle('Create a New Folder');
+  fileNameInput.setAttribute('placeholder', 'Enter foldername');
   hideShowModal("show", "new-file-modal");
 }
 
@@ -681,6 +713,20 @@ function renameCurrentFile(){
   setModalTitle('Rename a file');
   fileNameInput.value = path.basename(file);
   hideShowModal("show", "new-file-modal");
+}
+
+
+function saveAsCurrentFile(){
+  CURRENT_FILE_OPENER_ACTION = "saveas";
+  if(selectedFileElement){
+    let file = selectedFileElement.getAttribute("data-path");
+    let stats = fs.statSync(file);
+    if(!stats.isDirectory()){
+      setModalTitle('Save file as');
+      fileNameInput.value = path.basename(file);
+      hideShowModal("show", "new-file-modal");
+    }
+  }
 }
 
 
@@ -894,12 +940,18 @@ function loadSnippetsView(query){
         currentSnippet = event.currentTarget;
         // var taskFile = el.getAttribute('data-file');
       });
+      el.addEventListener('dblclick', (event)=>{
+        currentSnippet = event.currentTarget;
+        openSnippetInNewWindow();
+      });
       el.addEventListener('contextmenu', e => {
         currentSnippet = e.currentTarget;
         ipcRenderer.invoke('show-context-menu',"snippets");
         e.preventDefault();
       })
     });
+
+
   }
   snippetManager.loadSnippets(snippetsPath, query, snipCallback);
 }
@@ -1130,6 +1182,7 @@ function runACommand(){
   CURRENT_FILE_OPENER_ACTION = "runcommand";
   setModalTitle('Run a Command');
   hideShowModal("show" , "new-file-modal");
+  fileNameInput.setAttribute('placeholder','Enter command to run');
   if(currentFile){
     var ext = path.extname(currentFile);
     var baseName = path.basename(currentFile);
@@ -1180,6 +1233,7 @@ function hideShowModal(action, id, content){
     backdropUi.style.display = "none";
     el.style.display = "none";
     fileNameInput.value = "";
+    fileNameInput.setAttribute('placeholder','Enter filename');
    modalDescription.innerText = "";
     modalContentInput.value = "";
     modalContentView.style.display = "none";
@@ -1226,6 +1280,10 @@ let createDirectoryLink = (type, file, styleclass) => {
 }
 
 
+function refreshViewWhileEditing(){
+  readFiles(currentProject);
+  createTabs();
+}
 // refresh the views
 
 function refreshView(){
@@ -1885,6 +1943,7 @@ function makeTopResizable(){
 
 
 function makeTabsDraggable(){
+  let fileToSet = null;
   interact('.draggable-tabs')
       .draggable({
         inertia: true,
@@ -1898,6 +1957,7 @@ function makeTabsDraggable(){
         listeners: {
           start (event) {
            // onFileClickEvent(null, event.target.getAttribute('title'));
+            fileToSet = event.target.getAttribute('title');
           },
           move(event) {
             var target = event.target;
@@ -1921,6 +1981,7 @@ function makeTabsDraggable(){
             });
           },
           end (event) {
+            onFileClickEvent(null, fileToSet)
             createTabs();
           }
         }

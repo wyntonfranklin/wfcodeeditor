@@ -104,7 +104,11 @@ module.exports =  {
               },
               accelerator: 'CTRL+S'
             },
-            { label: 'Save as'},
+            { label: 'Save as',
+              click: () => {
+                webContents.executeJavaScript(`saveAsCurrentFile()`)
+              },
+            },
             {
               label : 'Preferences',
               click: () => {
