@@ -423,18 +423,30 @@ function runAFile(){
 }
 
 
-function addOpenFile(file){
+function addOpenFile(file, type){
   let statsObj = fs.statSync(file);
 
   if(!helper.exitsInObjectArray(openFiles, "name", file)) {
-    const buffer = fs.readFileSync(file);
-    openFiles.push({
-      name: file,
-      lastmod: statsObj.mtime,
-      changed: false,
-      content: buffer.toString(),
-      ocontent : buffer.toString(),
-    });
+    if(type!== undefined && type === 'image'){
+      console.log("opening image file");
+      openFiles.push({
+        name: file,
+        lastmod: statsObj.mtime,
+        changed: false,
+        content: "",
+        ocontent : "",
+      });
+    }else{
+      // only store non image contents
+      const buffer = fs.readFileSync(file);
+      openFiles.push({
+        name: file,
+        lastmod: statsObj.mtime,
+        changed: false,
+        content: buffer.toString(),
+        ocontent : buffer.toString(),
+      });
+    }
   }
 }
 
@@ -510,7 +522,7 @@ function appOpenCode(event, file, ext){
 }
 
 function appOpenImage(event, file, ext){
-  addOpenFile(file);
+  addOpenFile(file, "image");
   hideAllViews(imageView);
   imageViewer.src = file;
 }
@@ -760,8 +772,14 @@ function saveADirectory(path, callback){
 
 
 
-/************************************ SNIPPETS ********************************/
+/************************************ SNIPPETS SECTION ********************************/
 
+function openSnippetInNewWindow(){
+  let snippetId = currentSnippet.getAttribute("data-id");
+  snippetManager.getSnippet(getApplicationPath("snippets.db"), {_id: snippetId}, function(doc){
+    ipcRenderer.invoke('show-tutorial', {content: doc.snippet, type: 'code'});
+  })
+}
 
 function searchSnippets(){
   let query = document.getElementById('snippets-query').value;
@@ -1088,6 +1106,8 @@ function runCommand(command){
         if(err){
           console.log(err);
           sendToConsole(err);
+          sendToConsole("----------------------------------------Command Complete--------------------------------------");
+          scrollCmdViewDown();
           notificationsManager.error('Error encoutered while running this command');
         }else{
           console.log('examples dir now contains the example file along with : ',data)
@@ -1550,6 +1570,7 @@ function clearProject(){
 }
 
 function closeProject(){
+  clearProject();
   currentProject = null;
   currentDirectory = null;
   editor.session.setValue("");
@@ -1564,14 +1585,24 @@ function closeProject(){
 
 
 
-/** Initalize Application **/
+/** Initalize Application - Call once function **/
 
 function init(){
+
+  // left panel width
+  document.getElementById('left-panel').style.width = settingsManager.get('lpwidth',160) + 'px';
+  document.getElementById("side-bar").style.width  = settingsManager.get('spwidth',300) + 'px';
+
   setStyling();
   setModalsCloseEvents();
   getProjectDir(dir=>{
     if(fs.existsSync(dir)){
-      readFiles(dir)
+      projectsManager.getProject(getApplicationPath('projects.db'), {name:currentProject}, function(doc){
+        if(doc.opendirs){
+          openDir = doc.opendirs;
+        }
+        readFiles(dir)
+      });
     }else{
       notificationsManager.error(`Directory doesnt exists ${dir}`);
     }
@@ -2447,4 +2478,19 @@ function searchTutorials(){
   tutorialsPagination = null;
   currentTutorialAction = "search";
   fetchSearchTutorials();
+}
+
+function onCloseEvent(){
+  let leftPanel = document.getElementById('left-panel');
+  let sidePanel = document.getElementById("side-bar");
+  settingsManager.set('lpwidth', leftPanel.getBoundingClientRect().width);
+  if(sidePanel.style.display == "block"){
+    settingsManager.set('spwidth', sidePanel.getBoundingClientRect().width);
+  }else{
+    settingsManager.set('spwidth', parseFloat(sidePanel.style.width));
+  }
+  projectsManager.getProject(getApplicationPath('projects.db'),{name:currentProject}, function(doc){
+    doc.opendirs = openDir;
+    projectsManager.updateProject(getApplicationPath('projects.db'), {name:currentProject}, doc);
+  });
 }

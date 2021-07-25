@@ -4,6 +4,12 @@ module.exports =  {
   createMenu : (mainDialog) => {
     return [
       {
+        label: 'Open in new window',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openSnippetInNewWindow()`)
+        },
+      },
+      {
         label: 'Copy to clipboard',
         click: () => {
           mainDialog.webContents.executeJavaScript(`copySnippetToClipboard()`)

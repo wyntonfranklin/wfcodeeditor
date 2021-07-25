@@ -18,6 +18,7 @@ module.exports =  {
               mainDialog.webContents.executeJavaScript(`createANewFolder()`)
             },
           },
+          { type: 'separator' },
           { label: 'New PHP File',
             click: () => {
               mainDialog.webContents.executeJavaScript(`createAPhpFile()`)
@@ -31,6 +32,21 @@ module.exports =  {
           { label: 'New Javascript File',
             click: () => {
               mainDialog.webContents.executeJavaScript(`createAJsFile()`)
+            },
+          },
+          { label: 'New Python File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createAPythonFile()`)
+            },
+          },
+          { label: 'New CSS File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createACssFile()`)
+            },
+          },
+          { label: 'New SQL File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createASqlFile()`)
             },
           },
         ]

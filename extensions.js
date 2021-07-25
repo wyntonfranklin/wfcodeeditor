@@ -91,6 +91,10 @@ module.exports = {
     type : "file",
     ace : "text",
     icon : "ic_pdf",
+  },
+  groovy : {
+    type : "file",
+    ace : "text"
   }
 }
 

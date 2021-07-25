@@ -4,6 +4,7 @@ const path = require('path')
 let mainWindow, createFileWindow;
 var Datastore = require('nedb');
 const snippetsManger = require('./snippets');
+const settingsManager = require('./settingsManager');
 let db = require("./database");
 let dbPath = app.getPath('userData');
 db.init(dbPath)
@@ -44,8 +45,8 @@ ipcMain.handle('show-context-menu', (event, menu) => {
 function createWindow () {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: settingsManager.get('mwwidth', 800),
+    height: settingsManager.get('mwheight', 600),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
@@ -68,6 +69,7 @@ function createWindow () {
 
   snippetsWindow.on('close',  (e) => {
     snippetsWindow.hide();
+    mainWindow.focus();
     e.preventDefault();
   })
 
@@ -162,11 +164,6 @@ function createWindow () {
   tutorialsContextMenu = Menu.buildFromTemplate(require('./tutorialMenus').createMenu(mainWindow));
   cmdContextMenu = Menu.buildFromTemplate(require('./cmdMenu').createMenu(mainWindow));
 
-  mainWindow.webContents.on('context-menu', (e, params) => {
-   // console.log(params.);
-    //contextMenu.popup()
-  })
-
   mainWindow.on('maximize', function(){
     mainWindow.webContents.executeJavaScript('resizeAll()');
   });
@@ -198,6 +195,13 @@ function createWindow () {
 
   mainWindow.webContents.on('devtools-closed', ()=>{
     mainWindow.webContents.executeJavaScript('updateOnResize()');
+  });
+
+  mainWindow.on('close',  (e) => {
+    // on close events
+    settingsManager.set('mwheight', mainWindow.getBounds().height);
+    settingsManager.set('mwwidth',mainWindow.getBounds().width);
+    mainWindow.webContents.executeJavaScript('onCloseEvent()');
   });
 
   ipcMain.handle('file-no-exists', (event) => {
