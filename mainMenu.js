@@ -74,7 +74,18 @@ module.exports =  {
                     { defaultPath: '', properties: ['openFile'] });
                 if(filename !== undefined){
                   var currentFilename = filename[0];
-                  webContents.send("open-file", {file:currentFilename});
+                  webContents.send("open-file", {file:currentFilename,action:'open'});
+                }
+              },
+            },
+            {
+              label: 'Add File to Project',
+              click: () => {
+                var filename = dialog.showOpenDialogSync(
+                    { defaultPath: '', properties: ['openFile'] });
+                if(filename !== undefined){
+                  var currentFilename = filename[0];
+                  webContents.send("open-file", {file:currentFilename, action:'save'});
                 }
               },
             },
@@ -173,6 +184,13 @@ module.exports =  {
              label: 'HTML',
              click: () => {
                snippetsDialog.webContents.executeJavaScript(`loadSnippets("HTML")`)
+               snippetsDialog.show();
+             },
+           },
+           {
+             label: 'PYTHON',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("PYTHON")`)
                snippetsDialog.show();
              },
            },

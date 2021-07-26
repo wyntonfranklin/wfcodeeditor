@@ -84,6 +84,13 @@ module.exports =  {
               snippetsWindow.show();
             },
           },
+          {
+            label: 'PYTHON',
+            click: () => {
+              snippetsWindow.webContents.executeJavaScript(`loadSnippets("PYTHON")`)
+              snippetsWindow.show();
+            },
+          },
 
         ]
       },

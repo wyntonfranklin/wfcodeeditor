@@ -370,7 +370,11 @@ ipcRenderer.on('new-project-start', function (evt, message) {
 
 
 ipcRenderer.on('open-file', function (evt, message) {
-  onFileClickEvent(null, message.file);
+  if(message.action == "open"){
+    onFileClickEvent(null, message.file);
+  }else if(message.action == 'save'){
+    addFileToProject(message.file);
+  }
 });
 
 
@@ -726,6 +730,18 @@ function saveAsCurrentFile(){
       fileNameInput.value = path.basename(file);
       hideShowModal("show", "new-file-modal");
     }
+  }
+}
+
+function addFileToProject(filename){
+  let projectDir = getCurrentDirectory();
+  let fname = path.basename(filename);
+  let desPath = path.join(projectDir,fname);
+  try{
+    fs.copyFileSync(filename, desPath);
+    refreshView();
+  }catch (e){
+
   }
 }
 
@@ -1160,7 +1176,7 @@ function runCommand(command){
           sendToConsole(err);
           sendToConsole("----------------------------------------Command Complete--------------------------------------");
           scrollCmdViewDown();
-          notificationsManager.error('Error encoutered while running this command');
+          notificationsManager.error('Error encountered while running this command');
         }else{
           console.log('examples dir now contains the example file along with : ',data)
           sendToConsole(data)

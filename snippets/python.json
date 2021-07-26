@@ -1,0 +1,281 @@
+{
+  "addition " : {
+    "name" : "Addition",
+    "type" : "text",
+    "tags" : "add, addition",
+    "code" : "a = 2\nb = 3\nprint(a + b)"
+  },
+
+  "subtract" : {
+    "name" : "Subtraction",
+    "type" : "text",
+    "tags" : "subtract, subtraction",
+    "code" : "a = 2\nb = 3\nprint(a - b)"
+  },
+
+  "multiplication" : {
+    "name" : "Multiplication",
+    "type" : "text",
+    "tags" : "multiply, multiplication",
+    "code" : "a = 2\nb = 3\nprint(a * b)"
+  },
+
+  "division" : {
+    "name" : "Division",
+    "type" : "text",
+    "tags" : "divide, division",
+    "code" : "a = 2\nb = 3\nprint(a * b)"
+  },
+
+  "modulus" : {
+    "name" : "Modulus",
+    "type" : "text",
+    "tags" : "modulus, remainder",
+    "code" : "a = 2\nb = 3\nprint(a % b)"
+  },
+
+  "exponentiation" : {
+    "name" : "Exponentiation",
+    "type" : "text",
+    "tags" : "exponentiation, exponent, power",
+    "code" : "a = 2\nb = 3\nprint(b**a)"
+  },
+
+  "modulus" : {
+    "name" : "Modulus",
+    "type" : "text",
+    "tags" : "modulus, remainder",
+    "code" : "a = 2\nb = 3\nprint(a % b)"
+  },
+  "and" : {
+    "name" : "Logical AND",
+    "type" : "text",
+    "tags" : "logical and",
+    "code" : "a = 3\nprint(a > 1 and a < 4)"
+  },
+
+  "or" : {
+    "name" : "Logical OR",
+    "type" : "text",
+    "tags" : "logical or",
+    "code" : "a = 3\nprint(a > 4 or a < 4)"
+  },
+
+  "not" : {
+    "name" : "NOT",
+    "type" : "text",
+    "tags" : "not",
+    "code" : "a = 3\nprint(not(a > 4 or a < 4))"
+  },
+
+
+  "if_condition" : {
+    "name" : "IF Condition",
+    "type" : "text",
+    "tags" : "if, if else, elif",
+    "code" : "a = 200\nb = 33\nif b > a:\n\tprint('b is greater than a')\nelse:\n\tprint('b is not greater than a')"
+  },
+
+  "shorthand_if" : {
+    "name" : "Shorthand IF Condition",
+    "type" : "text",
+    "tags" : "if, if else, shorthand if",
+    "code" : "a = 2\nb = 2\nif a > b: print('a is greater than b')"
+  },
+
+  "shorthand_if_else" : {
+    "name" : "Shorthand IF ELSE Condition",
+    "type" : "text",
+    "tags" : "if, if else, shorthand if else",
+    "code" : "a = 200\nb = 33\nprint('a') if a > b else print('b')"
+  },
+
+
+  "while_loops" : {
+    "name" : "WHILE Loop",
+    "type" : "text",
+    "tags" : "loop, while loop, while",
+    "code" : "i = 1\nwhile i < 6:\n\tprint(i)\n\ti+=1"
+  },
+
+  "for_loops" : {
+    "name" : "FOR Loop",
+    "type" : "text",
+    "tags" : "loop, for loop, for",
+    "code" : "for x in range(6):\n\tprint(x)"
+  },
+
+
+  "function" : {
+    "name" : "FUNCTION",
+    "type" : "text",
+    "tags" : "function",
+    "code" : "def my_function():\n\tprint('Hello from a function')\n\nmy_function()"
+  },
+
+  "function_with_parameters" : {
+    "name" : "FUNCTION with Parameter",
+    "type" : "text",
+    "tags" : "function with parameter, function",
+    "code" : "def my_function(name):\n\tprint('Hello' + name)\n\nmy_function('Emily')"
+  },
+
+
+  "access_element_in_array" : {
+    "name" : "Access Array Items",
+    "type" : "text",
+    "tags" : "array, access element in array",
+    "code" : "numbers = [2, 4, 6, 8]\nprint(numbers[3])"
+  },
+
+  "length_of_array" : {
+    "name" : "Length of an Array",
+    "type" : "text",
+    "tags" : "array, array length, number of elements in array",
+    "code" : "numbers = [2, 4, 6, 8]\nprint(len(numbers))"
+  },
+
+  "looping_array_elements" : {
+    "name" : "Iterating over Elements of an Array",
+    "type" : "text",
+    "tags" : "array, array looping, loop over arrays",
+    "code" : "numbers = [2, 4, 6, 8]\nfor n in numbers:\n\tprint(n)"
+  },
+
+  "adding_array_elements" : {
+    "name" : "Adding Element to an Array",
+    "type" : "text",
+    "tags" : "array, append to an array, append()",
+    "code" : "numbers = [2, 4, 6, 8]\nnumbers.append(10)"
+  },
+
+  "removing_array_elements" : {
+    "name" : "Removing Elements from an Array",
+    "type" : "text",
+    "tags" : "array, remove to an , pop()",
+    "code" : "numbers = [2, 4, 6, 8]\nnumbers.remove(8)"
+  },
+
+
+  "create_dictionary" : {
+    "name" : "Create Dictionary",
+    "type" : "text",
+    "tags" : "dictionary, key, value",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\nprint(dict)"
+  },
+
+  "access_dictionary_items_using_keys" : {
+    "name" : "Access Key Value Pairs",
+    "type" : "text",
+    "tags" : "dictionary, get value,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\nprint(dict['id'])"
+  },
+
+  "get_dictionary_keys" : {
+    "name" : "Get Dictionary Keys",
+    "type" : "text",
+    "tags" : "dictionary, keys,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\nprint(dict.keys())"
+  },
+
+  "get_dictionary_values" : {
+    "name" : "Get Dictionary Values",
+    "type" : "text",
+    "tags" : "dictionary, get values,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\nprint(dict.values())"
+  },
+
+  "change_dictionary_values" : {
+    "name" : "Change Dictionary Values",
+    "type" : "text",
+    "tags" : "dictionary, change values,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\ndict['name'] = 'abc')"
+  },
+
+  "add_dictionary_items" : {
+    "name" : "Add Dictionary Items",
+    "type" : "text",
+    "tags" : "dictionary, add to dictionary,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\ndict.update({'year':2000})"
+  },
+
+  "remove_dictionary_items" : {
+    "name" : "Add Dictionary Items",
+    "type" : "text",
+    "tags" : "dictionary, remove values,",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\ndict.pop('id')"
+  },
+
+
+  "length_of_dictionary" : {
+    "name" : "Length of Dictionary",
+    "type" : "text",
+    "tags" : "dictionary, number of elements in dictionary",
+    "code" : "dict = { 'id' : 1, 'name' : 'xyz' }\nprint(len(dict))"
+  },
+
+  "user_input" : {
+    "name" : "User Input",
+    "type" : "text",
+    "tags" : "input, user input",
+    "code" : "msg = input('Enter Your Message Here!!')\nprint(msg)"
+  },
+
+  "create_file" : {
+    "name" : "Create File",
+    "type" : "text",
+    "tags" : "create file",
+    "code" : "f = open('file.txt', 'x')"
+  },
+
+  "read_file" : {
+    "name" : "Read File",
+    "type" : "text",
+    "tags" : "read file, open file",
+    "code" : "f = open('file.txt', 'r')\nprint(f.read())"
+  },
+
+  "write_file" : {
+    "name" : "Write File",
+    "type" : "text",
+    "tags" : "write file",
+    "code" : "f = open('file.txt', 'w')\nf.write('This is demo text')\nf.close()\nf = open('file.txt', 'r')\nprint(f.read())"
+  },
+
+  "append_file" : {
+    "name" : "Append File",
+    "type" : "text",
+    "tags" : "append file",
+    "code" : "f = open('file.txt', 'a')\nf.write('This is text to append')\nf.close()\nf = open('file.txt', 'r')\nprint(f.read())"
+  },
+
+
+  "class" : {
+    "name" : "Python Class",
+    "type" : "text",
+    "tags" : "class",
+    "code" : "class NewClass:\n\tx = 5\nobj = NewClass()\nprint(obj.x)"
+  },
+
+  "class_with_constructor" : {
+    "name" : "Python Class __init__()",
+    "type" : "text",
+    "tags" : "class, contructor, init",
+    "code" : "class Person:\n\tdef __init__(self, name, age):\n\t\tself.name = name\n\t\tself.age = age\np = Person('jon', 12)\nprint(p.name)\nprint(p.age)"
+  },
+
+  "class_with_method" : {
+    "name" : "Python Class __init__()",
+    "type" : "text",
+    "tags" : "class, contructor, init",
+    "code" : "class Person:\n\tdef __init__(self, name, age):\n\t\tself.name = name\n\t\tself.age = age\n\tdef msg(self):\n\t\tprint('Hi This is Message')\np = Person('jon', 12)\np.msg()"
+  },
+
+  "class_inheritance" : {
+    "name" : "Class Inheritance",
+    "type" : "text",
+    "tags" : "class, inheritance",
+    "code" : "class Person\n\tdef __init__(self, name, age):\n\t\tself.tname = name\n\t\tself.age = age\n\tdef msg(self):\n\t\tprint('Hi This is Message')\nclass Student(Person):\n\tdef __init__(self, sname, sage, grade):\n\t\tsuper().__init__(sname, sage)\n\t\tself.grade = grade\n\tdef info(self):\n\t\tprint('Student', self.name, 'is in', self.grade, 'grade')"
+  }
+
+}

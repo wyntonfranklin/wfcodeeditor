@@ -7,7 +7,7 @@
     "start": "electron .",
     "watch": "nodemon --exec electron .",
     "postinstall": "install-app-deps",
-    "build" : "electron-builder --win"
+    "build": "electron-builder --win"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -34,6 +34,7 @@
     "interactjs": "^1.10.11",
     "jimp": "^0.16.1",
     "micromodal": "^0.4.6",
+    "mysql": "^2.18.1",
     "nedb": "^1.8.0",
     "node-cmd": "^4.0.0",
     "notifyjs": "^3.0.0",
@@ -44,7 +45,9 @@
     "appId": "com.wftutorials.wfCodeEditor",
     "copyright": "Copyright wfTutorials.com",
     "win": {
-      "target": ["portable"]
+      "target": [
+        "portable"
+      ]
     }
   }
 }

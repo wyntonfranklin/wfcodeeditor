@@ -11,6 +11,8 @@ module.exports = {
       sdata = require("./snippets/html");
     }else if(type == "JAVASCRIPT"){
       sdata = require("./snippets/javascript");
+    }else if(type == "PYTHON"){
+      sdata = require("./snippets/python");
     }
     snippets = JSON.parse(JSON.stringify(sdata));
     return snippets;
