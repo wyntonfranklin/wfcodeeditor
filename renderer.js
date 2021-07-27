@@ -1994,6 +1994,7 @@ function makeTabsDraggable(){
             let isSwitched = false;
             var target = event.target;
             var box1 = target.getBoundingClientRect();
+            target.style.zIndex = 100;
             var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
             target.setAttribute('data-x', x)
@@ -2025,7 +2026,9 @@ function makeTabsDraggable(){
           },
           end (event) {
             console.log("end event called");
-            switchPositionOfFilesObjects(boxToMove1.getAttribute('title'), boxToMove2.getAttribute('title'));
+            if(boxToMove1 && boxToMove2){
+              switchPositionOfFilesObjects(boxToMove1.getAttribute('title'), boxToMove2.getAttribute('title'));
+            }
             onFileClickEvent(null, fileToSet)
             TABS_DRAGGING= false;
             createTabs();
@@ -2039,7 +2042,8 @@ function intersectRect(a, b) {
     return (
 
         (a.left >= b.left/2 &&
-        a.right <= b.right ) &&
+        a.right <= b.right)
+        &&
         a.top <= b.bottom &&
         b.top <= a.bottom)
   }else{
