@@ -47,6 +47,7 @@ let tutorialsPagination = null;
 let tutorialsViewScrollPosition = null;
 let selectedTutorialElement = null;
 let currentTutorialAction = "tutorials";
+let TABS_DRAGGING = false;
 
 let currentFile = null;
 let currentDirectory = null;
@@ -476,32 +477,34 @@ function onDirectoryClickEvent(e, file){
 // When a file is clicked you can call this function
 
 function onFileClickEvent(e, file){
-  let fileExceptions = ['zip','exe','gz','pdf','doc','docx','xls','ppt'];
-  let ext = path.extname(file).replace(/\./g,' ').trim();
-  let fileAction = null;
-  let fileActions = extensions;
-  currentFile = file;
-  updatePageTitle(file);
-  currentDirectory = null;
-  if(extensions.hasOwnProperty(ext)){
-    fileAction = fileActions[ext].type;
-    if(fileAction === "code"){
-      appOpenCode(e, file, ext);
-    }else if(fileAction === "image"){
-      appOpenImage(e, file, ext)
+  if(fs.existsSync(file)){
+    let fileExceptions = ['zip','exe','gz','pdf','doc','docx','xls','ppt'];
+    let ext = path.extname(file).replace(/\./g,' ').trim();
+    let fileAction = null;
+    let fileActions = extensions;
+    currentFile = file;
+    updatePageTitle(file);
+    currentDirectory = null;
+    if(extensions.hasOwnProperty(ext)){
+      fileAction = fileActions[ext].type;
+      if(fileAction === "code"){
+        appOpenCode(e, file, ext);
+      }else if(fileAction === "image"){
+        appOpenImage(e, file, ext)
+      }else{
+        notificationsManager.error(`Cannot open file of type ${ext}`);
+      }
     }else{
-      notificationsManager.error(`Cannot open file of type ${ext}`);
-    }
-  }else{
-    if(helper.exitsInArray(fileExceptions, ext)){
-      notificationsManager.error(`We cant open this file ${ext}`);
-    }else{
-      notificationsManager.info(`Trying to open this file ${ext}`);
-      appOpenCode(null, file, ext);
-    }
+      if(helper.exitsInArray(fileExceptions, ext)){
+        notificationsManager.error(`We cant open this file ${ext}`);
+      }else{
+        notificationsManager.info(`Trying to open this file ${ext}`);
+        appOpenCode(null, file, ext);
+      }
 
+    }
+    refreshView();
   }
-  refreshView();
 }
 
 // all good
@@ -739,7 +742,8 @@ function addFileToProject(filename){
   let desPath = path.join(projectDir,fname);
   try{
     fs.copyFileSync(filename, desPath);
-    refreshView();
+    onFileClickEvent(null, desPath);
+    //refreshView();
   }catch (e){
 
   }
@@ -1383,10 +1387,15 @@ function setTabEvents(){
   const divs2 = document.querySelectorAll('.tab-item');
   divs2.forEach( el => {
     el.addEventListener('click', e=>{
+      console.log(e);
+      e.preventDefault();
       let file = el.getAttribute('data-file');
-      onFileClickEvent(null, file);
+      if(!TABS_DRAGGING){
+         onFileClickEvent(null, file);
+      }
     })
     el.addEventListener('contextmenu', e => {
+      e.preventDefault();
       selectedTab = e.target;
       ipcRenderer.invoke('show-context-menu',"tabs");
     })
@@ -1960,44 +1969,65 @@ function makeTopResizable(){
 
 function makeTabsDraggable(){
   let fileToSet = null;
+  let boxToMove1 = null
+  let boxToMove2 = null;
+  let currentTargetFile = null;
   interact('.draggable-tabs')
       .draggable({
         inertia: true,
         modifiers: [
           interact.modifiers.restrictRect({
-            restriction: '.tabs-holder',
+            restriction: 'self',
             endOnly: true
           })
         ],
         autoScroll: true,
         listeners: {
           start (event) {
+            TABS_DRAGGING = true;
+            console.log(event.type, event.target)
+            event.preventDefault();
            // onFileClickEvent(null, event.target.getAttribute('title'));
             fileToSet = event.target.getAttribute('title');
           },
           move(event) {
+            let isSwitched = false;
             var target = event.target;
             var box1 = target.getBoundingClientRect();
             var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
             var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
             target.setAttribute('data-x', x)
             target.setAttribute('data-y', y)
+            //target.style.position = "fixed";
             target.style.left = (x) + 'px';
             target.style.top = (y) + 'px';
             const divstabs = document.querySelectorAll('.draggable-tabs');
-            let isSwitched = false;
             divstabs.forEach( tab => {
               if(tab.getAttribute('title') !== target.getAttribute('title')){
                 var box2 = tab.getBoundingClientRect();
-                if(intersectRect(box1, box2) && isSwitched==false){
-                  switchPositionOfFilesObjects(tab.getAttribute('title'), target.getAttribute('title'));
-                  isSwitched = true;
+                if(intersectRect(box1, box2) && !isSwitched){
+                  console.log("set intersaction");
+                  if(tab != null && target != null && tab !== undefined && target !== undefined){
+                    boxToMove1 = tab;
+                    boxToMove2 = target;
+                    tab.classList.remove("tabhover")
+                    tab.className += " tabhover";
+                    isSwitched = true;
+                  }else{
+                    console.log("null fo rsome resason")
+                  }
+                }else{
+                  tab.classList.remove("tabhover")
+                  console.log("nah wuck");
                 }
               }
             });
           },
           end (event) {
+            console.log("end event called");
+            switchPositionOfFilesObjects(boxToMove1.getAttribute('title'), boxToMove2.getAttribute('title'));
             onFileClickEvent(null, fileToSet)
+            TABS_DRAGGING= false;
             createTabs();
           }
         }
@@ -2005,10 +2035,16 @@ function makeTabsDraggable(){
 }
 
 function intersectRect(a, b) {
-  return (a.left <= b.right &&
-      b.left <= a.right &&
-      a.top <= b.bottom &&
-      b.top <= a.bottom)
+  if(a.x > 0 && b.x > 0 ){
+    return (
+
+        (a.left >= b.left/2 &&
+        a.right <= b.right ) &&
+        a.top <= b.bottom &&
+        b.top <= a.bottom)
+  }else{
+    return false;
+  }
 }
 
 function makeDraggable(){
