@@ -163,6 +163,16 @@ document.getElementById("save-task-btn").addEventListener('click', e => {
 });
 
 
+document.getElementById("welcome-new-project-btn").addEventListener('click', e => {
+  openFileSelectDialog();
+});
+
+
+document.getElementById("welcome-recent-project-btn").addEventListener('click', e => {
+  showRecentProjects();
+});
+
+
 document.getElementById("cmd-close").addEventListener('click', e => {
   document.getElementById("cmd-layout").style.display = "none";
   updateOnResize();
@@ -356,10 +366,11 @@ closeModalButton.addEventListener('click', e => {
 });
 
 ipcRenderer.on('get-code', function (evt, message) {
-  console.log(message); // Returns: {'SAVED': 'File Saved'}
-  var cursor = editor.selection.getCursor() // returns object like {row:1 , column: 4}
-  editor.insert(message.code)
-  editor.focus();
+  if(currentFile && codeView.style.display == "block"){
+    var cursor = editor.selection.getCursor() // returns object like {row:1 , column: 4}
+    editor.insert(message.code)
+    editor.focus();
+  }
 });
 
 
@@ -402,7 +413,11 @@ function getApplicationPath(file){
 }
 
 
-
+function startANewProject(projectPath){
+  closeProject();
+  currentProject = projectPath;
+  openProject(null, projectPath);
+}
 
 function setSaveButtonAsActive(){
 
@@ -424,8 +439,10 @@ function runAFile(){
       shell.openExternal(currentFile);
     }else if(ext == '.js'){
       runCommand('node ' + baseName);
+    }else if(ext == '.sh'){
+      runCommand('./' + baseName);
     }else{
-      notificationsManager.info('Cant run this file');
+      runACommand();
     }
   }
 }
@@ -696,6 +713,14 @@ function createASqlFile(){
 }
 
 
+function createABashFile(){
+  CURRENT_FILE_OPENER_ACTION = "file";
+  CURRENT_FILE_OPENER_TYPE = "sh";
+  setModalTitle('Create a Bash (sh) File');
+  hideShowModal("show" , "new-file-modal");
+}
+
+
 function copyAFile(filepath){
   let dest;
   copyPathHolder = filepath;
@@ -768,6 +793,9 @@ function copyFileToDest(filename, dest){
   let desPath = path.join(baseDir, filename);
   try{
     fs.copyFileSync(copySrc, desPath,  fs.constants.COPYFILE_EXCL);
+    if(dest){
+      onFileClickEvent(null, desPath);
+    }
   }catch (e){
     notificationsManager.error(e);
   }
@@ -1218,7 +1246,7 @@ function runACommand(){
     }else if(ext == ".py"){
       fileNameInput.value = 'python '+ baseName;
     }else{
-      notificationsManager.info('No configuration to run this file type');
+     // notificationsManager.info('No configuration to run this file type');
     }
   }
 }
@@ -1681,6 +1709,7 @@ function closeProject(){
   openFiles = [];
   settings.delete("currentproject");
   refreshView();
+  showWelcomeMessage();
 }
 
 
@@ -2648,5 +2677,14 @@ function onCloseEvent(){
   projectsManager.getProject(getApplicationPath('projects.db'),{name:currentProject}, function(doc){
     doc.opendirs = openDir;
     projectsManager.updateProject(getApplicationPath('projects.db'), {name:currentProject}, doc);
+  });
+}
+
+function openFileSelectDialog(){
+  ipcRenderer.invoke('show-open-file-dialog',{}, ).then((filename)=>{
+    console.log(filename);
+      if(filename){
+        startANewProject(filename);
+      }
   });
 }

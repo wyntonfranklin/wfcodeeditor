@@ -157,6 +157,15 @@ function createWindow () {
     return results;
   })
 
+  ipcMain.handle('show-open-file-dialog',  (event, options) => {
+    var filename = dialog.showOpenDialogSync(
+        { defaultPath: '', properties: ['openDirectory','createDirectory','promptToCreate'] });
+    if(filename) {
+      console.log(filename[0]);
+       return filename[0];
+    }
+  });
+
   contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow, mainWindow));
   fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));

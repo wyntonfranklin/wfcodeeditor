@@ -49,6 +49,11 @@ module.exports =  {
               mainDialog.webContents.executeJavaScript(`createASqlFile()`)
             },
           },
+          { label: 'New Bash File',
+            click: () => {
+              mainDialog.webContents.executeJavaScript(`createABashFile()`)
+            },
+          },
         ]
       },
       { type: 'separator' },

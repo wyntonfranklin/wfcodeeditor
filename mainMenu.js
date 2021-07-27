@@ -12,13 +12,7 @@ module.exports =  {
                 {
                   label: 'New Project',
                   click: () => {
-                    var filename = dialog.showOpenDialogSync(
-                      { defaultPath: '', properties: ['openDirectory','createDirectory','promptToCreate'] });
-                    if(filename !== undefined){
-                      var currentProject = filename[0];
-                      console.log(currentProject, "current");
-                      webContents.send("new-project-start", {project:currentProject});
-                    }
+                    webContents.executeJavaScript(`openFileSelectDialog()`);
                   },
                   accelerator: 'CTRL+P'
                 },
@@ -65,6 +59,11 @@ module.exports =  {
                     webContents.executeJavaScript(`createASqlFile()`)
                   },
                 },
+                { label: 'New Bash File',
+                  click: () => {
+                    webContents.executeJavaScript(`createABashFile()`)
+                  },
+                },
               ]
             },
             {
@@ -92,13 +91,7 @@ module.exports =  {
             {
               label: 'Open Project',
               click: () => {
-                var filename = dialog.showOpenDialogSync(
-                    { defaultPath: '', properties: ['openDirectory'] });
-                if(filename !== undefined){
-                  var currentProject = filename[0];
-                  console.log(currentProject, "current");
-                  webContents.send("new-project-start", {project:currentProject});
-                }
+                webContents.executeJavaScript(`openFileSelectDialog()`)
               },
             },
             {
