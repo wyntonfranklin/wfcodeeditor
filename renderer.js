@@ -55,6 +55,7 @@ let currentDirectory = null;
 let directoryUi = document.getElementById('directory');
 let backdropUi = document.getElementById('backdrop');
 let modalUi = document.getElementById('new-file-modal');
+let welcomeView = document.getElementById('welcome-view');
 
 let closeModalButton = document.getElementById('close-modal');
 let saveButton = document.getElementById('save-file-btn');
@@ -580,6 +581,8 @@ function onSaveButtonPressed(e){
       renameAFile(selectedFileElement, filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'copy-file'){
       copyFileToDest(filename);
+    }else if(CURRENT_FILE_OPENER_ACTION == 'add-file-to-project'){
+      copyFileToDest(filename, getCurrentDirectory());
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
       editor.findAll(filename);
     }else if(CURRENT_FILE_OPENER_ACTION == 'task'){
@@ -737,22 +740,24 @@ function saveAsCurrentFile(){
 }
 
 function addFileToProject(filename){
-  let projectDir = getCurrentDirectory();
-  let fname = path.basename(filename);
-  let desPath = path.join(projectDir,fname);
-  try{
-    fs.copyFileSync(filename, desPath);
-    onFileClickEvent(null, desPath);
-    //refreshView();
-  }catch (e){
-
-  }
+  let dest;
+  copyPathHolder = filename;
+  CURRENT_FILE_OPENER_ACTION = "add-file-to-project";
+  dest = getCurrentDirectory();
+  fileNameInput.value = path.basename(filename);
+  setModalTitle('Copy a file',`Copy file ${filename} to  ${dest}`);
+  hideShowModal("show" , "new-file-modal");
 }
 
 
-function copyFileToDest(filename){
+function copyFileToDest(filename, dest){
   let copySrc = copyPathHolder;
-  let selectedPath = selectedFileElement.getAttribute('data-path');
+  let selectedPath = null;
+  if(selectedPath == undefined || selectedPath == null){
+    selectedPath = selectedFileElement.getAttribute('data-path');
+  }else{
+    selectedPath = dest;
+  }
   let fileStats = getFileStats(selectedPath);
   let baseDir = null;
   if(fileStats.directory){
@@ -762,9 +767,9 @@ function copyFileToDest(filename){
   }
   let desPath = path.join(baseDir, filename);
   try{
-    fs.copyFileSync(copySrc, desPath);
+    fs.copyFileSync(copySrc, desPath,  fs.constants.COPYFILE_EXCL);
   }catch (e){
-
+    notificationsManager.error(e);
   }
 }
 
@@ -1167,7 +1172,9 @@ function showCmdLayout(){
 
 function runCommand(command){
   if(currentFile){
+
     let basePath = path.dirname(currentFile);
+    //saveCurrentFile();
     command = `cd ${basePath} & ` + command;
   }
   console.log(command);
@@ -1573,6 +1580,7 @@ function readNonProjectFiles(){
 /** Read Files **/
 
 let readFiles = (projectDir) => {
+  welcomeView.style.display = "none";
   if(projectDir){
     let directContent = "";
     document.getElementById("directory").innerHTML = "";
@@ -1625,16 +1633,25 @@ function scrollCmdViewDown(){
 /* Open Project */
 
 function openProject(event, filepath){
-  closeProject();
-  currentProject = filepath;
-  editor.session.setValue("");
-  currentFile = null;
-  currentDirectory = filepath;
-  saveLastProject(filepath);
-  hideShowModal('hide','projects-modal');
-  updatePageTitle("");
-  setCurrentProjectName(path.basename(filepath))
-  refreshView();
+  if(fs.existsSync(filepath)){
+    closeProject();
+    currentProject = filepath;
+    editor.session.setValue("");
+    currentFile = null;
+    currentDirectory = filepath;
+    saveLastProject(filepath);
+    hideShowModal('hide','projects-modal');
+    updatePageTitle("");
+    setCurrentProjectName(path.basename(filepath))
+    refreshView();
+  }else{
+    projectsManager.getProject(getApplicationPath('projects.db'), {name:filepath}, function(doc){
+      if(doc){
+        notificationsManager.error(`This project ${filepath} doest not exists`);
+        projectsManager.removeProject(getApplicationPath('projects.db'), doc._id);
+      }
+    });
+  }
 }
 
 
@@ -1681,13 +1698,28 @@ function init(){
   getProjectDir(dir=>{
     if(fs.existsSync(dir)){
       projectsManager.getProject(getApplicationPath('projects.db'), {name:currentProject}, function(doc){
-        if(doc.opendirs){
-          openDir = doc.opendirs;
+        if(doc){
+          console.log(doc);
+          if(typeof doc.opendirs !== undefined && doc.opendirs !== undefined){
+            openDir = doc.opendirs;
+          }
+          readFiles(dir);
+        }else{
+          notificationsManager.error('Cant find this project');
         }
-        readFiles(dir)
       });
     }else{
-      notificationsManager.error(`Directory doesnt exists ${dir}`);
+      projectsManager.getProject(getApplicationPath('projects.db'), {name:currentProject}, function(doc){
+        if(doc){
+          projectsManager.removeProject(getApplicationPath('projects.db'), doc._id, function(){
+            notificationsManager.error(`This project ${dir} doest not exist`)
+            closeProject();
+          })
+        }
+      });
+    }
+    if(!dir){
+      showWelcomeMessage();
     }
   })
   makeResizable();
@@ -1700,6 +1732,12 @@ function init(){
   let showCurrentFile = settingsManager.get('task-show-current-file',false);
   document.getElementById("showtaskbyfile").checked = showCurrentFile;
   SHOW_TASK_BY_FILE = showCurrentFile;
+}
+
+function showWelcomeMessage(){
+  if (codeView.style.display == 'none' && imageView.style.display == "none") {
+    welcomeView.style.display = "block";
+  }
 }
 
 function setStyling(){
@@ -2196,7 +2234,8 @@ function copyADirectory(folderpath){
       if (err) return console.error(err)
       console.log('success!')
       refreshView();
-    }) // copies file
+    }) ;
+    // copies file
   }
 
 }
