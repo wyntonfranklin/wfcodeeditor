@@ -6,10 +6,16 @@ module.exports =  {
             { label: 'Clear Buffer',
                 click: () => {
                     mainDialog.webContents.executeJavaScript(`clearCmdBuffer()`)
-                },},
+                },
+            },
             { label: 'Run a new Command',
                 click: () => {
                     mainDialog.webContents.executeJavaScript(`runACommand()`)
+                },
+            },
+            { label: 'Open Command Prompt',
+                click: () => {
+                    mainDialog.webContents.executeJavaScript(`openCommandPrompt()`)
                 },
             },
         ]

@@ -1,5 +1,5 @@
 module.exports =  {
-  createMenu : (snippetsWindow, mainWindow) => {
+  createMenu : (snippetsWindow, mainWindow, options) => {
     return [
       {
         label: 'Run this file',
@@ -16,6 +16,7 @@ module.exports =  {
       },
       {
         label: 'Add Selected as Task',
+        enabled : options.editorHasSelection,
         click: () => {
           mainWindow.webContents.executeJavaScript(`openTaskViewWithSelected()`)
         },
@@ -28,6 +29,7 @@ module.exports =  {
       },
       {
         label: 'Add Selected as Snippet',
+        enabled : options.editorHasSelection,
         click: () => {
           mainWindow.webContents.executeJavaScript(`AddSelectedAsSnippet()`)
         },
@@ -41,9 +43,15 @@ module.exports =  {
       },
       { role: 'copy'},
       { role: 'paste'},
+      { type: 'separator' },
       { label: 'Open in Side View',
         click: () => {
           mainWindow.webContents.executeJavaScript(`openCurrentFileInSideView()`)
+        },
+      },
+      { label: 'Open in New Window',
+        click: () => {
+          mainWindow.webContents.executeJavaScript(`openCurrentFileInNewWindow()`)
         },
       },
       { type: 'separator' },
@@ -58,6 +66,7 @@ module.exports =  {
           },
           {
             label: 'PHP',
+            enabled : options.snippetsEnabled,
             click: () => {
               snippetsWindow.webContents.executeJavaScript(`loadSnippets("PHP")`)
               snippetsWindow.show();
@@ -88,6 +97,13 @@ module.exports =  {
             label: 'PYTHON',
             click: () => {
               snippetsWindow.webContents.executeJavaScript(`loadSnippets("PYTHON")`)
+              snippetsWindow.show();
+            },
+          },
+          {
+            label: 'JAVA',
+            click: () => {
+              snippetsWindow.webContents.executeJavaScript(`loadSnippets("JAVA")`)
               snippetsWindow.show();
             },
           },

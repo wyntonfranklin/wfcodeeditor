@@ -1,0 +1,240 @@
+{
+  "display_output " : {
+    "name" : "Display Output",
+    "type" : "text",
+    "tags" : "output, syntax",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tSystem.out.println('Hello World');\n\t}\n}"
+  },
+
+  "user_input " : {
+    "name" : "User Input",
+    "type" : "text",
+    "tags" : "user input",
+    "code" : "import java.util.Scanner;\npublic class Main{\n\tpublic static void main(String[] args){\n\t\t Scanner scan = new Scanner(System.in);\n\t\tSystem.out.println('Enter Your Name');\n\t\tString name = scan.nextLine();\n\t\t System.out.println('Hello ' + name);\n\t}\n}"
+  },
+
+  "addition " : {
+    "name" : "Addition",
+    "type" : "text",
+    "tags" : "add, addition",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t  int x = 10 + 20;\n\t\tSystem.out.println(x);\n\t}\n}"
+  },
+
+  "subtract" : {
+    "name" : "Subtraction",
+    "type" : "text",
+    "tags" : "subtract, subtraction",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t  int x = 4 - 6;\n\t\tSystem.out.println(x);\n\t}\n}"
+  },
+
+  "multiplication" : {
+    "name" : "Multiplication",
+    "type" : "text",
+    "tags" : "multiply, multiplication",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t  int x = 15 * 17;\n\t\tSystem.out.println(x);\n\t}\n}"
+  },
+
+  "division" : {
+    "name" : "Division",
+    "type" : "text",
+    "tags" : "divide, division",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t  int x = 35 / 7;\n\t\tSystem.out.println(x);\n\t}\n}"
+  },
+
+  "modulus" : {
+    "name" : "Modulus",
+    "type" : "text",
+    "tags" : "modulus, remainder",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t  int x = 38 % 7;\n\t\tSystem.out.println(x);\n\t}\n}"
+  },
+
+  "and" : {
+    "name" : "Logical AND",
+    "type" : "text",
+    "tags" : "logical and",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t int a = 3;\n\t\tSystem.out.println(a > 1 && a < 4);\n\n\t}\n}"
+  },
+
+  "or" : {
+    "name" : "Logical OR",
+    "type" : "text",
+    "tags" : "logical or",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t int a = 3;\n\t\tSystem.out.println(a > 4 || a < 4);\n\n\t}\n}"
+  },
+
+  "not" : {
+    "name" : "NOT",
+    "type" : "text",
+    "tags" : "not",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t int a = 3;\n\t\tSystem.out.println(!(a > 4 or a < 4));\n\n\t}\n}"
+  },
+
+  "if_condition" : {
+    "name" : "IF Condition",
+    "type" : "text",
+    "tags" : "if, if else, elif",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t int a = 200;\nint b = 33;\nif(b > a) {\n\t\t\tSystem.out.println('b is greater than a');}\n\n\t}\n}"
+  },
+
+  "if_else_condition" : {
+    "name" : "IF Condition",
+    "type" : "text",
+    "tags" : "if, if else, elif",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\t int grade = 40;\n\t\tif(grade > 40) {\n\t\t\tSystem.out.println('passed');}\n\t\telse {\n\t\t\tSystem.out.println('fail');}\n\t}\n}"
+  },
+
+  "switch_statements" : {
+    "name" : "Switch Statements",
+    "type" : "text",
+    "tags" : "switch, cases, default",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tint day = 3;\n\t\tswitch(day){\n\t\t\tcase 1:\n\t\t\t\tSystem.out.println('Monday');\n\t\t\t\tbreak;\n\t\t\tcase 2:\n\t\t\t\tSystem.out.println('Tuesday');\n\t\t\t\tbreak;\n\t\t\tcase 3:\n\t\t\t\tSystem.out.println('Wednesday');\n\t\t\t\tbreak;\n\t\t\tcase 4:\n\t\t\t\tSystem.out.println('Thursday');\n\t\t\t\tbreak;\n\t\t\tcase 5:\n\t\t\t\tSystem.out.println('Friday');\n\t\t\t\tbreak;\n\t\t\tcase 6:\n\t\t\t\tSystem.out.println('Saturday');\n\t\t\t\tbreak;\n\t\t\tcase 7:\n\t\t\t\tSystem.out.println('Sunday');\n\t\t\t\tbreak;\n\t\t\tdefault:\n\t\t\t\ttSystem.out.println('Waiting..');} \n\t\t}\n}"
+  },
+
+  "while_loops" : {
+    "name" : "WHILE Loop",
+    "type" : "text",
+    "tags" : "loop, while loop, while",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tint i = 0;\n\t\twhile(i < 5){\n\t\t\tSystem.out.println(i);\n\t\t\ti++;\n\t\t}\n\t}\n}"
+  },
+
+  "do_while_loop" : {
+    "name" : "DO WHILE Loop",
+    "type" : "text",
+    "tags" : "loop, do while loop",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tint i = 0;\n\t\tdo{\n\t\t\tSystem.out.println(i);\n\t\t\ti++;\n\t\t}\n\t\twhile (i < 5);\n\t\t}\n\t}\n}"
+  },
+
+  "for_loops" : {
+    "name" : "FOR Loop",
+    "type" : "text",
+    "tags" : "loop, for loop, for",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tfor (int i = 0; i < 5; i++){\n\t\t\tSystem.out.println(i);}\n\t\t}\n}"
+  },
+
+  "for_each_loop" : {
+    "name" : "FOR EACH Loop",
+    "type" : "text",
+    "tags" : "loop, for each loop, for",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tString[] arr = ['Two', 'Four', 'Eight'];\n\t\tfor (String n : arr){\n\t\t\tSystem.out.println(i);}\n\t\t}\n}"
+  },
+
+  "mehtod" : {
+    "name" : "method",
+    "type" : "text",
+    "tags" : "method",
+    "code" : "public class Main{\n\tstatic void printMsg(){\n\t\tSystem.out.println('Hello Welcome!');\n\t}\n\tpublic static void main(String[] args){\n\t\tprintMsg();\n\t}\n}"
+  },
+
+  "method_with_parameters" : {
+    "name" : "method with Parameter",
+    "type" : "text",
+    "tags" : "method with parameter, method",
+    "code" : "public class Main{\n\tstatic void printMsg(String name){\n\t\tSystem.out.println('Hello Welcome!' + name);\n\t}\n\tpublic static void main(String[] args){\n\t\tprintMsg('Lisa');\n\t}\n}"
+  },
+
+  "method_overloading" : {
+    "name" : "method with Parameter",
+    "type" : "text",
+    "tags" : "method with parameter, method",
+    "code" : "public class Main{\n\tstatic int add(int x1, int x2){\n\t\treturn x1 + x2;\n\t}\n\tstatic double add(double x1, double x2){\n\t\treturn x1 + x2;\n\t}\n\tpublic static void main(String[] args){\n\t\tint sum1 = add(1, 2);\n\t\tint sum2 = add(2.5, 2.5);\n\tSystem.out.println('Sum of Int ' + sum1);\n\tSystem.out.println('Sum of Doubles ' + sum2);\n\t}\n}"
+  },
+
+  "access_element_in_array" : {
+    "name" : "Access Array Items",
+    "type" : "text",
+    "tags" : "array, access element in array",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tint numbers[] = {2, 4, 6, 8};\n\t\tSystem.out.println(numbers[2]);\n\t}\n}"
+  },
+
+  "length_of_array" : {
+    "name" : "Length of an Array",
+    "type" : "text",
+    "tags" : "array, array length, number of elements in array",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tint numbers[] = {2, 4, 6, 8};\n\t\tSystem.out.println(numbers.length);\n\t}\n}"
+  },
+
+  "looping_array_elements" : {
+    "name" : "Iterating over Elements of an Array",
+    "type" : "text",
+    "tags" : "array, array looping, loop over arrays",
+    "code" : "public class Main{\n\tpublic static void main(String[] args){\n\t\tString[] arr = ['Two', 'Four', 'Eight'];\n\t\tfor (int i = 0; i < arr.length; i++){\n\t\t\tSystem.out.println(numbers[i]);}\n\t\t}\n}"
+  },
+
+  "class" : {
+    "name" : "Java Class",
+    "type" : "text",
+    "tags" : "class",
+    "code" : "public class Person { \n\tString name = 'John'; \n\tpublic static void main(String[] args){\n\t\t Person p = new Person(); \n\t\tSystem.out.println(p.name);\n\t}\n}"
+  },
+
+  "class_with_constructor" : {
+    "name" : "Java Class Constructor",
+    "type" : "text",
+    "tags" : "class, contructor, init",
+    "code" : "public class Person { \n\tString name; \n\tpublic Person(String pname){\n\t\tname = pname;\n\t}\n\tpublic static void main(String[] args){\n\t\t Person p = new Person('Lisa'); \n\t\tSystem.out.println(p.name);\n\t}\n}"
+  },
+
+  "class_with_mmethods" : {
+    "name" : "Java Class Method with Objects",
+    "type" : "text",
+    "tags" : "class, method, access methods with objects, non static method",
+    "code" : "public class Person { \n\tString name; \n\tpublic Person(String pname){\n\t\tname = pname;\n\t}\n\tpublic void printMsg(){\n\t\tSystem.out.print('This is a Person class');\n\t}\n\tpublic static void main(String[] args){\n\t\t Person p = new Person('Lisa'); \n\t\tp.printMsg();\n\t}\n}"
+  },
+
+  "class_inheritance" : {
+    "name" : "Class Inheritance",
+    "type" : "text",
+    "tags" : "class, inheritance",
+    "code" : "class Person {\n\tprotected String name; \n\tprotected int age; \n\tpublic void printInfo(){\n\t\tSystem.out.println('Hello ' + name);\n\t}\n}\nclass Employee extends Person{\n\tprotected int salary;\n}\npublic class Main{\n\tpublic static void main(String[] args){\n\t\tEmployee emp = new Employee();\n\t\tSystem.out.println('Name :' + emp.name + '\nSalary :' + emp.salary);\n\t}\n}"
+  },
+
+  "encapsulation" : {
+    "name" : "Class Encapsulation",
+    "type" : "text",
+    "tags" : "private, encapsulate, get method, set method",
+    "code" : "public class Person {\n\tprivate String name;\n\tpublic String getName() {\n\t\treturn name;\n\t}\n\tpublic void setName(String pName) {\n\t\tthis.name = pName;\n\t}\n}\npublic class Main{\n\tpublic static void main(String[] args){\n\t\tPerson p = new Person();\n\t\tp.setName('Liam');\n\t\tSystem.out.println(p.getName());\n\t}\n}"
+  },
+
+  "abstraction" : {
+    "name" : "Class Abstraction",
+    "type" : "text",
+    "tags" : "abstract class",
+    "code" : "abstract class Animal{\n\tpublic abstract void makeSound();\n\tpublic void eat(){\n\t\tSystem.out.println('EATTT!');\n\t}\n}\nclass Cat extends Animal{\n\tpublic void makeSound(){\n\t\tSystem.out.println('MEOW!');\n\t}\n}\npublic class Main{\n\tpublic static void main(String[] args){\n\t\tCat cat = new Cat();\n\t\tcat.makeSound();\n\t\tcat.eat();\n\t}\n}"
+  },
+
+  "interface" : {
+    "name" : "Interfaces",
+    "type" : "text",
+    "tags" : "java interface, abstraction",
+    "code" : "interface Animal{\n\tpublic void makeSound();}\nclass Cat implements Animal{\n\tpublic void makeSound(){\n\t\tSystem.out.println('MEOW!');\n\t}\n}\npublic class Main{\n\tpublic static void main(String[] args){\n\t\tCat cat = new Cat();\n\t\tcat.makeSound();}\n}"
+  },
+
+  "polymorphism" : {
+    "name" : "Interfaces",
+    "type" : "text",
+    "tags" : "java interface, abstraction",
+    "code" : "class Animal{\n\tpublic void eat(){\n\t\tSystem.out.println('EATTT!');\n\t}\n}\nclass Cat extends Animal{\n\tpublic void eat(){\n\t\tSystem.out.println('I eat chicken!');\n\t}\n}\npublic class Main{\n\tpublic static void main(String[] args){\n\t\tAnimal cat = new Cat();\n\t\tcat.eat();\n\t}\n}"
+  },
+
+  "create_file" : {
+    "name" : "Create File",
+    "type" : "text",
+    "tags" : "create file",
+    "code" : "import java.io.File;\npublic class FileHandling {\n\tpublic static void main(String[] args) {\n\t\tFile file = new File('file.txt');\n\t\tif(file.createNewFile()){\n\t\t\t\tSystem.out.println('File Created!');\n\t\t}\n\t}\n}"
+  },
+
+  "write_file" : {
+    "name" : "Write File",
+    "type" : "text",
+    "tags" : "write file",
+    "code" : "import java.io.FileWriter;\npublic class FileHandling {\n\tpublic static void main(String[] args) {\n\t\tFileWriter writeFile = new FileWriter('file.txt');\n\t\twriteFile.write('Writing to a File in Java');\n\t\twriteFile.close();\n\t}\n}"
+  },
+
+  "read_file" : {
+    "name" : "read File",
+    "type" : "text",
+    "tags" : "read file",
+    "code" : "import java.io.File;import java.util.Scanner;\n\npublic class FileHandling {\n\tpublic static void main(String[] args) {\n\t\tFile file = new File('file.txt');\n\t\tScanner readFile = new Scanner(file);while(readFile.hasNextLine()){\n\t\t\tString line = readFile.nextLine();\n\t\t\tSystem.out.println(data);}\n\t\readFile.close();\n\t}\n}"
+  }
+
+}

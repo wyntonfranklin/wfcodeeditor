@@ -1,4 +1,13 @@
-const {dialog} = require('electron')
+const {dialog,  clipboard} = require('electron')
+const fs = require("fs-extra")
+
+function isPasteActive(){
+  const text = clipboard.readText();
+  if(fs.existsSync(text) ){
+    return true;
+  }
+  return false;
+}
 
 module.exports =  {
   createMenu : (mainDialog) => {
@@ -67,10 +76,12 @@ module.exports =  {
         },
       },
       { label: 'Paste',
+        enabled : isPasteActive(),
         click: () => {
           mainDialog.webContents.executeJavaScript(`pasteBuffer()`)
         },
       },
+      { type: 'separator' },
       { label: 'Open in Explorer',
         click: () => {
           mainDialog.webContents.executeJavaScript(`openInExplorer()`)

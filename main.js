@@ -23,11 +23,16 @@ ipcMain.handle('read-user-data', (event) => {
   return path;
 });
 
-ipcMain.handle('show-context-menu', (event, menu) => {
+ipcMain.handle('show-context-menu', (event, menu, options) => {
+  if(options == undefined){
+    options = {};
+  }
   if(menu == "code"){
-    contextMenu.popup();
+    contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow, mainWindow, options));
+    contextMenu.popup(mainWindow);
   }else if(menu == "file"){
-    fileContextMenu.popup();
+    fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
+    fileContextMenu.popup(mainWindow);
   }else if(menu == "tabs"){
     tabsContextMenu.popup();
   }else if(menu == "tasks"){
@@ -44,7 +49,7 @@ ipcMain.handle('show-context-menu', (event, menu) => {
 
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: settingsManager.get('mwwidth', 800),
     height: settingsManager.get('mwheight', 600),
     webPreferences: {
@@ -166,8 +171,6 @@ function createWindow () {
     }
   });
 
-  contextMenu = Menu.buildFromTemplate(require('./editorMenu').createMenu(snippetsWindow, mainWindow));
-  fileContextMenu = Menu.buildFromTemplate(require('./fileMenus').createMenu(mainWindow));
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));
   tasksContextMenu = Menu.buildFromTemplate(require('./tasksMenu').createMenu(mainWindow));
   snippetsContextMenu = Menu.buildFromTemplate(require('./snippetsMenu').createMenu(mainWindow));

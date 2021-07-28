@@ -352,9 +352,11 @@ document.getElementById("tutorial-view-back").addEventListener('click', e=>{
 });
 
 codeView.addEventListener('contextmenu', e=>{
-  ipcRenderer.invoke('show-context-menu','code').then(dbPath=>{
-
-  });
+  ipcRenderer.invoke('show-context-menu','code',
+      {
+        snippetsEnabled: canUseSnippets(),
+        editorHasSelection: editorHasSelection(),
+      });
 });
 
 document.getElementById('cmd-layout-content').addEventListener('contextmenu', e=>{
@@ -371,6 +373,8 @@ ipcRenderer.on('get-code', function (evt, message) {
     var cursor = editor.selection.getCursor() // returns object like {row:1 , column: 4}
     editor.insert(message.code)
     editor.focus();
+  }else{
+    notificationsManager.info('No file active')
   }
 });
 
@@ -568,6 +572,7 @@ function appOpenImage(event, file, ext){
 function hideAllViews(view){
   codeView.style.display = "none";
   imageView.style.display = "none";
+  imageViewer.src = "";
   if(view){
     view.style.display = "block";
   }
@@ -1503,8 +1508,7 @@ let setListeners = () => {
       selectedFileElement = e.target;
       undoDirectoryStyling();
       helper.addElementClass(e.target, "active");
-      ipcRenderer.invoke('show-context-menu',"file").then(e=>{
-      });
+      ipcRenderer.invoke('show-context-menu',"file");
     });
 
 
@@ -1705,19 +1709,21 @@ function clearProject(){
 }
 
 function closeProject(){
-  clearProject();
-  currentProject = null;
-  currentDirectory = null;
-  editor.session.setValue("");
-  imageViewer.src = "";
-  updatePageTitle("");
-  setCurrentProjectName("");
-  sideBarManager.closeSideBars();
-  openFiles = [];
-  settings.delete("currentproject");
-  hideAllViews();
-  refreshView();
-  showWelcomeMessage();
+  closeAllTabs(function(){
+    clearProject();
+    currentProject = null;
+    currentDirectory = null;
+    editor.session.setValue("");
+    imageViewer.src = "";
+    updatePageTitle("");
+    setCurrentProjectName("");
+    sideBarManager.closeSideBars();
+    openFiles = [];
+    settings.delete("currentproject");
+    hideAllViews();
+    refreshView();
+    showWelcomeMessage();
+  })
 }
 
 
@@ -2339,16 +2345,21 @@ function closeSelectedTab(){
 }
 
 
-function closeAllTabs(){
+function closeAllTabs(callback){
   let size = openFiles.length;
   if(size > 0){
     let fileObject = openFiles[size-1];
     closeATab(fileObject.name, ()=>{
       createTabs();
-      closeAllTabs();
+      closeAllTabs(callback);
     });
   }else{
-    clearProject();
+  // clearProject();
+    if(callback){
+      callback();
+    }else{
+      clearProject();
+    }
   }
 }
 
@@ -2379,10 +2390,11 @@ function closeATab(file, callback){
   let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
   if(fileObject){
     if((fileObject.content !== fileObject.ocontent)){
+      let filename = path.basename(file);
       ipcRenderer.invoke('show-confirm-dialog',{
-        title: 'Unsaved changes to file',
+        title: "Unsaved changes to file " + filename ,
         buttons: ["Yes","No"],
-        message: "Save changes to this file"
+        message: "Save changes to this file - " + filename,
       }).then((result)=>{
         if(result.response ==0){
           saveAFile(fileObject.name, fileObject.content);
@@ -2479,6 +2491,10 @@ function openSelectedFileInSideView(){
 
 function openSelectedFileInNewWindow(){
   openFileInNewWindow(selectedFileElement.getAttribute("data-path"));
+}
+
+function openCurrentFileInNewWindow(){
+  openFileInNewWindow(currentFile);
 }
 
 function openCurrentFileInSideView(){
@@ -2703,4 +2719,30 @@ function openFileSelectDialog(){
         startANewProject(filename);
       }
   });
+}
+
+function canUseSnippets(){
+  if(codeView.style.display == "block"){
+    return true;
+  }
+  return false;
+}
+
+function editorHasSelection(){
+  if(editor.getSelectedText()){
+    return true;
+  }
+  return false;
+}
+
+function canRunCurrentFile(){
+  var ext = path.extname(currentFile);
+}
+
+function openUnSavedFiles(){
+
+}
+
+function openCommandPrompt(){
+  open("cmd.exe");
 }
