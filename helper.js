@@ -1,5 +1,6 @@
 const fs = require("fs")
 var path = require('path');
+const extensions = require('./extensions');
 
 module.exports = {
   removeFromObjectArray: (arr, key, value) => {
@@ -60,7 +61,17 @@ module.exports = {
     }
     return false;
   },
-  extensionsObject : () => {
+  getFileType : function(filename){
+    if(filename){
+      let ext = path.extname(filename).replace(/\./g,' ').trim();
+      if(extensions.hasOwnProperty(ext)){
+        let fileType = extensions[ext].type;
+        return fileType;
+      }
+      return null;
+    }
+  },
+  extensionsObject : function() {
     return {
       php : {
         type : "code",

@@ -22,6 +22,12 @@ const sideBars = {
 
 module.exports =  {
 
+    isBarOpen : function(bar){
+        if(sideBars[bar] && sideBars[bar].el.style.display === "block"){
+            return true;
+        }
+        return false;
+    },
     showSideBarContainer : function(){
         sideBar.style.display = "block";
     },

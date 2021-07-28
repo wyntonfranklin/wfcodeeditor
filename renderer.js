@@ -48,6 +48,7 @@ let tutorialsViewScrollPosition = null;
 let selectedTutorialElement = null;
 let currentTutorialAction = "tutorials";
 let TABS_DRAGGING = false;
+let currentSideViewFile = null;
 
 let currentFile = null;
 let currentDirectory = null;
@@ -182,11 +183,11 @@ document.getElementById("cmd-close").addEventListener('click', e => {
 document.getElementById("showtaskbyfile").addEventListener('change', function() {
   if (this.checked) {
    SHOW_TASK_BY_FILE = true;
-   settingsManager.set('task-show-current-file',true);
+   settingsManager.set('taskShowCurrentFile',true);
   } else {
     SHOW_TASK_BY_FILE = false;
-    settingsManager.set('task-show-current-file',false);
-    console.log(settingsManager.get('task-show-current-file', true))
+    settingsManager.set('taskShowCurrentFile',false);
+    console.log(settingsManager.get('taskShowCurrentFile', true))
     console.log(SHOW_TASK_BY_FILE);
   }
   loadTaskView();
@@ -516,7 +517,9 @@ function onFileClickEvent(e, file){
       if(helper.exitsInArray(fileExceptions, ext)){
         notificationsManager.error(`We cant open this file ${ext}`);
       }else{
-        notificationsManager.info(`Trying to open this file ${ext}`);
+        if(settingsManager.get("fileTypeNotification", true)){
+          notificationsManager.info(`Trying to open this file ${ext}`);
+        }
         appOpenCode(null, file, ext);
       }
 
@@ -828,19 +831,21 @@ function renameAFile(el, filename){
 
 
 function saveCurrentFile(){
-  if(currentFile){
+  if(currentFile && helper.getFileType(currentFile) === "code"){
+    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
     var code = editor.getValue();
     var sel = editor.getSelection();
     let cpostion = sel.getCursor();
+    fileObject.file.ocontent = code;
+    openFiles[fileObject.position] = fileObject.file;
     saveAFile(currentFile, code);
-    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
-    if(fileObject){
-      fileObject.file.ocontent = code;
-      openFiles[fileObject.position] = fileObject.file;
-    }
     sel.moveCursorToPosition(cpostion);
     setSaveButtonAsInActive();
     refreshView();
+    if(currentFile === currentSideViewFile && sideBarManager.isBarOpen("codeview")){
+     // reload sideview
+      openCurrentFileInSideView(currentSideViewFile);
+    }
   }else{
     notificationsManager.info('Nothing to save');
   }
@@ -964,7 +969,7 @@ function toggleSnippetsView(){
 function loadSnippetsView(query){
   let snippetsPath = path.join(APPLICATION_PATH,'snippets.db');
   if(query == undefined){
-    if(settingsManager.get('show-snippets-by-project', false)){
+    if(settingsManager.get('showSnippetsByProject', false)){
       var query = {project:currentProject};
     }else{
       var query = {};
@@ -1758,7 +1763,7 @@ function init(){
   makeResizableLeft();
 
   // init settings for application
-  let showCurrentFile = settingsManager.get('task-show-current-file',false);
+  let showCurrentFile = settingsManager.get('taskShowCurrentFile',false);
   document.getElementById("showtaskbyfile").checked = showCurrentFile;
   SHOW_TASK_BY_FILE = showCurrentFile;
 }
@@ -2082,10 +2087,14 @@ function makeTabsDraggable(){
                     tab.className += " tabhover";
                     isSwitched = true;
                   }else{
-                    console.log("null fo rsome resason")
+                   // isSwitched = false;
+                  //  boxToMove1 = null;
+                  //  boxToMove2  = null;
                   }
                 }else{
-                  tab.classList.remove("tabhover")
+                  tab.classList.remove("tabhover");
+                 // boxToMove1 = null;
+                 // boxToMove2  = null;
                   console.log("nah wuck");
                 }
               }
@@ -2105,11 +2114,17 @@ function makeTabsDraggable(){
 }
 
 function intersectRect(a, b) {
+  console.log(a, "a");
+  console.log(b,"b");
   if(a.x > 0 && b.x > 0 ){
+    let minStart = b.x + (b.width/2);
     return (
 
-        (a.left >= b.left/2 &&
-        a.right <= b.right)
+        (
+            a.x > b.x && a.x <= minStart
+        )
+
+
         &&
         a.top <= b.bottom &&
         b.top <= a.bottom)
@@ -2479,19 +2494,17 @@ function openCurrentTabInNewWindow(){
 function openFileInSideView(file){
   // option resize functions
   if(file){
-    let ext = path.extname(file).replace(/\./g,' ').trim();
-    if(extensions.hasOwnProperty(ext)) {
-      let fileAction = extensions[ext].type;
-      if (fileAction === "code") {
-        sideBarManager.openSideBar(function(){
-          const buffer = fs.readFileSync(file);
-          setCodeView(path.basename(file),buffer.toString(), fileAction)
-        }, "codeview");
-      }else if(fileAction === "image"){
-        sideBarManager.openSideBar(function(){;
-          setCodeView(path.basename(file),file,fileAction)
-        }, "codeview");
-      }
+    currentSideViewFile = file;
+    let fileAction = helper.getFileType(file);
+    if (fileAction === "code") {
+      sideBarManager.openSideBar(function(){
+        const buffer = fs.readFileSync(file);
+        setCodeView(path.basename(file),buffer.toString(), fileAction)
+      }, "codeview");
+    }else if(fileAction === "image"){
+      sideBarManager.openSideBar(function(){;
+        setCodeView(path.basename(file),file,fileAction)
+      }, "codeview");
     }
     resizeCodeViewImageView();
   }
