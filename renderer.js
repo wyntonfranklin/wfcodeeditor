@@ -568,7 +568,9 @@ function appOpenImage(event, file, ext){
 function hideAllViews(view){
   codeView.style.display = "none";
   imageView.style.display = "none";
-  view.style.display = "block";
+  if(view){
+    view.style.display = "block";
+  }
 }
 
 
@@ -1713,6 +1715,7 @@ function closeProject(){
   sideBarManager.closeSideBars();
   openFiles = [];
   settings.delete("currentproject");
+  hideAllViews();
   refreshView();
   showWelcomeMessage();
 }
@@ -1769,7 +1772,7 @@ function init(){
 }
 
 function showWelcomeMessage(){
-  if (codeView.style.display == 'none' && imageView.style.display == "none") {
+  if (codeView.style.display === 'none' && imageView.style.display === "none") {
     welcomeView.style.display = "block";
   }
 }
