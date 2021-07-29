@@ -49,9 +49,12 @@ let selectedTutorialElement = null;
 let currentTutorialAction = "tutorials";
 let TABS_DRAGGING = false;
 let currentSideViewFile = null;
+let fileChangeDialogOpen = false;
 
 let currentFile = null;
 let currentDirectory = null;
+let currentEditorFile = null;
+let currentImageFile = null;
 
 let directoryUi = document.getElementById('directory');
 let backdropUi = document.getElementById('backdrop');
@@ -114,6 +117,37 @@ editor.on("input", e => {
     }
   }
 
+});
+
+editor.on("focus", e => {
+
+  if(!fileChangeDialogOpen){
+    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    // file has been edited outside
+    if(isFileEdited(currentFile)){
+      fileChangeDialogOpen = true;
+      ipcRenderer.invoke('show-confirm-dialog',{
+        title: "This file has been edited" + currentFile ,
+        buttons: ["Reload","Overwrite","Close"],
+        message: "Reload the file from the source" + currentFile,
+      }).then((result) =>{
+        if(result.response ==0){
+          onFileClickEvent(null, currentFile, true);
+        }else if(result.response == 1){
+          saveCurrentFile();
+        }else{
+
+        }
+        fileChangeDialogOpen  = false;
+      });
+    }
+  }
+});
+
+imageViewer.addEventListener('click', function(e){
+  if(currentFile !== currentImageFile){
+    onFileClickEvent(null, currentImageFile);
+  }
 });
 
 
@@ -356,6 +390,12 @@ codeView.addEventListener('contextmenu', e=>{
       });
 });
 
+codeView.addEventListener('click', e=>{
+  if(currentFile !== currentEditorFile){
+    onFileClickEvent(null, currentEditorFile);
+  }
+});
+
 document.getElementById('cmd-layout-content').addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-context-menu','cmd');
 });
@@ -495,7 +535,8 @@ function onDirectoryClickEvent(e, file){
 
 // When a file is clicked you can call this function
 
-function onFileClickEvent(e, file){
+function onFileClickEvent(e, file, fromSource){
+  fromSource = (fromSource ===undefined) ? false : fromSource;
   if(fs.existsSync(file)){
     let fileExceptions = ['zip','exe','gz','pdf','doc','docx','xls','ppt'];
     let ext = path.extname(file).replace(/\./g,' ').trim();
@@ -507,7 +548,7 @@ function onFileClickEvent(e, file){
     if(extensions.hasOwnProperty(ext)){
       fileAction = fileActions[ext].type;
       if(fileAction === "code"){
-        appOpenCode(e, file, ext);
+        appOpenCode(e, file, ext, fromSource);
       }else if(fileAction === "image"){
         appOpenImage(e, file, ext)
       }else{
@@ -520,7 +561,7 @@ function onFileClickEvent(e, file){
         if(settingsManager.get("fileTypeNotification", true)){
           notificationsManager.info(`Trying to open this file ${ext}`);
         }
-        appOpenCode(null, file, ext);
+        appOpenCode(null, file, ext, fromSource);
       }
 
     }
@@ -530,14 +571,15 @@ function onFileClickEvent(e, file){
 
 // all good
 
-function appOpenCode(event, file, ext){
+function appOpenCode(event, file, ext, fromSource){
   if(event){
     helper.addElementClass(event.target, "active");
   }
   addOpenFile(file);
+  currentEditorFile = file;
   let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
   hideAllViews(codeView);
-  if(fileObject){
+  if(fileObject && !fromSource){
     if(fileObject.session){
       editor.setSession(fileObject.session);
       //editor.session.setValue(fileObject.content);
@@ -559,6 +601,7 @@ function appOpenCode(event, file, ext){
 
 function appOpenImage(event, file, ext){
   addOpenFile(file, "image");
+  currentImageFile = file;
   hideAllViews(imageView);
   imageViewer.src = file;
 }
@@ -2168,12 +2211,10 @@ function checkIfCurrentFileIsEdited(){
 }
 
 function isFileEdited(file){
-  let statsObj = fs.statSync(file);
+  const buffer = fs.readFileSync(file);
   let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
-  if(fileObject !== null){
-    if(fileObject.lastmod !== statsObj.mtime){
+  if(fileObject.content !== buffer.toString()){
       return true;
-    }
   }
   return false;
 }
