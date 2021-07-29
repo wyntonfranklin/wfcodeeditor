@@ -80,12 +80,7 @@ module.exports =  {
             {
               label: 'Add File to Project',
               click: () => {
-                var filename = dialog.showOpenDialogSync(
-                    { defaultPath: '', properties: ['openFile'] });
-                if(filename !== undefined){
-                  var currentFilename = filename[0];
-                  webContents.send("open-file", {file:currentFilename, action:'save'});
-                }
+                webContents.executeJavaScript(`openAddFileToProjectDialog()`)
               },
             },
             {
@@ -193,10 +188,6 @@ module.exports =  {
         {
           label: 'Actions',
           submenu: [
-            {
-              label: 'DevTools',
-              role: 'toggleDevTools'
-            },
             {
               role: 'toggleFullScreen'
             },

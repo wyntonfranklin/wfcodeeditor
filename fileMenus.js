@@ -65,6 +65,11 @@ module.exports =  {
           },
         ]
       },
+      { label: 'Add File to Project',
+        click: () => {
+          mainDialog.webContents.executeJavaScript(`openAddFileToProjectDialog()`)
+        },
+      },
       { type: 'separator' },
       { label: 'Rename',
         click: () => {
@@ -100,16 +105,7 @@ module.exports =  {
       { type: 'separator' },
       { label: 'Delete',
         click: () => {
-          let options  = {
-            title: 'Please confirm this delete',
-            buttons: ["Yes","Cancel"],
-            message: "Do you really want to quit?"
-          }
-          dialog.showMessageBox(options).then( result => {
-            console.log(`User selected: ${result.response}`);
-            mainDialog.webContents.executeJavaScript(`deletedSelectItem(${result.response})`)
-          })
-
+          mainDialog.webContents.executeJavaScript(`confirmFileDelete()`)
         },
       },
     ]

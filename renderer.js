@@ -100,7 +100,6 @@ editor.on("input", e => {
   let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
   // file has been edited
   if(!editor.session.getUndoManager().isClean()){
-    console.log("editting")
     if(fileObject){
      // fileObject.file.changed = true;
       fileObject.file.content = editor.getValue();
@@ -187,8 +186,6 @@ document.getElementById("showtaskbyfile").addEventListener('change', function() 
   } else {
     SHOW_TASK_BY_FILE = false;
     settingsManager.set('taskShowCurrentFile',false);
-    console.log(settingsManager.get('taskShowCurrentFile', true))
-    console.log(SHOW_TASK_BY_FILE);
   }
   loadTaskView();
 });
@@ -458,7 +455,6 @@ function addOpenFile(file, type){
 
   if(!helper.exitsInObjectArray(openFiles, "name", file)) {
     if(type!== undefined && type === 'image'){
-      console.log("opening image file");
       openFiles.push({
         name: file,
         lastmod: statsObj.mtime,
@@ -543,7 +539,6 @@ function appOpenCode(event, file, ext){
   hideAllViews(codeView);
   if(fileObject){
     if(fileObject.session){
-      console.log('has session');
       editor.setSession(fileObject.session);
       //editor.session.setValue(fileObject.content);
     }else{
@@ -555,7 +550,6 @@ function appOpenCode(event, file, ext){
       const buffer = fs.readFileSync(file);
       editor.session.setValue(buffer.toString());
     }catch (e){
-      console.log(e);
       notificationsManager.error(`Cant open this file ${file}`);
     }
   }
@@ -629,21 +623,18 @@ function onSaveButtonPressed(e){
       let sntId = currentSnippet.getAttribute("data-id");
       if(sntId){
         snippetManager.getSnippet(getApplicationPath('snippets.db'), {_id: sntId}, function(snt){
-          console.log(fileNameInput.value);
           let update = snippetManager.changeSnippetContent(snt, fileNameInput.value, modalContentInput.value);
-          console.log(update);
           snippetManager.updateSnippet(getApplicationPath('snippets.db'),
               {_id: snt._id}, update, function(){
                 loadSnippetsView();
               });
         })
       }else{
-        console.log('snippet no found');
+
       }
     }else if(CURRENT_FILE_OPENER_ACTION == "saveas"){
       saveFileAsAction(filename);
     }
-    console.log("The file was saved!");
     hideShowModal('hide',"new-file-modal");
     readFiles(currentProject);
   }else{
@@ -778,7 +769,7 @@ function addFileToProject(filename){
   let dest;
   copyPathHolder = filename;
   CURRENT_FILE_OPENER_ACTION = "add-file-to-project";
-  dest = getCurrentDirectory();
+  dest = getCurrentSelectedDirectory();
   fileNameInput.value = path.basename(filename);
   setModalTitle('Copy a file',`Copy file ${filename} to  ${dest}`);
   hideShowModal("show" , "new-file-modal");
@@ -877,7 +868,6 @@ function saveADirectory(path, callback){
     if(callback){
       callback(path);
     }
-    console.log("Directory is created.");
   });
 }
 
@@ -894,11 +884,9 @@ function openSnippetInNewWindow(){
 
 function searchSnippets(){
   let query = document.getElementById('snippets-query').value;
-  console.log(query);
   if(query){
     loadSnippetsView({
       $where: function () {
-        // console.log(this.title);
         if(this.title.toLowerCase().indexOf(query.toLowerCase()) !== -1){
           return true;
         }
@@ -1028,15 +1016,19 @@ function saveSnippet(){
   const timestamp = Date.now();
   let snippetsDbPath = path.join(APPLICATION_PATH,'snippets.db');
   if(snippetName && snippetContent){
-    snippetManager.saveSnippet({
-      title: snippetName,
-      snippet : snippetContent,
-      timestamp : timestamp,
-      project : (currentProject) ? currentProject : "",
-      file : (currentFile) ? currentFile : "",
-    }, snippetsDbPath, function(){
-      loadSnippetsView();
-    });
+    if(snippetContent.length > 1000){
+        notificationsManager.error('To long to be a snippet. Max length is 300. Current is ' + snippetContent.length)
+    }else{
+      snippetManager.saveSnippet({
+        title: snippetName,
+        snippet : snippetContent,
+        timestamp : timestamp,
+        project : (currentProject) ? currentProject : "",
+        file : (currentFile) ? currentFile : "",
+      }, snippetsDbPath, function(){
+        loadSnippetsView();
+      });
+    }
   }
 }
 
@@ -1067,15 +1059,19 @@ function saveTask(){
   let task = taskEl.value;
   const timestamp = Date.now();
   if(task){
-    taskManager.saveTasks({
-      content: task,
-      file : (currentFile) ? currentFile : "",
-      timestamp: timestamp,
-      project : (currentProject) ? currentProject : "",
-    }, getTasksPath(), function(){
-      loadTaskView();
-      taskEl.value = "";
-    });
+    if(task.length > 300 ){
+      notificationsManager.error('Task length cannot be greater than 300 characters. Current is ' + task.length)
+    }else{
+      taskManager.saveTasks({
+        content: task,
+        file : (currentFile) ? currentFile : "",
+        timestamp: timestamp,
+        project : (currentProject) ? currentProject : "",
+      }, getTasksPath(), function(){
+        loadTaskView();
+        taskEl.value = "";
+      });
+    }
   }
 }
 
@@ -1217,19 +1213,16 @@ function runCommand(command){
     //saveCurrentFile();
     command = `cd ${basePath} & ` + command;
   }
-  console.log(command);
   sendToConsole(command);
   showCmdLayout();
   cmd.run(command,
       function(err, data, stderr){
         if(err){
-          console.log(err);
           sendToConsole(err);
           sendToConsole("----------------------------------------Command Complete--------------------------------------");
           scrollCmdViewDown();
           notificationsManager.error('Error encountered while running this command');
         }else{
-          console.log('examples dir now contains the example file along with : ',data)
           sendToConsole(data)
           sendToConsole("----------------------------------------Command Complete--------------------------------------");
           scrollCmdViewDown();
@@ -1383,7 +1376,7 @@ function switchPositionOfFilesObjects(file1, file2){
 
 function createTabs(){
   let html = '';
-  if(openFiles.length < 0){
+  if(openFiles.length <= 0){
     clearProject();
   }
   for(let i=0; i<= openFiles.length-1; i++){
@@ -1434,7 +1427,6 @@ function setTabEvents(){
   const divs2 = document.querySelectorAll('.tab-item');
   divs2.forEach( el => {
     el.addEventListener('click', e=>{
-      console.log(e);
       e.preventDefault();
       let file = el.getAttribute('data-file');
       if(!TABS_DRAGGING){
@@ -1544,13 +1536,12 @@ function saveLastProject(filepath){
   settings.set("currentproject", filepath);
   const timestamp = Date.now();
   projectsManager.getProject(getApplicationPath('projects.db'), {name: filepath}, function(doc){
-    console.log(doc);
     if(doc == undefined || doc == null){
       projectsManager.saveProject({
         name:filepath,
         timestamp : timestamp
       },getApplicationPath('projects.db'), function(docs){
-          console.log(docs);
+
       })
     }
   });
@@ -1565,7 +1556,6 @@ function assignAceMode(editor, ext){
 }
 
 function getProjectDir(callback){
-  console.log("get project directory")
   let cpPath = settings.get('currentproject');
   currentProject = cpPath;
   setCurrentProjectName(helper.getDirectoryName(cpPath));
@@ -1742,7 +1732,6 @@ function init(){
     if(fs.existsSync(dir)){
       projectsManager.getProject(getApplicationPath('projects.db'), {name:currentProject}, function(doc){
         if(doc){
-          console.log(doc);
           if(typeof doc.opendirs !== undefined && doc.opendirs !== undefined){
             openDir = doc.opendirs;
           }
@@ -1886,7 +1875,6 @@ function updateOnResize(){
   newFileModal.style.top = (( window.innerHeight + 50) - window.innerHeight) + 'px';
   newFileModal.style.left = (appPanel.innerWidth/2)+ 'px';
   rightPanel.style.width = ((containerPanel.clientWidth -10) -  (Math.round(leftPanel.getBoundingClientRect().width))) + "px";
-  console.log("resize event");
 
 }
 
@@ -2066,7 +2054,6 @@ function makeTabsDraggable(){
         listeners: {
           start (event) {
             TABS_DRAGGING = true;
-            console.log(event.type, event.target)
             event.preventDefault();
            // onFileClickEvent(null, event.target.getAttribute('title'));
             fileToSet = event.target.getAttribute('title');
@@ -2088,7 +2075,6 @@ function makeTabsDraggable(){
               if(tab.getAttribute('title') !== target.getAttribute('title')){
                 var box2 = tab.getBoundingClientRect();
                 if(intersectRect(box1, box2) && !isSwitched){
-                  console.log("set intersaction");
                   if(tab != null && target != null && tab !== undefined && target !== undefined){
                     boxToMove1 = tab;
                     boxToMove2 = target;
@@ -2104,13 +2090,11 @@ function makeTabsDraggable(){
                   tab.classList.remove("tabhover");
                  // boxToMove1 = null;
                  // boxToMove2  = null;
-                  console.log("nah wuck");
                 }
               }
             });
           },
           end (event) {
-            console.log("end event called");
             if(boxToMove1 && boxToMove2){
               switchPositionOfFilesObjects(boxToMove1.getAttribute('title'), boxToMove2.getAttribute('title'));
             }
@@ -2123,8 +2107,6 @@ function makeTabsDraggable(){
 }
 
 function intersectRect(a, b) {
-  console.log(a, "a");
-  console.log(b,"b");
   if(a.x > 0 && b.x > 0 ){
     let minStart = b.x + (b.width/2);
     return (
@@ -2212,7 +2194,7 @@ function openInExplorer(){
   if(pathToOpen){
     openExplorer(pathToOpen, err => {
       if(err) {
-        console.log(err);
+
       }
       else {
         //Do Something
@@ -2228,23 +2210,28 @@ function deletedSelectItem(action){
       var stats = fs.statSync(file);
       if (stats.isDirectory()) {
         try {
-          fs.rmdirSync(file, { recursive: true });
-          console.log("TEST FOLDER DELETE OK");
+          //fs.rmdirSync(file, { recursive: true });
+          ipcRenderer.invoke('remove-a-file', file).then((status)=>{
+            onFileRemovedCallback(file);
+          });
         } catch (err) {
-          console.error(err);
+
         }
       } else {
-        try {
-          fs.unlinkSync(file);
-          // console.log("SYNC DELETE OK");
-        } catch (err) {
-          console.error(err);
-        }
+        ipcRenderer.invoke('remove-a-file', file).then((status)=>{
+            onFileRemovedCallback(file);
+        });
       }
-      helper.removeFromObjectArray(openFiles, "name", file);
-      refreshView();
     }
   }
+}
+
+function onFileRemovedCallback(file){
+  helper.removeFromObjectArray(openFiles, "name", file);
+  if(openFiles.length > 0){
+    onFileClickEvent(null, openFiles[openFiles.length-1].name);
+  }
+  refreshView();
 }
 
 function setModalTitle(title, description){
@@ -2285,7 +2272,6 @@ function copyADirectory(folderpath){
     fs.mkdirSync(path.join(destFolder, folderName));
     fs.copy(folderpath, path.join(destFolder, folderName), err => {
       if (err) return console.error(err)
-      console.log('success!')
       refreshView();
     }) ;
     // copies file
@@ -2377,7 +2363,6 @@ function closeAllOtherTabs(currentSize){
       closeAllOtherTabs(size);
     }
   }else{
-    console.log("last file");
     let fileObject = openFiles[0];
     onFileClickEvent(null, fileObject.name);
     createTabs();
@@ -2616,9 +2601,7 @@ function fetchSearchTutorials(){
 function showTutorials(data){
   let template = '';
   allTutorials = [].concat(allTutorials, data.tutorials);
-  console.log(data.meta);
   tutorialsPagination = data.meta;
-  //console.log(allTutorials)
   let myTutorials = allTutorials;
   myTutorials.forEach((tutorial)=>{
     template += `<div data-id="${tutorial.id}" class="card mb-3 tutorial-item" data-website="https://app.wftutorials.com/tutorial/mobile/${tutorial.id}?noandroid">
@@ -2641,7 +2624,6 @@ function showTutorials(data){
   divs.forEach( el => {
     el.addEventListener('contextmenu', e => {
       selectedTutorialElement = e.currentTarget;
-      console.log(selectedTutorialElement)
       ipcRenderer.invoke('show-context-menu',"tutorials");
       e.preventDefault();
     })
@@ -2649,7 +2631,6 @@ function showTutorials(data){
     el.addEventListener('dblclick', (event) => {
       let wl = document.getElementById('webview-layout');
       tutorialsViewScrollPosition =  wl.scrollTop;
-       console.log(wl.scrollTop);
       var tutorialUrl = el.getAttribute('data-website');
       if (tutorialUrl) {
         document.getElementById('webview-content').style.display = 'none';
@@ -2713,11 +2694,20 @@ function onCloseEvent(){
 }
 
 function openFileSelectDialog(){
-  ipcRenderer.invoke('show-open-file-dialog',{}, ).then((filename)=>{
-    console.log(filename);
+  ipcRenderer.invoke('show-open-file-dialog',
+      { defaultPath: '', properties: ['openDirectory','createDirectory','promptToCreate'] }, ).then((filename)=>{
       if(filename){
         startANewProject(filename);
       }
+  });
+}
+
+function openAddFileToProjectDialog(){
+  ipcRenderer.invoke('show-open-file-dialog', { defaultPath: '', properties: ['openFile'] }, )
+      .then((filename)=>{
+        if(filename){
+          addFileToProject(filename);
+        }
   });
 }
 
@@ -2745,4 +2735,20 @@ function openUnSavedFiles(){
 
 function openCommandPrompt(){
   open("cmd.exe");
+}
+
+function confirmFileDelete(){
+  let file = selectedFileElement.getAttribute("data-path");
+  let filename = path.basename(file);
+  ipcRenderer.invoke('show-confirm-dialog',{
+    title: "Please confirm this delete: " + filename ,
+    buttons: ["Yes","Cancel"],
+    message: "Delete this Item - " + filename,
+  }).then((result)=>{
+    if(result.response ==0){
+      deletedSelectItem(result.response);
+    }else{
+      deletedSelectItem(result.response);
+    }
+  });
 }

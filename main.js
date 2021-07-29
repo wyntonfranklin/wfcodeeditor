@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog} = require('electron')
+const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog,  shell} = require('electron')
 const path = require('path')
 let mainWindow, createFileWindow;
 var Datastore = require('nedb');
@@ -16,6 +16,11 @@ let snippetsWindow, tutorialWindow, settingsWindow;
 let message; // pass messages to different windows
 
 db.loadDatabases();
+
+
+ipcMain.handle('remove-a-file', (event, fpath) => {
+  return shell.trashItem(fpath);
+});
 
 
 ipcMain.handle('read-user-data', (event) => {
@@ -163,8 +168,7 @@ function createWindow () {
   })
 
   ipcMain.handle('show-open-file-dialog',  (event, options) => {
-    var filename = dialog.showOpenDialogSync(
-        { defaultPath: '', properties: ['openDirectory','createDirectory','promptToCreate'] });
+    var filename = dialog.showOpenDialogSync(options);
     if(filename) {
       console.log(filename[0]);
        return filename[0];
