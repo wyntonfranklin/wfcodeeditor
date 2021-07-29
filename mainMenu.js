@@ -182,6 +182,20 @@ module.exports =  {
                snippetsDialog.show();
              },
            },
+           {
+             label: 'C#',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("CSHARP")`)
+               snippetsDialog.show();
+             },
+           },
+           {
+             label: 'C++',
+             click: () => {
+               snippetsDialog.webContents.executeJavaScript(`loadSnippets("CPP")`)
+               snippetsDialog.show();
+             },
+           },
 
          ]
        },

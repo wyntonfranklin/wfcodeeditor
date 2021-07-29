@@ -15,6 +15,12 @@ module.exports = {
       sdata = require("./snippets/python");
     }else if(type == "JAVA"){
       sdata = require("./snippets/java");
+    }else if(type == "RUBY"){
+      sdata = require("./snippets/ruby");
+    }else if(type == "CPP"){
+      sdata = require("./snippets/cpp");
+    }else if(type == "CSHARP"){
+      sdata = require("./snippets/csharp");
     }
     snippets = JSON.parse(JSON.stringify(sdata));
     return snippets;

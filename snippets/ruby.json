@@ -1,0 +1,204 @@
+{
+	"puts": {
+		"name": "A built-in ruby command to output to the console",
+		"type": "text",
+		"tags": "put, print, log, log to console",
+		"code": "puts \"Hello world!\";"
+	},
+
+	"comment": {
+		"name": "A single-line comment",
+		"type": "text",
+		"tags": "comment, single-line comment",
+		"code": "# This is a single-line comment"
+	},
+
+	"multiline_comment": {
+		"name": "A multiline comment",
+		"type": "text",
+		"tags": "comment, multi-line comment",
+		"code": "=begin\nThis is a comment\nwritten in\nmore than just one line\n=end"
+	},
+
+	"global_variable" : {
+		"name" : "Global variables begin with $. Uninitialized global variables have the value nil and produce warnings with the -w option",
+		"type" : "text",
+		"tags" : "variable, global, global variable",
+		"code" : "$global_variable = 10"
+	},
+	
+	"instance_variable" : {
+		"name" : "Instance variables begin with @. Uninitialized instance variables have the value nil and produce warnings with the -w option",
+		"type" : "text",
+		"tags" : "variable, instance var, instance variable",
+		"code" : "@cust_id = id"
+	},
+	
+	"class_variable" : {
+		"name" : "Class variables begin with @@ and must be initialized before they can be used in method definitions",
+		"type" : "text",
+		"tags" : "variable, class var, class variable",
+		"code" : "@@no_of_customers = 0"
+	},
+
+	"constant" : {
+		"name" : "Constants begin with an uppercase letter",
+		"type" : "text",
+		"tags" : "constant, const",
+		"code" : "VAR1 = 100"
+	},
+
+	"if": {
+		"name": "if statement - Executes some code if a condition is true",
+		"type": "text",
+		"tags": "if, conditional",
+		"code": "if conditional\n\tcode...\nend"
+	},
+
+	"if_elsif": {
+		"name": "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type": "text",
+		"tags": "if, if elif, conditional",
+		"code": "if condition1\n\tputs \"condition 1 is true\"\nelif condition2\n\tputs \"condition 2 is true\"\nelse\n\tputs \"no condition met\"\nend"
+	},
+
+	"unless_statement": {
+		"name": "unless - Executes code if conditional is false",
+		"type": "text",
+		"tags": "unless, conditional",
+		"code": "unless condition1\n\tputs \"condition 1 is true\"\nelse\n\tputs \"no condition met\"\nend"
+	},
+
+	"unless_modifier": {
+		"name": "unless - Executes code if conditional is false",
+		"type": "text",
+		"tags": "unless, unless modifier, conditional",
+		"code": "code unless conditional"
+	},
+
+	"unless": {
+		"name": "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type": "text",
+		"tags": "if, if elif else, conditional",
+		"code": "if condition1:\n\tprint(\"condition 1 is true\")\nelif condition2:\n\tprint(\"condition 2 is true\")\nelif:\n\tprint(\"no other condition is true\")\n"
+	},
+
+	"while": {
+		"name": "With the while loop we can execute a set of statements as long as a condition is true",
+		"type": "text",
+		"tags": "while, while loop, loop, loops",
+		"code": "while conditional do\n\tcode\nend"
+	},
+	
+	"while_modifier": {
+		"name": "With the while modifier loop we can execute a set of statements at least once even if the condition is false",
+		"type": "text",
+		"tags": "while, while loop, loop, loops",
+		"code": "begin\n\tcode\nend while conditional"
+	},
+
+	"for_loop": {
+		"name": "A for loop is used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string)",
+		"type": "text",
+		"tags": "for loop, loop, loops",
+		"code": "for i in 0..5\n\tputs \"Value of local variable is #{i}\"\nend"
+	},
+	
+	"each_loop": {
+		"name": "A for loop is used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string)",
+		"type": "text",
+		"tags": "each, each loop, loop, loops",
+		"code": "(0..5).each do |i|\n\tputs \"Value of local variable is #{i}\"\nend"
+	},
+
+	"method": {
+		"name": "A function is a block of statements that can be used repeatedly in a program",
+		"type": "text",
+		"tags": "method, function, function definition",
+		"code": "def function_name\n\texpr...\nend"
+	},
+
+	"method_argument": {
+		"name": "A function can use arguments aka inputs to be used in the functions body",
+		"type": "text",
+		"tags": "method, function arguments, function definition with inputs",
+		"code": "def method_name (var1, var2)\n\texpr...\nend"
+	},
+
+	"array": {
+		"name": "An array stores multiple values in one single variable",
+		"type": "text",
+		"tags": "array, list",
+		"code": "nums = Array[value1, value2, value3]"
+	},
+
+	"hash": {
+		"name": "Hash are used to store data values in key:value pairs",
+		"type": "text",
+		"tags": "hash, object, object literal, key value",
+		"code": "H = {\"a\" => 100, \"b\" => 200}"
+	},
+	
+	"range": {
+		"name": "Ruby supports ranges and allows us to use ranges in a variety of ways",
+		"type": "text",
+		"tags": "range",
+		"code": "rangeName = (1..10)"
+	},
+
+	"class": {
+		"name": "A class is a template for objects, and an object is an instance of class",
+		"type": "text",
+		"tags": "class, ruby class",
+		"code": "class Customer\n\t@@no_of_customers = 0\n\tdef initialize(id, name, addr)\n\t\t@cust_id = id\n\t\t@cust_name = name\n\t\t@cust_addr = addr\n\tend\nend"
+	},
+
+	"initialize": {
+		"name": "Class constructor is used to set initial values of properties at the time of object creation",
+		"type": "text",
+		"tags": "constructor, initialize",
+		"code": "\tdef initialize(id, name, addr)\n\t\t@cust_id = id\n\t\t@cust_name = name\n\t\t@cust_addr = addr\n\tend"
+	},
+
+	"require" : {
+		"name" : "Use require statement to use code of other modules",
+		"type" : "text",
+		"tags" : "require",
+		"code" : "require 'modulename.rb'"
+	},
+
+	"datetime_now" : {
+		"name" : "The Time class represents dates and times in Ruby",
+		"type" : "text",
+		"tags" : "datetime, date, now, date now, current time",
+		"code" : "now = Time.now"
+	},
+
+	"file_open" : {
+		"name" : "Use File.open method to create a new file object and assign that file object to a file",
+		"type" : "text",
+		"tags" : "open, file, file open",
+		"code" : "File.open(\"filename\", \"mode\") do |aFile|\n\t# ... process the file\nend"
+	},
+
+	"file_read" : {
+		"name" : "Use the method sysread to read the contents of a file. You can open the file in any of the modes when using the method sysread",
+		"type" : "text",
+		"tags" : "read, read file",
+		"code" : "aFile = File.new(\"input.txt\", \"r\")\nif aFile\n\tcontent = aFile.sysread(20)\n\tputs content\nelse\n\tputs \"Unable to open file!\"\nend"
+	},
+	
+	"file_write" : {
+		"name" : "Use the method syswrite to write the contents into a file. You need to open the file in write mode when using the method syswrite",
+		"type" : "text",
+		"tags" : "write, write file",
+		"code" : "aFile = File.new(\"input.txt\", \"r+\")\nif aFile\n\taFile.syswrite(\"ABCDEF\")\nelse\n\tputs \"Unable to open file!\"\nend"
+	},
+
+	"rescue" : {
+		"name" : "Capture an exception using rescue block and then use retry statement to execute begin block from the beginning",
+		"type" : "text",
+		"tags" : "rescure, try, except, exception handling, error handling",
+		"code" : "begin/n/t# Exceptions raised by this code will\n\t# be caught by the following rescue clause\nrescue\n\t# This block will capture all types of exceptions\n\tretry  # This will move control to the beginning of begin\nend"
+	}
+}

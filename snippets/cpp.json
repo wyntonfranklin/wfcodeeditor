@@ -1,0 +1,218 @@
+{
+	"include" : {
+		"name" : "includes header file libraries",
+		"type" : "text",
+		"tags" : "include, hash include",
+		"code" : "#include <libraryName>"
+	},
+
+	"cout": {
+		"name": "The cout object, together with the << operator, is used to output values/print text",
+		"type": "text",
+		"tags": "cout, print, console, log,",
+		"code": "cout << \"Hello World!\";"
+	},
+	
+	"comment": {
+		"name": "A single-line comment",
+		"type": "text",
+		"tags": "comment, single-line comment",
+		"code": "// This is a single-line comment"
+	},
+	
+	"multiline_comment": {
+		"name": "A multiline comment",
+		"type": "text",
+		"tags": "comment, multi-line comment",
+		"code": "/*\nThis is a multiple-lines comment block\nthat spans over multiple\nlines\n*/"
+	},
+	
+	"variable": {
+		"name": "To create a variable, you must specify the type and assign it a value",
+		"type": "text",
+		"tags": "variable, type variable",
+		"code": "type variableName = value;"
+	},
+	
+	"constant": {
+		"name": "The const keyword will declare the variable as 'constant', which means unchangeable and read-only",
+		"type": "text",
+		"tags": "constant",
+		"code": "const type variableName = value;"
+	},
+
+	"reference" : {
+		"name" : "A reference variable is a 'reference' to an existing variable, and it is created with the & operator",
+		"type" : "text",
+		"tags" : "reference",
+		"code" : "string food = \"Pizza\";  // food variable\nstring &meal = food;    // reference to food"
+	},
+
+	"pointer" : {
+		"name" : "A pointer is a variable that stores the memory address as its value",
+		"type" : "text",
+		"tags" : "pointer",
+		"code" : "string food = \"Pizza\";  // A food variable of type string\nstring* ptr = &food; // A pointer variable, with the name ptr, that stores the address of food"
+	},
+	
+	"string_length": {
+		"name": "To get the length of a string, use the length() function",
+		"type": "text",
+		"tags": "string length",
+		"code": "text.length();"
+	},
+	
+	"if": {
+		"name": "if statement - Executes some code if a condition is true",
+		"type": "text",
+		"tags": "if, conditional",
+		"code": "if (expression) {\n\t//executed if condition is true\n}"
+	},
+	
+	"if_else": {
+		"name": "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type": "text",
+		"tags": "if, if else, conditional",
+		"code": "if (expression) {\n\t//executed if condition is true\n} else {\n\t//executed if condition is false\n}"
+	},
+	
+	"switch": {
+		"name": "switch statement - Selects one of many blocks of executed",
+		"type": "text",
+		"tags": "switch, conditional",
+		"code": "switch (expression) {\n\tcase x:\n\t\t//executed if expression=x\n\t\tbreak;\n\tcase y:\n\t\t//executed if expression=y\n\t\tbreak;\n\tdefault:\n\t\t//executed if expression is different from all labels\n}"
+	},
+	
+	"while": {
+		"name": "while loop - Loops through a block of code as long as the specified condition is true",
+		"type": "text",
+		"tags": "while, while loop, loop, loops",
+		"code": "while (expression) {\n\t//code to be executed\n}"
+	},
+	
+	"do_while": {
+		"name": "do while loop - Loops through a block of code at least once and will run again as long as the specified condition is true",
+		"type": "text",
+		"tags": "do while, do while loop, loop, loops",
+		"code": "do {\n\t//code to be executed\n}\nwhile (expression)"
+	},
+	
+	"for_loop": {
+		"name": "for loop - Used when you know in advance how many times the script should run",
+		"type": "text",
+		"tags": "for loop, loop, loops",
+		"code": "for (statement 1; statement 2; statement 3) { {\n\t//executed for each iteration;\n}"
+	},
+	
+	"add": {
+		"name": "Sum of x and y",
+		"type": "text",
+		"tags": "sum, add, addition",
+		"code": "type result = x + y"
+	},
+	
+	"subract": {
+		"name": "Differenct of x and y",
+		"type": "text",
+		"tags": "difference, subtract, subtract",
+		"code": "type result = x - y"
+	},
+	
+	"multiply": {
+		"name": "Product of x and y",
+		"type": "text",
+		"tags": "multiply, product, multiplication",
+		"code": "type result = x * y"
+	},
+	
+	"divide": {
+		"name": "Quotient of x and y",
+		"type": "text",
+		"tags": "quotient, divide, division",
+		"code": "type result = x / y"
+	},
+	
+	"modulus": {
+		"name": "Remainder of x and y",
+		"type": "text",
+		"tags": "modulus, remainer, modulo",
+		"code": "type result = x % y"
+	},
+
+	"increment": {
+		"name": "Incrementing a number x by 1",
+		"type": "text",
+		"tags": "increment",
+		"code": "++x;"
+	},
+	
+	"decrement": {
+		"name": "Decrementing a number x by 1",
+		"type": "text",
+		"tags": "decrement",
+		"code": "--x;"
+	},
+
+	"increment_number": {
+		"name": "Incrementing a number x by a specific number",
+		"type": "text",
+		"tags": "increment by number, increment",
+		"code": "x += number;"
+	},
+	
+	"decrement_number": {
+		"name": "Decrementing a number x by a specific number",
+		"type": "text",
+		"tags": "decrement by number, decrement",
+		"code": "x -= number;"
+	},
+	
+	"function": {
+		"name": "A function is a block of code which only runs when it is called",
+		"type": "text",
+		"tags": "function, function definition",
+		"code": "void functionName() {\n\tcode to be executed;\n}"
+	},
+	
+	"function_argument": {
+		"name": "A function is a block of code which only runs when it is called. You can pass data, known as parameters, into a function",
+		"type": "text",
+		"tags": "function arguments, function definition with inputs",
+		"code": "void functionName(type argument1,type argument2) {\n\tcode to be executed;\n}"
+	},
+	
+	"array": {
+		"name": "An array stores multiple values in one single variable",
+		"type": "text",
+		"tags": "array, list,",
+		"code": "type arrayName[arrayLength] = {value1, value2, value3};"
+	},
+	
+	"class": {
+		"name": "A class is a template for objects, and an object is an instance of class",
+		"type": "text",
+		"tags": "class, php class",
+		"code": "class MyClass { // The class\n\tpublic: // Access specifier\n\t\tint myNum; // Attribute (int variable)\n\t\tstring myString; // Attribute (string variable)\n};"
+	},
+	
+	"constructor": {
+		"name": "Class constructor is used to set initial values of properties at the time of object creation",
+		"type": "text",
+		"tags": "constructor",
+		"code": "ClassName(string x, string y, int z) { // Constructor with parameters\n\tbrand = x;\n\tmodel = y;\n\tyear = z;\n}"
+	},
+
+	"try_catch" : {
+		"name" : "A try catch block handles exceptions thrown in try block and show the erros in catch block",
+		"type" : "text",
+		"tags" : "try, try catch, error handling",
+		"code" : "try{\n\t// Your code goes here\n} catch(type error){\n\t// log errors here\n}"
+	},
+	
+	"try_throw_catch" : {
+		"name" : "A try catch block handles exceptions thrown in try block and show the erros in catch block",
+		"type" : "text",
+		"tags" : "try, try catch, try throw catch, error handling",
+		"code" : "try{\n\t// Your code goes here\n} catch(type error){\n\t// log errors here\n}"
+	}
+}

@@ -1,0 +1,253 @@
+{
+	"using" : {
+		"name" : "using namespave means that we can use classes from that specific namespace",
+		"type" : "text",
+		"tags" : "using, include",
+		"code" : "using System;"
+	},
+
+	"write_line": {
+		"name": "WriteLine() prints the output on a new line each time",
+		"type": "text",
+		"tags": "print, wite, write line",
+		"code": "Console.WriteLine(\"Hello World!\");"
+	},
+	
+	"comment": {
+		"name": "A single-line comment",
+		"type": "text",
+		"tags": "comment, single-line comment",
+		"code": "// This is a single-line comment"
+	},
+	
+	"multiline_comment": {
+		"name": "A multiline comment",
+		"type": "text",
+		"tags": "comment, multi-line comment",
+		"code": "/*\nThis is a multiple-lines comment block\nthat spans over multiple\nlines\n*/"
+	},
+	
+	"variable": {
+		"name": "To create a variable, you must specify the type and assign it a value",
+		"type": "text",
+		"tags": "variable, type variable",
+		"code": "type variableName = value;"
+	},
+	
+	"const": {
+		"name": "The const keyword will declare the variable as 'constant', which means unchangeable and read-only",
+		"type": "text",
+		"tags": "const, constant",
+		"code": "const type variableName = value;"
+	},
+	
+	"string_length": {
+		"name": "The length of a string can be found with the Length property",
+		"type": "text",
+		"tags": "string length",
+		"code": "txt.Length;"
+	},
+	
+	"if": {
+		"name": "if statement - Executes some code if a condition is true",
+		"type": "text",
+		"tags": "if, conditional",
+		"code": "if (expression) {\n\t//executed if condition is true\n}"
+	},
+	
+	"if_else": {
+		"name": "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type": "text",
+		"tags": "if, if else, conditional",
+		"code": "if (expression) {\n\t//executed if condition is true\n} else {\n\t//executed if condition is false\n}"
+	},
+	
+	"switch": {
+		"name": "switch statement - Selects one of many blocks of executed",
+		"type": "text",
+		"tags": "switch, conditional",
+		"code": "switch (expression) {\n\tcase x:\n\t\t//executed if expression=x\n\t\tbreak;\n\tcase y:\n\t\t//executed if expression=y\n\t\tbreak;\n\tdefault:\n\t\t//executed if expression is different from all labels\n}"
+	},
+	
+	"while": {
+		"name": "while loop - Loops through a block of code as long as the specified condition is true",
+		"type": "text",
+		"tags": "while, while loop, loop, loops",
+		"code": "while (expression) {\n\t//code to be executed\n}"
+	},
+	
+	"do_while": {
+		"name": "do while loop - Loops through a block of code at least once and will run again as long as the specified condition is true",
+		"type": "text",
+		"tags": "do while, do while loop, loop, loops",
+		"code": "do {\n\t//code to be executed\n}\nwhile (expression)"
+	},
+	
+	"for_loop": {
+		"name": "for loop - Used when you know in advance how many times the script should run",
+		"type": "text",
+		"tags": "for loop, loop, loops",
+		"code": "for (statement 1; statement 2; statement 3) { {\n\t//executed for each iteration;\n}"
+	},
+
+	"for_each" : {
+		"name" : "A foreach loop is used exclusively to loop through elements in an array",
+		"type" : "text",
+		"tags" : "for, for each, foreach, loop",
+		"code" : "foreach (type variableName in arrayName)\n{\n\t// code block to be executed\n}"
+	},
+	
+	"add": {
+		"name": "Sum of x and y",
+		"type": "text",
+		"tags": "sum, add, addition",
+		"code": "type result = x + y"
+	},
+	
+	"subract": {
+		"name": "Differenct of x and y",
+		"type": "text",
+		"tags": "difference, subtract, subtract",
+		"code": "type result = x - y"
+	},
+	
+	"multiply": {
+		"name": "Product of x and y",
+		"type": "text",
+		"tags": "multiply, product, multiplication",
+		"code": "type result = x * y"
+	},
+	
+	"divide": {
+		"name": "Quotient of x and y",
+		"type": "text",
+		"tags": "quotient, divide, division",
+		"code": "type result = x / y"
+	},
+	
+	"modulus": {
+		"name": "Remainder of x and y",
+		"type": "text",
+		"tags": "modulus, remainer, modulo",
+		"code": "type result = x % y"
+	},
+
+	"increment": {
+		"name": "Incrementing a number x by 1",
+		"type": "text",
+		"tags": "increment",
+		"code": "x++;"
+	},
+	
+	"decrement": {
+		"name": "Decrementing a number x by 1",
+		"type": "text",
+		"tags": "decrement",
+		"code": "x--;"
+	},
+
+	"increment_number": {
+		"name": "Incrementing a number x by a specific number",
+		"type": "text",
+		"tags": "increment by number, increment",
+		"code": "x += number;"
+	},
+	
+	"decrement_number": {
+		"name": "Decrementing a number x by a specific number",
+		"type": "text",
+		"tags": "decrement by number, decrement",
+		"code": "x -= number;"
+	},
+	
+	"function": {
+		"name": "A function is a block of code which only runs when it is called",
+		"type": "text",
+		"tags": "method, function, function definition",
+		"code": "static void MyMethod() {\n\tcode to be executed;\n}"
+	},
+	
+	"function_argument": {
+		"name": "A function is a block of code which only runs when it is called. You can pass data, known as parameters, into a function",
+		"type": "text",
+		"tags": "method, function arguments, function definition with inputs",
+		"code": "static void MyMethod(string fname)\n{\n\tConsole.WriteLine(fname + \" says hello!\");\n}"
+	},
+	
+	"array": {
+		"name": "An array stores multiple values in one single variable",
+		"type": "text",
+		"tags": "array",
+		"code": "type[] arrayName = {value1, value2, value3};"
+	},
+	
+	"class": {
+		"name": "A class is a template for objects, and an object is an instance of class",
+		"type": "text",
+		"tags": "class, php class",
+		"code": "class Car\n{\n\tpublic string model;\n\n\t// Create a class constructor with a parameter\n\tpublic Car(string modelName)\n\t{\n\t\tmodel = modelName;\n\t}\n\n\tstatic void Main(string[] args)\n\t{\n\t\tCar Ford = new Car(\"Mustang\");\n\t\tConsole.WriteLine(Ford.model);\n\t}\n}"
+	},
+	
+	"constructor": {
+		"name": "Class constructor is used to set initial values of properties at the time of object creation",
+		"type": "text",
+		"tags": "constructor",
+		"code": "public ClassName(string modelName, string modelColor, int modelYear) {\n\tmodel = modelName;\n\tcolor = modelColor;\n\tyear = modelYear;\n}"
+	},
+
+	"modifier" : {
+		"name" : "A modifier is used to set the access level/visibility for classes, fields, methods and properties",
+		"type" : "text",
+		"tags" : "modifier, public, private, protected, internal",
+		"code" : "public type variableName = value"
+	},
+
+	"interface" : {
+		"name" : "An interface is a completely \"abstract class\" that is used to group related methods with empty bodies",
+		"type" : "text",
+		"tags" : "interface",
+		"code" : "interface Animal {\n\tvoid animalSound(); // interface method (does not have a body)\n\tvoid run(); // interface method (does not have a body)\n}"
+	},
+
+	"enum" : {
+		"name" : "An enum is a special \"class\" that represents a group of constants (unchangeable variables, like final variables)",
+		"type" : "text",
+		"tags" : "enum, enumeration",
+		"code" : "enum Level {\n\tLOW,\n\tMEDIUM,\n\tHIGH\n}"
+	},
+
+	"input" : {
+		"name" : "Use Console.ReadLine() to get user input",
+		"type" : "text",
+		"tags" : "input, system in",
+		"code" : "string userName = Console.ReadLine();"
+	},
+
+	"read_file" : {
+		"name" : "Use the ReadAllText() method from System.IO to read the contents of the file",
+		"type" : "text",
+		"tags" : "file, file read, read",
+		"code" : "File.ReadAllText(\"filename.txt\");  // Read the contents of the file"
+	},
+	
+	"write_file" : {
+		"name" : "Use the WriteAllText() method from System.IO to create a file named \"filename.txt\" and write some content to it",
+		"type" : "text",
+		"tags" : "file, file write, write",
+		"code" : "File.WriteAllText(\"filename.txt\", \"Hello world!\");  // Create a file and write the content of writeText to it"
+	},
+
+	"try_catch" : {
+		"name" : "A try catch block handles exceptions thrown in try block and show the erros in catch block",
+		"type" : "text",
+		"tags" : "try, try catch, error handling",
+		"code" : "try{\n\t// Your code goes here\n} catch(Exception error){\n\t// log errors here\n}"
+	},
+	
+	"try_catch_finally" : {
+		"name" : "The finally statement lets you execute code, after try...catch, regardless of the resul",
+		"type" : "text",
+		"tags" : "try, try catch, try catch finally, error handling",
+		"code" : "try{\n\t// Your code goes here\n} catch(Exception error){\n\t// log errors here\n} finally {\n\tConsole.WriteLine(\"The 'try catch' is finished.\");\n}"
+	}
+}

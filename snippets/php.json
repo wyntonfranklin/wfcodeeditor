@@ -1,38 +1,207 @@
 {
-  "create_function" : {
-    "name" : "Create Function",
-    "type" : "text",
-    "code": "function mailhelper_run_task($message){\n  $task = new TaskResult();\n  $taskToRun = $message->getTask();\n  switch ($taskToRun){\n    case TaskResult::TASK_CALCULATOR:\n      $task->setOutput(\"All good\");\n      mailhelper_calculate($task, $message);\n      break;\n    default:\n      $task->setOutput(\"Cant find this task $taskToRun\");\n\n  }\n  return $task;\n}"
-  },
-  "create_if" : {
-    "name" : "IF Statement",
-    "type" : "text",
-    "tags" : "if, if else",
-    "code": "if (condition) {\n  \n}"
-  },
-  "create_if_else" : {
-    "name" : "IF ELSE Statement",
-    "type" : "text",
-    "code": "if (condition) {\n  \n} else {\n \n}"
-  },
-  "create_switch_statement" : {
-    "name" : "Switch Statement",
-    "type" : "text",
-    "code": "switch (n) {\n  case label1:\n     // code to be executed if n=label1;\n    break;\n  case label2:\n    // code to be executed if n=label2;\n    break;\n  case label3:\n    // code to be executed if n=label3;\n    break;\n  default:\n    // code to be executed if n is different from all labels;\n}"
-  },
-  "while_loop" : {
-    "name" : "While Loop",
-    "type" : "text",
-    "code": "while (condition is true) {\n   // code to be executed;\n}"
-  },
-  "create_for_loop" : {
-    "name" : "For Loop",
-    "type" : "text",
-    "code": "for ($x = 0; $x <= 10; $x++) {\n // do something here \n}"
-  },
-  "db_connection" : {
-    "name" : "MySQL database connection function",
-    "type" : "text",
-    "code": "function get_connection(){\n  $dsn = \"mysql:host=localhost;dbname=you databasename\";\n  $user = \"root\";\n  $passwd = \"\";\n  $conn = new PDO($dsn, $user, $passwd);\n  return $conn;\n}"
-  }
+	"php" : {
+		"name" : "PHP script can be placed anywhere in the document",
+		"type" : "text",
+		"tags" : "php",
+		"code": "<?php\n// PHP code goes here\n?>"
+	},
+	
+	"echo" : {
+		"name" : "A built-in PHP function to output to the web page",
+		"type" : "text",
+		"tags" : "echo, print",
+		"code" : "echo \"Hello world!\""
+	},
+
+	"comment" : {
+		"name" : "A single-line comment",
+		"type" : "text",
+		"tags" : "comment, single-line comment",
+		"code" : "// This is a single-line comment"
+	},
+
+	"multiline_comment" : {
+		"name" : "A multiline comment",
+		"type" : "text",
+		"tags" : "comment, multi-line comment",
+		"code" : "/*\nThis is a multiple-lines comment block\nthat spans over multiple\nlines\n*/"
+	},
+
+	"variable" : {
+		"name" : "A php variable",
+		"type" : "text",
+		"tags" : "variable",
+		"code" : "$variableName = value"
+	},
+
+	"constant" : {
+		"name" : "A php constant definition",
+		"type" : "text",
+		"tags" : "constant, define",
+		"code" : "define(name, value, case-insensitive)"
+	},
+
+	"strlen" : {
+		"name" : "The PHP strlen() function returns the length of a string",
+		"type" : "text",
+		"tags" : "strlen, string length",
+		"code" : "strlen(\"the string\")"
+	},
+	
+	"str_word_count" : {
+		"name" : "The PHP str_word_count() function counts the number of words in a string",
+		"type" : "text",
+		"tags" : "str_word_count, string words, word count",
+		"code" : "str_word_count(\"the string\")"
+	},
+
+	"if" : {
+		"name" : "if statement - Executes some code if a condition is true",
+		"type" : "text",
+		"tags" : "if, conditional",
+		"code" : "if (condition) {\n\t//executed if condition is true;\n}"
+	},
+	
+	"if_else" : {
+		"name" : "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type" : "text",
+		"tags" : "if, if else, conditional",
+		"code" : "if (condition) {\n\t//executed if condition is true;\n} else {\n\t//executed if condition is false;\n}"
+	},
+
+	"switch" : {
+		"name" : "switch statement - Selects one of many blocks of executed",
+		"type" : "text",
+		"tags" : "switch, conditional",
+		"code" : "switch (n) {\n\tcase label1:\n\t\t//executed if n=label1;\n\t\tbreak;\n\tcase label2:\n\t\t//executed if n=label2;\n\t\tbreak;\n\tdefault:\n\t\texecuted if n is different from all labels;\n}"
+	},
+
+	"while" : {
+		"name" : "while loop - Loops through a block of code as long as the specified condition is true",
+		"type" : "text",
+		"tags" : "while, while loop, loop, loops",
+		"code" : "while (condition) {\n\t//code to be executed;\n}"
+	},
+
+	"do_while" : {
+		"name" : "do while loop - Loops through a block of code at least once and will run again as long as the specified condition is true",
+		"type" : "text",
+		"tags" : "do while, do while loop, loop, loops",
+		"code" : "do {\n\t//code to be executed;\n} while (condition)"
+	},
+
+	"for_loop" : {
+		"name" : "for loop - Used when you know in advance how many times the script should run",
+		"type" : "text",
+		"tags" : "for loop, loop, loops",
+		"code" : "for (init counter; test counter; increment counter) {\n\t//executed for each iteration;\n}"
+	},
+
+	"for_each_loop" : {
+		"name" : "foreach loop - Loops through a block of code for each element in an array",
+		"type" : "text",
+		"tags" : "for each, for, loop, loops",
+		"code" : "foreach ($array as $value) {\n\tcode to be executed;\n}"
+	},
+
+	"add" : {
+		"name" : "Sum of $x and $y",
+		"type" : "text",
+		"tags" : "sum, add, addition",
+		"code" : "$result = $x + $y"
+	},
+	"subract" : {
+		"name" : "Differenct of $x and $y",
+		"type" : "text",
+		"tags" : "difference, subtract, subtract",
+		"code" : "$result = $x - $y"
+	},
+	"multiply" : {
+		"name" : "Product of $x and $y",
+		"type" : "text",
+		"tags" : "multiply, product, multiplication",
+		"code" : "$result = $x * $y"
+	},
+	"divide" : {
+		"name" : "Quotient of $x and $y",
+		"type" : "text",
+		"tags" : "quotient, divide, division",
+		"code" : "$result = $x / $y"
+	},
+	"modulus" : {
+		"name" : "Remainder of $x and $y",
+		"type" : "text",
+		"tags" : "modulus, remainer, modulo",
+		"code" : "$result = $x % $y"
+	},
+	"exponent" : {
+		"name" : "Result of raising $x to the $y'th power",
+		"type" : "text",
+		"tags" : "exponentation, exponent",
+		"code" : "$result = $x ** $y"
+	},
+
+	"function" : {
+		"name" : "A function is a block of statements that can be used repeatedly in a program",
+		"type" : "text",
+		"tags" : "function, function definition",
+		"code" : "function functionName() {\n\tcode to be executed;\n}"
+	},
+
+	"function_argument" : {
+		"name" : "A function can use arguments aka inputs to be used in the functions body",
+		"type" : "text",
+		"tags" : "function arguments, function definition with inputs",
+		"code" : "function functionName(argument1, argument2) {\n\tcode to be executed;\n}"
+	},
+
+	"array" : {
+		"name" : "An array stores multiple values in one single variable",
+		"type" : "text",
+		"tags" : "array, list,",
+		"code" : "$arrayName = array(value1, value2, value3);"
+	},
+	
+	"associatice_array" : {
+		"name" : "Associative arrays are arrays that use named keys that you assign to them",
+		"type" : "text",
+		"tags" : "associatice array, associative list, list",
+		"code" : "$arrayName = array(\"valueName1\"=>value1, \"valueName2\"=>value2, \"valueName3\"=>value3);"
+	},
+
+	"two_dimensional_array" : {
+		"name" : "A two-dimensional array is an array of arrays (a three-dimensional array is an array of arrays of arrays)",
+		"type" : "text",
+		"tags" : "two dimensional array, array, list",
+		"code" : "$twoDimensionalArray = array (\n\tarray(),\n\tarray(),\n\tarray()\n);"
+	},
+
+	"class" : {
+		"name" : "A class is a template for objects, and an object is an instance of class",
+		"type" : "text",
+		"tags" : "class, php class",
+		"code" : "class ClassName {\n\tpublic $property1;\n\tpublic $property2;\n\n\tfunction __construct($property1, $property2) {\n\t\t$this->property1 = $property1;\n\t\t$this->property2 = $property2;\n\t}\n}"
+	},
+
+	"constructor" : {
+		"name" : "Class constructor is used to set initial values of properties at the time of object creation",
+		"type" : "text",
+		"tags" : "constructor, __construct, construct",
+		"code" : "function __construct($property1) {\n\t$this->property1 = $property1;\n}"
+	},
+
+	"destructor" : {
+		"name" : "A destructor is called when the object is destructed or the script is stopped or exited",
+		"type" : "text",
+		"tags" : "destructor, __destruct, destruct",
+		"code" : "function __destruct() {\n\techo \"The fruit is {$this->name}.\";\n}"
+	},
+
+	"random_number_function" : {
+		"name" : "The rand() function generates a random number",
+		"type" : "text",
+		"tags" : "rand, rand(), random, random number, random number function",
+		"code" : "$randomNumber = rand();"
+	}
+	
 }

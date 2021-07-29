@@ -1,27 +1,273 @@
 {
-  "basic-function": {
-    "name": "Basic Function",
-    "type": "text",
-    "code": "// change the function name.\nfunction myFunctionName() {\n  // do something here\n}\n"
-  },
-  "basic-function-with-argument": {
-    "name": "Basic Function with Argument",
-    "type": "text",
-    "code": "function myFunctionName(param) {\n  // do something here\n  return param;\n}"
-  },
-  "simple-object": {
-    "name": "Simple Object",
-    "type": "text",
-    "code": "const animal = {type:\"dog\", height:\"20\", color:\"brown\"};"
-  },
-  "switch-statement": {
-    "name": "Switch Statement",
-    "type": "text",
-    "code": "switch(expression) {\n  case x:\n    // code block\n    break;\n  case y:\n    // code block\n    break;\n  default:\n    // code block\n}"
-  },
-  "for-loop": {
-    "name": "Simple Object",
-    "type": "text",
-    "code": "const animal = {type:\"dog\", height:\"20\", color:\"brown\"};"
-  }
+	"console_log": {
+		"name": "A built-in JS function to output to the console",
+		"type": "text",
+		"tags": "console, log, console.log",
+		"code": "console.log(\"Hello world!\");"
+	},
+	"console_table": {
+		"name": "A built-in JS function to output to the console in a tabular format",
+		"type": "text",
+		"tags": "console, log, log table, console.table",
+		"code": "console.table( yourVariableOrObject );"
+	},
+	
+	"comment": {
+		"name": "A single-line comment",
+		"type": "text",
+		"tags": "comment, single-line comment",
+		"code": "// This is a single-line comment"
+	},
+	
+	"multiline_comment": {
+		"name": "A multiline comment",
+		"type": "text",
+		"tags": "comment, multi-line comment",
+		"code": "/*\nThis is a multiple-lines comment block\nthat spans over multiple\nlines\n*/"
+	},
+	
+	"variable_var": {
+		"name": "A variable with var keyword",
+		"type": "text",
+		"tags": "variable, var",
+		"code": "var variableName = value;"
+	},
+	
+	"variable_let": {
+		"name": "Variables defined with let cannot be redeclared and must be declared before use",
+		"type": "text",
+		"tags": "variable, let",
+		"code": "let variableName = value;"
+	},
+	
+	"constant": {
+		"name": "A const variable cannot be reassigned and redeclared",
+		"type": "text",
+		"tags": "constant",
+		"code": "const variableName = value;"
+	},
+	
+	"string_length": {
+		"name": "To find the length of a string, use the built-in length property",
+		"type": "text",
+		"tags": "string length",
+		"code": "text.length;"
+	},
+	
+	"if": {
+		"name": "if statement - Executes some code if a condition is true",
+		"type": "text",
+		"tags": "if, conditional",
+		"code": "if (condition) {\n\t//executed if condition is true;\n}"
+	},
+	
+	"if_else": {
+		"name": "if...else statement - Executes some code if a condition is true and another code if that condition is false",
+		"type": "text",
+		"tags": "if, if else, conditional",
+		"code": "if (condition) {\n\t//executed if condition is true;\n} else {\n\t//executed if condition is false;\n}"
+	},
+	
+	"switch": {
+		"name": "switch statement - Selects one of many blocks of executed",
+		"type": "text",
+		"tags": "switch, conditional",
+		"code": "switch (n) {\n\tcase label1:\n\t\t//executed if n=label1;\n\t\tbreak;\n\tcase label2:\n\t\t//executed if n=label2;\n\t\tbreak;\n\tdefault:\n\t\texecuted if n is different from all labels;\n}"
+	},
+	
+	"while": {
+		"name": "while loop - Loops through a block of code as long as the specified condition is true",
+		"type": "text",
+		"tags": "while, while loop, loop, loops",
+		"code": "while (condition) {\n\t//code to be executed;\n}"
+	},
+	
+	"do_while": {
+		"name": "do while loop - Loops through a block of code at least once and will run again as long as the specified condition is true",
+		"type": "text",
+		"tags": "do while, do while loop, loop, loops",
+		"code": "do {\n\t//code to be executed;\n} while (condition)"
+	},
+	
+	"for_loop": {
+		"name": "for loop - Used when you know in advance how many times the script should run",
+		"type": "text",
+		"tags": "for loop, loop, loops",
+		"code": "for (init counter; test counter; increment counter) {\n\t//executed for each iteration;\n}"
+	},
+	
+	"array_for_each": {
+		"name": "The forEach() method calls a function (a callback function) once for each array element",
+		"type": "text",
+		"tags": "for each, for, loop, loops",
+		"code": "list.forEach((value, index, array)=>{\n\tcode to be executed;\n})"
+	},
+	
+	"add": {
+		"name": "Sum of x and y",
+		"type": "text",
+		"tags": "sum, add, addition",
+		"code": "var result = x + y"
+	},
+	
+	"subract": {
+		"name": "Differenct of x and y",
+		"type": "text",
+		"tags": "difference, subtract, subtract",
+		"code": "var result = x - y"
+	},
+	
+	"multiply": {
+		"name": "Product of x and y",
+		"type": "text",
+		"tags": "multiply, product, multiplication",
+		"code": "var result = x * y"
+	},
+	
+	"divide": {
+		"name": "Quotient of x and y",
+		"type": "text",
+		"tags": "quotient, divide, division",
+		"code": "var result = x / y"
+	},
+	
+	"modulus": {
+		"name": "Remainder of x and y",
+		"type": "text",
+		"tags": "modulus, remainer, modulo",
+		"code": "var result = x % y"
+	},
+	
+	"exponent": {
+		"name": "Result of raising x to the y'th power",
+		"type": "text",
+		"tags": "exponentation, exponent",
+		"code": "var result = x ** y"
+	},
+
+	"increment": {
+		"name": "Incrementing a number x by 1",
+		"type": "text",
+		"tags": "increment",
+		"code": "x++;"
+	},
+	
+	"decrement": {
+		"name": "Decrementing a number x by 1",
+		"type": "text",
+		"tags": "decrement",
+		"code": "x--;"
+	},
+
+	"increment_number": {
+		"name": "Incrementing a number x by a specific number",
+		"type": "text",
+		"tags": "increment by number, increment",
+		"code": "x += number;"
+	},
+	
+	"decrement_number": {
+		"name": "Decrementing a number x by a specific number",
+		"type": "text",
+		"tags": "decrement by number, decrement",
+		"code": "x -= number;"
+	},
+	
+	"function": {
+		"name": "A function is a block of statements that can be used repeatedly in a program",
+		"type": "text",
+		"tags": "function, function definition",
+		"code": "function functionName() {\n\tcode to be executed;\n}"
+	},
+	
+	"async_function": {
+		"name": "An async function is a block of statements that can run blocking code",
+		"type": "text",
+		"tags": "async function, async function definition",
+		"code": "async function functionName() {\n\tawait anotherAsyncFunction();\n}"
+	},
+	
+	"arrow_function": {
+		"name": "An arrow function has no binding of 'this'",
+		"type": "text",
+		"tags": "function, function definition",
+		"code": "var functionName = () => {\n\tcode to be executed;\n}"
+	},
+	
+	"async_arrow_function": {
+		"name": "An async arrow function with blocking code",
+		"type": "text",
+		"tags": "function, function definition",
+		"code": "var functionName = async () => {\n\tawait anotherAsyncFunction();\n}"
+	},
+	
+	"function_argument": {
+		"name": "A function can use arguments aka inputs to be used in the functions body",
+		"type": "text",
+		"tags": "function arguments, function definition with inputs",
+		"code": "function functionName(argument1, argument2) {\n\tcode to be executed;\n}"
+	},
+	
+	"arrow_function_argument": {
+		"name": "An arrow function can use arguments aka inputs to be used in the functions body",
+		"type": "text",
+		"tags": "function arguments, function definition with inputs",
+		"code": "var functionName = (argument1, argument2) => {\n\tcode to be executed;\n}"
+	},
+
+	"promise" : {
+		"name" : "A JavaScript Promise object contains both the producing code and calls to the consuming code",
+		"type" : "text",
+		"tags" : "promise, asynchronous",
+		"code" : "let myPromise = new Promise(function(myResolve, myReject) {\n\t// \"Producing Code\" (May take some time)\n\n\tmyResolve(); // when successful\n\tmyReject(); // when error\n});"
+	},
+	
+	"array": {
+		"name": "An array stores multiple values in one single variable",
+		"type": "text",
+		"tags": "array, list,",
+		"code": "var arrayName = [value1, value2, value3];"
+	},
+	
+	"object": {
+		"name": "Container for data to hold key value pairs",
+		"type": "text",
+		"tags": "object, object literal, key value",
+		"code": "var objectName = {\n\tkeyName1: value1,\n\tkeyName2: value2,\n\tkeyName3: value3\n};"
+	},
+	
+	"two_dimensional_array": {
+		"name": "A two-dimensional array is an array of arrays (a three-dimensional array is an array of arrays of arrays)",
+		"type": "text",
+		"tags": "two dimensional array, array, list",
+		"code": "var twoDimensionalArray = [\n\t[],\n\t[],\n\t[]\n];"
+	},
+	
+	"class": {
+		"name": "A class is a template for objects, and an object is an instance of class",
+		"type": "text",
+		"tags": "class, php class",
+		"code": "class ClassName {\n\tconstructor(property1, property2) {\n\t\tthis.property1 = property1;\n\t\tthis.property2 = property2;\n\t}\n}"
+	},
+	
+	"constructor": {
+		"name": "Class constructor is used to set initial values of properties at the time of object creation",
+		"type": "text",
+		"tags": "constructor",
+		"code": "constructor(property1) {\n\tthis.property1 = property1;\n}"
+	},
+
+	"try_catch" : {
+		"name" : "A try catch block handles exceptions thrown in try block and show the erros in catch block",
+		"type" : "text",
+		"tags" : "try, try catch, error handling",
+		"code" : "try{\n\t// Your code goes here\n} catch(error){\n\t// log errors here\n}"
+	},
+	
+	"random_number_function": {
+		"name": "The Math.random() function generates a random number between 0 and 1",
+		"type": "text",
+		"tags": "random, random(), random number, random number function",
+		"code": "var randomNumber = Math.random();"
+	}
 }
