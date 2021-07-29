@@ -129,7 +129,7 @@ editor.on("focus", e => {
       ipcRenderer.invoke('show-confirm-dialog',{
         title: "This file has been edited" + currentFile ,
         buttons: ["Reload","Overwrite","Close"],
-        message: "Reload the file from the source" + currentFile,
+        message: "Reload the file from the source: " + currentFile,
       }).then((result) =>{
         if(result.response ==0){
           onFileClickEvent(null, currentFile, true);
@@ -577,15 +577,22 @@ function appOpenCode(event, file, ext, fromSource){
   }
   addOpenFile(file);
   currentEditorFile = file;
-  let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+  let fo = helper.getObjectAndIdFromArrayByKey(openFiles,'name', file);
+  let fileObject = fo.file;
   hideAllViews(codeView);
-  if(fileObject && !fromSource){
-    if(fileObject.session){
-      editor.setSession(fileObject.session);
-      //editor.session.setValue(fileObject.content);
+  if(fileObject){
+    if(fromSource){
+      const buffer = fs.readFileSync(file);
+      editor.session.setValue(buffer.toString());
+      fo.file.content = buffer.toString();
+      fo.file.ocontent = buffer.toString();
+      openFiles[fo.position] = fo.file;
     }else{
-      //var ses = new EditSession(fileObject.content);
-      editor.setSession(ace.createEditSession(fileObject.content));
+      if(fileObject.session){
+        editor.setSession(fileObject.session);
+      }else{
+        editor.setSession(ace.createEditSession(fileObject.content));
+      }
     }
   }else{
     try{
