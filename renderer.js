@@ -107,6 +107,7 @@ editor.on("input", e => {
      // fileObject.file.changed = true;
       fileObject.file.content = editor.getValue();
       fileObject.file.session = editor.getSession();
+      fileObject.file.lastmod = Date.now();
       openFiles[fileObject.position] = fileObject.file;
     }
     refreshViewWhileEditing();
@@ -497,7 +498,7 @@ function addOpenFile(file, type){
     if(type!== undefined && type === 'image'){
       openFiles.push({
         name: file,
-        lastmod: statsObj.mtime,
+        lastmod: Date.parse(statsObj.mtime),
         changed: false,
         content: "",
         ocontent : "",
@@ -507,7 +508,7 @@ function addOpenFile(file, type){
       const buffer = fs.readFileSync(file);
       openFiles.push({
         name: file,
-        lastmod: statsObj.mtime,
+        lastmod: Date.parse(statsObj.mtime),
         changed: false,
         content: buffer.toString(),
         ocontent : buffer.toString(),
@@ -2220,7 +2221,8 @@ function checkIfCurrentFileIsEdited(){
 function isFileEdited(file){
   const buffer = fs.readFileSync(file);
   let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
-  if(fileObject.content !== buffer.toString()){
+  var stats = fs.statSync(file);
+  if(fileObject.content !== buffer.toString() && fileObject.lastmod < Date.parse(stats.mtime)){
       return true;
   }
   return false;
