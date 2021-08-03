@@ -144,7 +144,7 @@ function createWindow () {
 
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, snippetsWindow, settingsWindow) )
   Menu.setApplicationMenu(mainMenu)

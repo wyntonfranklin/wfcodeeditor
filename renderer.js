@@ -71,6 +71,7 @@ let codeView = document.getElementById('code-view');
 let imageView = document.getElementById('image-view');
 let imageViewer = document.getElementById('image-viewer');
 let fileTabs = document.getElementById("file-tabs");
+let rightPanel = document.getElementById('code-input');
 
 let modalTitle = document.getElementById('dialog-title');
 let modalDescription = document.getElementById('modal-description');
@@ -108,6 +109,8 @@ editor.on("input", e => {
       fileObject.file.content = editor.getValue();
       fileObject.file.session = editor.getSession();
       fileObject.file.lastmod = Date.now();
+      fileObject.file.cursor = editor.getSelection().getCursor();
+      console.log(editor.getSelection().getCursor());
       openFiles[fileObject.position] = fileObject.file;
     }
     refreshViewWhileEditing();
@@ -141,6 +144,12 @@ editor.on("focus", e => {
         }
         fileChangeDialogOpen  = false;
       });
+    }else{
+      // update file cursor position
+      if(fileObject){
+        fileObject.file.cursor = editor.getSelection().getCursor();
+        openFiles[fileObject.position] = fileObject.file;
+      }
     }
   }
 });
@@ -394,6 +403,14 @@ codeView.addEventListener('contextmenu', e=>{
 codeView.addEventListener('click', e=>{
   if(currentFile !== currentEditorFile){
     onFileClickEvent(null, currentEditorFile);
+  }else{
+    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    if(fileObject){
+      fileObject.file.cursor = editor.getSelection().getCursor();
+      //fileObject.file.scroll =  rightPanel.scrollTop;
+    //  console.log(rightPanel.scrollTop);
+      openFiles[fileObject.position] = fileObject.file;
+    }
   }
 });
 
@@ -594,6 +611,14 @@ function appOpenCode(event, file, ext, fromSource){
       }else{
         editor.setSession(ace.createEditSession(fileObject.content));
       }
+    }
+    if(fileObject.cursor){
+      console.log(fileObject.cursor);
+      var sel = editor.getSelection();
+      sel.moveCursorToPosition(fileObject.cursor);
+    }
+    if(fileObject.scroll){
+      codeView.scrollTop = fileObject.scroll;
     }
   }else{
     try{
@@ -878,7 +903,6 @@ function renameAFile(el, filename){
   }
 }
 
-
 function saveCurrentFile(){
   if(currentFile && helper.getFileType(currentFile) === "code"){
     let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
@@ -886,6 +910,7 @@ function saveCurrentFile(){
     var sel = editor.getSelection();
     let cpostion = sel.getCursor();
     fileObject.file.ocontent = code;
+    fileObject.file.cursor = cpostion;
     openFiles[fileObject.position] = fileObject.file;
     saveAFile(currentFile, code);
     sel.moveCursorToPosition(cpostion);
