@@ -20,6 +20,7 @@ const snippetManager = require('./snippetsManager');
 const projectsManager = require('./projectsManager');
 const settingsManager = require('./settingsManager');
 const notificationsManager = require('./notificationsManager');
+const fileObjMg = require('./fileObjectManager');
 let interact = require('interactjs')
 let ncp = require("copy-paste");
 const open = require('open');
@@ -110,7 +111,7 @@ editor.on("input", e => {
       fileObject.file.session = editor.getSession();
       fileObject.file.lastmod = Date.now();
       fileObject.file.cursor = editor.getSelection().getCursor();
-      console.log(editor.getSelection().getCursor());
+      fileObject.file.scroll = editor.session.getScrollTop();
       openFiles[fileObject.position] = fileObject.file;
     }
     refreshViewWhileEditing();
@@ -122,6 +123,8 @@ editor.on("input", e => {
   }
 
 });
+
+
 
 editor.on("focus", e => {
 
@@ -148,6 +151,7 @@ editor.on("focus", e => {
       // update file cursor position
       if(fileObject){
         fileObject.file.cursor = editor.getSelection().getCursor();
+        fileObject.file.scroll = editor.session.getScrollTop();
         openFiles[fileObject.position] = fileObject.file;
       }
     }
@@ -392,6 +396,7 @@ document.getElementById("tutorial-view-back").addEventListener('click', e=>{
   return false;
 });
 
+
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-context-menu','code',
       {
@@ -407,8 +412,7 @@ codeView.addEventListener('click', e=>{
     let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
     if(fileObject){
       fileObject.file.cursor = editor.getSelection().getCursor();
-      //fileObject.file.scroll =  rightPanel.scrollTop;
-    //  console.log(rightPanel.scrollTop);
+      fileObject.file.scroll = editor.session.getScrollTop();
       openFiles[fileObject.position] = fileObject.file;
     }
   }
@@ -511,9 +515,9 @@ function runAFile(){
 function addOpenFile(file, type){
   let statsObj = fs.statSync(file);
 
-  if(!helper.exitsInObjectArray(openFiles, "name", file)) {
+  if(!fileObjMg.fileExists(file)) {
     if(type!== undefined && type === 'image'){
-      openFiles.push({
+      fileObjMg.addFile({
         name: file,
         lastmod: Date.parse(statsObj.mtime),
         changed: false,
@@ -523,7 +527,7 @@ function addOpenFile(file, type){
     }else{
       // only store non image contents
       const buffer = fs.readFileSync(file);
-      openFiles.push({
+      fileObjMg.addFile({
         name: file,
         lastmod: Date.parse(statsObj.mtime),
         changed: false,
@@ -535,7 +539,8 @@ function addOpenFile(file, type){
 }
 
 function removeOpenFile(file){
-  helper.removeFromObjectArray(openFiles, "name", file);
+  //helper.removeFromObjectArray(openFiles, "name", file);
+  fileObjMg.removeFiles(file);
 }
 
 function onDirectoryClickEvent(e, file){
@@ -595,7 +600,8 @@ function appOpenCode(event, file, ext, fromSource){
   }
   addOpenFile(file);
   currentEditorFile = file;
-  let fo = helper.getObjectAndIdFromArrayByKey(openFiles,'name', file);
+  //let fo = helper.getObjectAndIdFromArrayByKey(openFiles,'name', file);
+  let fo = fileObjMg.getFile(file);
   let fileObject = fo.file;
   hideAllViews(codeView);
   if(fileObject){
@@ -604,7 +610,8 @@ function appOpenCode(event, file, ext, fromSource){
       editor.session.setValue(buffer.toString());
       fo.file.content = buffer.toString();
       fo.file.ocontent = buffer.toString();
-      openFiles[fo.position] = fo.file;
+      //openFiles[fo.position] = fo.file;
+      fileObjMg.updateFiles(fo.file, fo.position);
     }else{
       if(fileObject.session){
         editor.setSession(fileObject.session);
@@ -618,7 +625,7 @@ function appOpenCode(event, file, ext, fromSource){
       sel.moveCursorToPosition(fileObject.cursor);
     }
     if(fileObject.scroll){
-      codeView.scrollTop = fileObject.scroll;
+      editor.session.setScrollTop(fileObject.scroll);
     }
   }else{
     try{
@@ -630,6 +637,9 @@ function appOpenCode(event, file, ext, fromSource){
   }
   editor.focus();
   assignAceMode(editor, ext);
+  editor.getSession().on("changeScrollTop", e=> {
+    console.log("scroll changed"); // update file object here
+  });
 }
 
 function appOpenImage(event, file, ext){
@@ -723,7 +733,8 @@ function onSaveButtonPressed(e){
 function saveFileAsAction(filename){
   let file = selectedFileElement.getAttribute('data-path');
   let newFile = path.join(getCurrentDirectory(), filename);
-  let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  //let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  let fileObject = fileObjMg.getFile(file).file;
   let ext = path.extname(file).replace(/\./g,' ').trim();
   if(extensions.hasOwnProperty(ext)){
       let fileAction = extensions[ext].type;
@@ -883,14 +894,16 @@ function renameAFile(el, filename){
   let fileType = el.getAttribute("data-type");
   let dir = path.dirname(file);
   let fileOpen = false;
-  let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,"name", file);
+  //let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,"name", file);
+  let fileObject = fileObjMg.getFile(file);
   let newFile = path.join(dir, filename);
   try{
     fs.renameSync(file, newFile);
     if(fileObject){
       let updateFileObject = fileObject.file;
       updateFileObject.name = newFile;
-      openFiles[fileObject.position] = updateFileObject;
+     // openFiles[fileObject.position] = updateFileObject;
+      fileObjMg.updateFiles(updateFileObject, fileObject.position);
     }
     if(currentFile == selectedFileElement.getAttribute('data-path')){
       currentFile = newFile;
@@ -905,13 +918,15 @@ function renameAFile(el, filename){
 
 function saveCurrentFile(){
   if(currentFile && helper.getFileType(currentFile) === "code"){
-    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+   // let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    let fileObject = fileObjMg.getFile(currentFile);
     var code = editor.getValue();
     var sel = editor.getSelection();
     let cpostion = sel.getCursor();
     fileObject.file.ocontent = code;
     fileObject.file.cursor = cpostion;
-    openFiles[fileObject.position] = fileObject.file;
+    //openFiles[fileObject.position] = fileObject.file;
+    fileObjMg.updateFiles(fileObject.file,fileObject.position);
     saveAFile(currentFile, code);
     sel.moveCursorToPosition(cpostion);
     setSaveButtonAsInActive();
@@ -1434,7 +1449,7 @@ function refreshView(){
 function switchPositionOfFilesObjects(file1, file2){
   let file1Position =null;
   let file2Position = null;
-  for(let i=0; i<= openFiles.length-1; i++){
+  for(let i=0; i<= fileObjMg.getFiles().length-1; i++){
       if(openFiles[i].name == file1){
         file1Position = i;
       }
@@ -1452,11 +1467,11 @@ function switchPositionOfFilesObjects(file1, file2){
 
 function createTabs(){
   let html = '';
-  if(openFiles.length <= 0){
+  if(fileObjMg.getFiles().length <= 0){
     clearProject();
   }
-  for(let i=0; i<= openFiles.length-1; i++){
-    var fileObject = openFiles[i];
+  for(let i=0; i<= fileObjMg.getFiles().length-1; i++){
+    var fileObject = fileObjMg.getFiles()[i];
     let file = fileObject.name;
     if(file)
     {
