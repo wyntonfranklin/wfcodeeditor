@@ -6,7 +6,7 @@ module.exports =  {
     removeFiles : function(file){
         for( var i = 0; i < openFiles.length; i++){
 
-            if ( openFiles[i][key] === file) {
+            if ( openFiles[i]["name"] === file) {
                 openFiles.splice(i, 1);
             }
 
@@ -45,8 +45,21 @@ module.exports =  {
     updateFiles: function(update, position){
         openFiles[position] = update;
     },
+    updateThisFile: function(file){
+        this.updateFiles(file, file.position)
+    },
     clearFiles : function(){
         openFiles = [];
+    },
+    getLastFile: function(){
+       return this.getFiles()[this.getFiles().length - 1];
+    },
+    hasLastFile: function(){
+        if(this.getFiles()[this.getFiles().length - 1] !== undefined){
+            return true;
+        }
+        return false;
     }
+
 
 }

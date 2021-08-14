@@ -51,6 +51,7 @@ let currentTutorialAction = "tutorials";
 let TABS_DRAGGING = false;
 let currentSideViewFile = null;
 let fileChangeDialogOpen = false;
+let currentFileScrollPosition = null;
 
 let currentFile = null;
 let currentDirectory = null;
@@ -102,7 +103,8 @@ editor.setOptions({
 });
 editor.on("input", e => {
 
-  let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+  //let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+  let fileObject = fileObjMg.getFile(currentFile);
   // file has been edited
   if(!editor.session.getUndoManager().isClean()){
     if(fileObject){
@@ -112,7 +114,8 @@ editor.on("input", e => {
       fileObject.file.lastmod = Date.now();
       fileObject.file.cursor = editor.getSelection().getCursor();
       fileObject.file.scroll = editor.session.getScrollTop();
-      openFiles[fileObject.position] = fileObject.file;
+      //openFiles[fileObject.position] = fileObject.file;
+      fileObjMg.updateFiles(fileObject.position, fileObject.file);
     }
     refreshViewWhileEditing();
   }else{
@@ -129,7 +132,8 @@ editor.on("input", e => {
 editor.on("focus", e => {
 
   if(!fileChangeDialogOpen){
-    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    //let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    let fileObject = fileObjMg.getFile(currentFile);
     // file has been edited outside
     if(isFileEdited(currentFile)){
       fileChangeDialogOpen = true;
@@ -152,7 +156,8 @@ editor.on("focus", e => {
       if(fileObject){
         fileObject.file.cursor = editor.getSelection().getCursor();
         fileObject.file.scroll = editor.session.getScrollTop();
-        openFiles[fileObject.position] = fileObject.file;
+        //openFiles[fileObject.position] = fileObject.file;
+        fileObjMg.updateFiles(fileObject.file,fileObject.position);
       }
     }
   }
@@ -245,7 +250,8 @@ document.getElementById("showtaskbyfile").addEventListener('change', function() 
 
 document.getElementById("action-go-to-website").addEventListener('click', e=>{
   if(currentFile){
-    let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
+    //let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', currentFile);
+    let fileObject = fileObjMg.getFile(currentFile).file;
     const re = /\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/;
     var matches = fileObject.content.match(re);
     if(matches.length > 0){
@@ -409,11 +415,13 @@ codeView.addEventListener('click', e=>{
   if(currentFile !== currentEditorFile){
     onFileClickEvent(null, currentEditorFile);
   }else{
-    let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    //let fileObject = helper.getObjectAndIdFromArrayByKey(openFiles,'name', currentFile);
+    let fileObject = fileObjMg.getFile(currentFile);
     if(fileObject){
       fileObject.file.cursor = editor.getSelection().getCursor();
       fileObject.file.scroll = editor.session.getScrollTop();
-      openFiles[fileObject.position] = fileObject.file;
+      //openFiles[fileObject.position] = fileObject.file;
+      fileObjMg.updateFiles(fileObject.file, fileObject.position);
     }
   }
 });
@@ -556,6 +564,22 @@ function onDirectoryClickEvent(e, file){
 }
 
 
+function updateCurrentFile(file, type){
+  if(type !== undefined && type == 'code'){
+    if(currentFile !== null){
+      var currentFileObject = fileObjMg.getFile(currentFile);
+      if(currentFileObject){
+        currentFileObject.file.scroll = currentFileScrollPosition;
+        fileObjMg.updateThisFile(currentFileObject.file);
+      }
+    }
+    currentFile = file;
+  }else{
+    currentFile = file;
+  }
+}
+
+
 // When a file is clicked you can call this function
 
 function onFileClickEvent(e, file, fromSource){
@@ -565,7 +589,6 @@ function onFileClickEvent(e, file, fromSource){
     let ext = path.extname(file).replace(/\./g,' ').trim();
     let fileAction = null;
     let fileActions = extensions;
-    currentFile = file;
     updatePageTitle(file);
     currentDirectory = null;
     if(extensions.hasOwnProperty(ext)){
@@ -595,6 +618,7 @@ function onFileClickEvent(e, file, fromSource){
 // all good
 
 function appOpenCode(event, file, ext, fromSource){
+  updateCurrentFile(file,'code');
   if(event){
     helper.addElementClass(event.target, "active");
   }
@@ -638,11 +662,13 @@ function appOpenCode(event, file, ext, fromSource){
   editor.focus();
   assignAceMode(editor, ext);
   editor.getSession().on("changeScrollTop", e=> {
-    console.log("scroll changed"); // update file object here
+    currentFileScrollPosition = editor.session.getScrollTop();
+    console.log("scroll changed", currentFileScrollPosition); // update file object here
   });
 }
 
 function appOpenImage(event, file, ext){
+  updateCurrentFile(file);
   addOpenFile(file, "image");
   currentImageFile = file;
   hideAllViews(imageView);
@@ -1506,8 +1532,8 @@ function setTabEvents(){
     el.addEventListener('click', e=>{
       let file = el.getAttribute('data-file');
       closeATab(file, ()=>{
-        if(openFiles[openFiles.length-1] !== undefined){
-          onFileClickEvent(null, openFiles[openFiles.length-1].name);
+        if(fileObjMg.hasLastFile()){
+          onFileClickEvent(null, fileObjMg.getLastFile().name);
         }else{
           clearProject();
         }
@@ -1675,8 +1701,8 @@ function openNewProject(){
 
 function readNonProjectFiles(){
   let html = "";
-  for(let i=0; i<= openFiles.length-1; i++){
-    var fileObject = openFiles[i];
+  for(let i=0; i<= fileObjMg.getFiles().length-1; i++){
+    var fileObject = fileObjMg.getFiles()[i];
     let file = fileObject.name;
     if(file)
     {
@@ -1715,7 +1741,7 @@ let readFiles = (projectDir) => {
       document.getElementById("directory").innerHTML = directContent;
       setListeners();
     });
-  }else if(openFiles.length > 0){
+  }else if(fileObjMg.getFiles().length > 0){
       // show open files
     readNonProjectFiles();
   }else {
@@ -2260,7 +2286,8 @@ function checkIfCurrentFileIsEdited(){
 
 function isFileEdited(file){
   const buffer = fs.readFileSync(file);
-  let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  //let fileObject = helper.getObjectFromArrayByKey(openFiles,"name", file);
+  let fileObject = fileObjMg.getFile(file).file;
   var stats = fs.statSync(file);
   if(fileObject.content !== buffer.toString() && fileObject.lastmod < Date.parse(stats.mtime)){
       return true;
@@ -2317,9 +2344,10 @@ function deletedSelectItem(action){
 }
 
 function onFileRemovedCallback(file){
-  helper.removeFromObjectArray(openFiles, "name", file);
-  if(openFiles.length > 0){
-    onFileClickEvent(null, openFiles[openFiles.length-1].name);
+  //helper.removeFromObjectArray(openFiles, "name", file);
+  fileObjMg.removeFiles(file);
+  if(fileObjMg.getFiles().length > 0){
+    onFileClickEvent(null, fileObjMg.getFiles()[fileObjMg.getFiles().length-1].name);
   }
   refreshView();
 }
@@ -2412,8 +2440,8 @@ function getFileStats(file){
 function closeSelectedTab(){
   let tabFile = selectedTab.getAttribute('data-file');
   helper.removeFromObjectArray(openFiles,"name",tabFile);
-  if(openFiles[openFiles.length-1] !== undefined){
-    onFileClickEvent(null, openFiles[openFiles.length-1].name);
+  if(fileObjMg.getFiles()[fileObjMg.getFiles().length-1] !== undefined){
+    onFileClickEvent(null, fileObjMg.getFiles()[fileObjMg.getFiles().length-1].name);
   }else{
     clearProject();
   }
@@ -2422,9 +2450,9 @@ function closeSelectedTab(){
 
 
 function closeAllTabs(callback){
-  let size = openFiles.length;
+  let size = fileObjMg.getFiles().length;
   if(size > 0){
-    let fileObject = openFiles[size-1];
+    let fileObject = fileObjMg.getFiles()[size-1];
     closeATab(fileObject.name, ()=>{
       createTabs();
       closeAllTabs(callback);
@@ -2440,9 +2468,9 @@ function closeAllTabs(callback){
 }
 
 function closeAllOtherTabs(currentSize){
-  let size = currentSize === undefined ? openFiles.length : currentSize;
+  let size = currentSize === undefined ? fileObjMg.getFiles().length : currentSize;
   if(size > 0){
-    let fileObject = openFiles[size-1];
+    let fileObject = fileObjMg.getFiles()[size-1];
     if(fileObject.name !== selectedTab.getAttribute("data-file")){
       closeATab(fileObject.name, ()=>{
         createTabs();
@@ -2453,7 +2481,7 @@ function closeAllOtherTabs(currentSize){
       closeAllOtherTabs(size);
     }
   }else{
-    let fileObject = openFiles[0];
+    let fileObject = fileObjMg.getFiles()[0];
     onFileClickEvent(null, fileObject.name);
     createTabs();
     //clearProject();
@@ -2462,7 +2490,8 @@ function closeAllOtherTabs(currentSize){
 
 
 function closeATab(file, callback){
-  let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+  //let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+  let fileObject = fileObjMg.getFile(file).file;
   if(fileObject){
     if((fileObject.content !== fileObject.ocontent)){
       let filename = path.basename(file);
@@ -2488,7 +2517,8 @@ function closeATab(file, callback){
 }
 
 function removeATab(fileObject){
-  helper.removeFromObjectArray(openFiles,"name",fileObject.name);
+  //helper.removeFromObjectArray(openFiles,"name",fileObject.name);
+  fileObjMg.removeFiles(fileObject.name);
   refreshView();
 }
 
@@ -2534,7 +2564,8 @@ function readFilesFromDir(dir, callback) {
         }
       }else{
         let ext = path.extname(file).replace(/\./g,' ').trim();
-        let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+        //let fileObject = helper.getObjectFromArrayByKey(openFiles,'name', file);
+        let fileObject = fileObjMg.getFile(file) ? fileObjMg.getFile(file).file :  null;
         if(currentFile === file){
           if(fileObject != null && (fileObject.content !== fileObject.ocontent) ){
             fileListing += createDirectoryLink("file", file,"active save");
