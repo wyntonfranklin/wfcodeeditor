@@ -1476,17 +1476,17 @@ function switchPositionOfFilesObjects(file1, file2){
   let file1Position =null;
   let file2Position = null;
   for(let i=0; i<= fileObjMg.getFiles().length-1; i++){
-      if(openFiles[i].name == file1){
+      if(fileObjMg.getFiles()[i].name == file1){
         file1Position = i;
       }
-      if(openFiles[i].name == file2){
+      if(fileObjMg.getFiles()[i].name == file2){
         file2Position = i;
       }
   }
   if(file1Position !== null && file2Position !== null){
-    var temp = openFiles[file2Position];
-    openFiles[file2Position] = openFiles[file1Position];
-    openFiles[file1Position] = temp;
+    var temp = fileObjMg.getFiles()[file2Position];
+    fileObjMg.getFiles()[file2Position] = fileObjMg.getFiles()[file1Position];
+    fileObjMg.getFiles()[file1Position] = temp;
   }
 
 }
