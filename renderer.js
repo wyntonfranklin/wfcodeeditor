@@ -1893,6 +1893,7 @@ function setStyling(){
   const bkLight = '#ffffff';
   const bkDark = '#3b3b3b';
   document.getElementById("code-input").style.fontSize = settingsManager.get('fontsize', 15) + 'px';
+  document.getElementById('code-preview').style.fontSize = settingsManager.get('fontsize', 15) + 'px';
   let theme = settingsManager.get('theme','light');
   var sheetToBeRemoved = document.getElementById('code-view-styling');
   let myTheme = document.getElementById('app-theme');
