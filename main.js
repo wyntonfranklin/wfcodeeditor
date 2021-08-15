@@ -49,6 +49,13 @@ ipcMain.handle('show-context-menu', (event, menu, options) => {
   }else if(menu == 'cmd'){
     cmdContextMenu.popup();
   }
+});
+
+ipcMain.on('ondragstart', (event, filePath) => {
+  event.sender.startDrag({
+    file: filePath,
+    icon: './icons/ic_action_file.png'
+  })
 })
 
 
@@ -144,7 +151,7 @@ function createWindow () {
 
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, snippetsWindow, settingsWindow) )
   Menu.setApplicationMenu(mainMenu)
@@ -174,6 +181,8 @@ function createWindow () {
        return filename[0];
     }
   });
+
+
 
   tabsContextMenu = Menu.buildFromTemplate(require('./tabsMenus').createMenu(mainWindow));
   tasksContextMenu = Menu.buildFromTemplate(require('./tasksMenu').createMenu(mainWindow));

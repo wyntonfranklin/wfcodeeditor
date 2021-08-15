@@ -1449,7 +1449,7 @@ let createDirectoryLink = (type, file, styleclass) => {
   let fname = path.basename(file);
   let fileIcon = getIcon(file);
   let  tempFolder = ` <li class="directory-parent"><a title="${fname}" data-type="dir" data-path="${file}" class="file-link ${styleclass}"><img src="./icons/ic_folder.png"> ${fname}</a></li>`;
-  let  tempFile = ` <li class="directory-parent"><a title="${fname}" data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="${fileIcon}"> ${fname}</a></li>`;
+  let  tempFile = ` <li class="directory-parent"><a draggable="true" title="${fname}" data-type="file" data-path="${file}" class="file-link ${styleclass}"><img src="${fileIcon}"> ${fname}</a></li>`;
   if(type === 'dir'){
     return tempFolder;
   }
@@ -1644,6 +1644,14 @@ let setListeners = () => {
       helper.addElementClass(event.target, "active");
     });
 
+    // on drag start
+    el.ondragstart = (event) => {
+      event.preventDefault();
+      let file = event.target.getAttribute("data-path");
+      //window.electron.startDrag(file);
+      ipcRenderer.send('ondragstart',file);
+    }
+
 
   });
 }
@@ -1807,11 +1815,12 @@ function clearProject(){
   editor.session.setValue("");
   imageViewer.src = "";
   updatePageTitle("");
-  openFiles = [];
+  fileObjMg.clearFiles();
   currentFile = null;
   selectedFileElement = null;
   clearTasksView();
   codeView.style.display = "none";
+  openDir = [];
 
 }
 
@@ -1825,7 +1834,8 @@ function closeProject(){
     updatePageTitle("");
     setCurrentProjectName("");
     sideBarManager.closeSideBars();
-    openFiles = [];
+    fileObjMg.clearFiles();
+    openDir = [];
     settings.delete("currentproject");
     hideAllViews();
     refreshView();
