@@ -6,7 +6,6 @@ const snippetsManager = require('./snippets');
 let currentSnippetType = null;
 
 
-
 document.getElementById("search-snippets").addEventListener('click', e => {
   let query = document.getElementById('search-query').value;
   if(query){
@@ -43,7 +42,7 @@ function displaySnippets(snippets, type){
   }
 
   snippetListing.innerHTML = htmlView;
-
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   const divs = document.querySelectorAll('.snippet-item');
   divs.forEach( el => {
     el.addEventListener('click', e=>{

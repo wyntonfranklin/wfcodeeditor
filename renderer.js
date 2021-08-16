@@ -90,6 +90,27 @@ var openDir = [];
 let copyPathHolder =  null;
 
 
+/** Possible file transfer start but doesnt seem to be working to double check this
+document.addEventListener('drop', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  console.log(event.dataTransfer.items);
+  for (const f of event.dataTransfer.files) {
+    // Using the path attribute to get absolute file path
+    console.log('File Path of dragged files: ', f.path)
+  }
+});
+
+document.addEventListener('dragenter', (event) => {
+  console.log('File is in the Drop Space');
+  console.log(event.dataTransfer.items);
+});
+
+ **/
+
+
+
 
 /** Set up the Editor **/
 
