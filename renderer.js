@@ -1841,7 +1841,7 @@ function clearProject(){
   selectedFileElement = null;
   clearTasksView();
   codeView.style.display = "none";
-  openDir = [];
+  //openDir = [];
 
 }
 
