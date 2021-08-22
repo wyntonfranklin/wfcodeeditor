@@ -33,6 +33,7 @@
     "highlight.js": "^11.1.0",
     "interactjs": "^1.10.11",
     "jimp": "^0.16.1",
+    "jszip": "^3.7.1",
     "micromodal": "^0.4.6",
     "mysql": "^2.18.1",
     "nedb": "^1.8.0",

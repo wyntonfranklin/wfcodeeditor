@@ -11,7 +11,7 @@ let views = [webView, imageView, codeView];
 setStyling();
 
 ipcRenderer.on('get-tutorial-data', function (evt, message) {
-
+    setStyling();
     if(message.type === "link"){
         let wv = webView;
         hideOtherViews(webView);

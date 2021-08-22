@@ -27,6 +27,7 @@ const open = require('open');
 const cmd=require('node-cmd');
 const sideBarManager = require('./sidebarManager');
 const Jimp = require('jimp');
+const JSZip = require("jszip");
 
 let ctrlIsPressed = false;
 const settings = new Store();
@@ -67,7 +68,7 @@ let closeModalButton = document.getElementById('close-modal');
 let saveButton = document.getElementById('save-file-btn');
 let fileNameInput = document.getElementById("file-name-input");
 let projectName = document.getElementById("project-name");
-
+let backupButton = document.getElementById("backup-project");
 
 let codeView = document.getElementById('code-view');
 let imageView = document.getElementById('image-view');
@@ -423,6 +424,22 @@ document.getElementById("tutorial-view-back").addEventListener('click', e=>{
   return false;
 });
 
+// backup project action
+backupButton.addEventListener('click', e=> {
+    if(currentProject !== null && currentProject !== undefined){
+      var zip = new JSZip();
+      let fileLocation = "C:\\Users\\wfranklin\\Documents\\backups\\test124.zip";
+      zip.folder(currentProject);
+      zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
+          .pipe(fs.createWriteStream(fileLocation))
+          .on('finish', function () {
+            // JSZip generates a readable stream with a "end" event,
+            // but is piped here in a writable stream which emits a "finish" event.
+            console.log("out.zip written.");
+          });
+    }
+});
+
 
 codeView.addEventListener('contextmenu', e=>{
   ipcRenderer.invoke('show-context-menu','code',
@@ -726,19 +743,25 @@ function onSaveButtonPressed(e){
       addToOpenDirectory(dirPath);
       saveAFile(path.join(dirPath, filename), "",(fpath)=>{
         onFileClickEvent(null, fpath);
+        closeSaveDialog();
       });
     }else if(CURRENT_FILE_OPENER_ACTION == "dir"){
       saveADirectory(path.join(getCurrentSelectedDirectory(), filename), (fpath)=>{
         onDirectoryClickEvent(null, fpath);
+        closeSaveDialog();
       });
     }else if(CURRENT_FILE_OPENER_ACTION =='rename'){
       renameAFile(selectedFileElement, filename);
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'copy-file'){
       copyFileToDest(filename);
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'add-file-to-project'){
       copyFileToDest(filename, getCurrentDirectory());
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'sar'){
       editor.findAll(filename);
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'task'){
       let taskId = selectedTaskElement.getAttribute("data-id");
       taskManager.getTask(getTasksPath(),{_id:taskId}, function(tO){
@@ -748,10 +771,13 @@ function onSaveButtonPressed(e){
               loadTaskView();
             });
       });
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'runcommand'){
       runCommand(filename);
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == 'snippet'){
       saveSnippet();
+      closeSaveDialog();
     }else if(CURRENT_FILE_OPENER_ACTION == "snippet_edit"){
       let sntId = currentSnippet.getAttribute("data-id");
       if(sntId){
@@ -760,6 +786,7 @@ function onSaveButtonPressed(e){
           snippetManager.updateSnippet(getApplicationPath('snippets.db'),
               {_id: snt._id}, update, function(){
                 loadSnippetsView();
+                closeSaveDialog();
               });
         })
       }else{
@@ -767,12 +794,17 @@ function onSaveButtonPressed(e){
       }
     }else if(CURRENT_FILE_OPENER_ACTION == "saveas"){
       saveFileAsAction(filename);
+      closeSaveDialog();
     }
-    hideShowModal('hide',"new-file-modal");
-    readFiles(currentProject);
+
   }else{
 
   }
+}
+
+function closeSaveDialog(){
+  hideShowModal('hide',"new-file-modal");
+  readFiles(currentProject);
 }
 
 /********************* FILE TASKS **********************/
@@ -1115,7 +1147,7 @@ function loadSnippetsView(query){
       template += `    <div class="d-flex w-100 justify-content-between">
                   <h6 class="mb-1">${snippet.title}</h6>
                 </div>`;
-      template += `<p class="mb-1">${snippet.snippet}</p>`;
+      //template += `<p class="mb-1">${snippet.snippet}</p>`;
       if (snippet.file) {
         var name = path.basename(snippet.file);
         template += `<span class="badge badge-info">${name}</span>`;
