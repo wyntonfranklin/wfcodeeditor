@@ -424,21 +424,23 @@ document.getElementById("tutorial-view-back").addEventListener('click', e=>{
   return false;
 });
 
+/*
 // backup project action
 backupButton.addEventListener('click', e=> {
     if(currentProject !== null && currentProject !== undefined){
       var zip = new JSZip();
       let fileLocation = "C:\\Users\\wfranklin\\Documents\\backups\\test124.zip";
-      zip.folder(currentProject);
-      zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
-          .pipe(fs.createWriteStream(fileLocation))
-          .on('finish', function () {
-            // JSZip generates a readable stream with a "end" event,
-            // but is piped here in a writable stream which emits a "finish" event.
-            console.log("out.zip written.");
-          });
+      addFilesFromDirectoryToZip(currentProject, zip);
+      console.log(zip.files);
+      zip.generateAsync({type:"base64"}).then(function (base64) {
+        let buff = Buffer.from(base64, 'base64');
+        fs.writeFile(fileLocation, buff, (err) => {
+          if (err) throw err;
+          console.log('The binary data has been decoded and saved to my-file.png');
+        });
+      });
     }
-});
+});*/
 
 
 codeView.addEventListener('contextmenu', e=>{
@@ -2937,3 +2939,24 @@ function confirmFileDelete(){
     }
   });
 }
+
+/*
+
+const addFilesFromDirectoryToZip = (directoryPath = "", zip) => {
+  const directoryContents = fs.readdirSync(directoryPath, {
+    withFileTypes: true,
+  });
+
+  directoryContents.forEach(({ name }) => {
+    const path = `${directoryPath}/${name}`;
+
+    if (fs.statSync(path).isFile()) {
+      zip.file(path, fs.readFileSync(path, "utf-8"));
+    }
+
+    if (fs.statSync(path).isDirectory()) {
+      addFilesFromDirectoryToZip(path, zip);
+    }
+  });
+};
+*/
