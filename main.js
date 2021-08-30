@@ -52,7 +52,7 @@ ipcMain.handle('show-context-menu', (event, menu, options) => {
 });
 
 ipcMain.on('ondragstart', (event, filePath) => {
-  let fileIcon = path.join(__dirname, "/icons/ic_action_file.png");
+  let fileIcon = path.join(__dirname,"./icons/ic_action_file.png");
   event.sender.startDrag({
     file: filePath,
     icon: fileIcon
