@@ -970,6 +970,22 @@ function copyFileToDest(filename, dest){
   }
 }
 
+function fileExistsConfirmation(file, callback){
+  if(fs.existsSync(file)){
+    ipcRenderer.invoke('show-confirm-dialog',{
+      title: "File Exists",
+      buttons: ["Yes","No"],
+      message: "Overwrite changes to this file - " + file,
+    }).then((result)=>{
+      if(result.response ==0){
+         if(callback && typeof callback === "function"){
+           callback();
+         }
+      }
+    });
+  }
+}
+
 function renameAFile(el, filename){
   let file = el.getAttribute("data-path");
   let fileType = el.getAttribute("data-type");
@@ -979,19 +995,21 @@ function renameAFile(el, filename){
   let fileObject = fileObjMg.getFile(file);
   let newFile = path.join(dir, filename);
   try{
-    fs.renameSync(file, newFile);
-    if(fileObject){
-      let updateFileObject = fileObject.file;
-      updateFileObject.name = newFile;
-     // openFiles[fileObject.position] = updateFileObject;
-      fileObjMg.updateFiles(updateFileObject, fileObject.position);
-    }
-    if(currentFile == selectedFileElement.getAttribute('data-path')){
-      currentFile = newFile;
-    }
-    selectedFileElement.setAttribute("data-path", newFile);
-    readFiles(currentProject);
-    createTabs();
+    fileExistsConfirmation(newFile, function(){
+      fs.renameSync(file, newFile);
+      if(fileObject){
+        let updateFileObject = fileObject.file;
+        updateFileObject.name = newFile;
+        // openFiles[fileObject.position] = updateFileObject;
+        fileObjMg.updateFiles(updateFileObject, fileObject.position);
+      }
+      if(currentFile == selectedFileElement.getAttribute('data-path')){
+        currentFile = newFile;
+      }
+      selectedFileElement.setAttribute("data-path", newFile);
+      readFiles(currentProject);
+      createTabs();
+    });
   }catch (e){
 
   }
