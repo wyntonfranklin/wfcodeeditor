@@ -1,6 +1,6 @@
 {
   "name": "wfCodeEditor",
-  "version": "1.0.7",
+  "version": "1.1.1",
   "description": "A minimal Code Editor",
   "main": "main.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "postinstall": "install-app-deps",
     "build": "electron-builder --win"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/wyntonfranklin/wfcodeeditor",
   "keywords": [
     "Electron",
     "quick",
