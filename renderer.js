@@ -2224,6 +2224,7 @@ function makeTabsDraggable(){
   let boxToMove1 = null
   let boxToMove2 = null;
   let currentTargetFile = null;
+  let isSwitched = false;
   interact('.draggable-tabs')
       .draggable({
         inertia: true,
@@ -2242,7 +2243,7 @@ function makeTabsDraggable(){
             fileToSet = event.target.getAttribute('title');
           },
           move(event) {
-            let isSwitched = false;
+            isSwitched = false;
             var target = event.target;
             var box1 = target.getBoundingClientRect();
             target.style.zIndex = 100;
@@ -2265,12 +2266,13 @@ function makeTabsDraggable(){
                     tab.className += " tabhover";
                     isSwitched = true;
                   }else{
-                   // isSwitched = false;
+                      isSwitched = false;
                   //  boxToMove1 = null;
                   //  boxToMove2  = null;
                   }
                 }else{
                   tab.classList.remove("tabhover");
+                  isSwitched = false;
                  // boxToMove1 = null;
                  // boxToMove2  = null;
                 }
@@ -2866,6 +2868,7 @@ function searchTutorials(){
 }
 
 function onCloseEvent(){
+  let closeapp = true;
   let leftPanel = document.getElementById('left-panel');
   let sidePanel = document.getElementById("side-bar");
   settingsManager.set('lpwidth', leftPanel.getBoundingClientRect().width);
@@ -2878,6 +2881,24 @@ function onCloseEvent(){
     doc.opendirs = openDir;
     projectsManager.updateProject(getApplicationPath('projects.db'), {name:currentProject}, doc);
   });
+  let hasChanges = checkUnSavedChanges();
+  if(hasChanges){
+    ipcRenderer.invoke('show-confirm-dialog',{
+      title: "You have unsaved changes. Close this app?",
+      buttons: ["Yes","Cancel"],
+      message: "Press yes to close without saving.",
+    }).then((result)=>{
+      if(result.response ==0){
+          closeThisApp();
+      }
+    });
+  }else{
+    closeThisApp();
+  }
+}
+
+function closeThisApp(){
+  ipcRenderer.invoke('close-app-from-renderer');
 }
 
 function openFileSelectDialog(){
@@ -2938,6 +2959,22 @@ function confirmFileDelete(){
       deletedSelectItem(result.response);
     }
   });
+}
+
+
+function checkUnSavedChanges(){
+  let files = fileObjMg.getFiles();
+ // console.log(files);
+  let filesWithChanges = false;
+  for(let i=0; i<= files.length-1; i++){
+    let fileObject = fileObjMg.getFile(files[i].name).file;
+    console.log(fileObject);
+    if(fileObject != null && (fileObject.content !== fileObject.ocontent)){
+      filesWithChanges = true;
+      console.log("test this");
+    }
+  }
+  return filesWithChanges;
 }
 
 /*

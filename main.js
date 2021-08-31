@@ -152,7 +152,7 @@ function createWindow () {
 
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, snippetsWindow, settingsWindow) )
   Menu.setApplicationMenu(mainMenu)
@@ -221,17 +221,27 @@ function createWindow () {
   });
 
   mainWindow.webContents.on('devtools-closed', ()=>{
-    mainWindow.webContents.executeJavaScript('updateOnResize()');
+    if(mainWindow !== null){
+    //  mainWindow.webContents.executeJavaScript('updateOnResize()');
+    }
   });
 
   mainWindow.on('close',  (e) => {
+    e.preventDefault();
     // on close events
     settingsManager.set('mwheight', mainWindow.getBounds().height);
     settingsManager.set('mwwidth',mainWindow.getBounds().width);
     settingsManager.set('tutsheight', tutorialWindow.getBounds().height);
     settingsManager.set('tutswidth', tutorialWindow.getBounds().width);
     mainWindow.webContents.executeJavaScript('onCloseEvent()');
+
   });
+
+  ipcMain.handle('close-app-from-renderer', (event) => {
+     mainWindow.destroy();
+     app.quit();
+  })
+
 
   ipcMain.handle('file-no-exists', (event) => {
 

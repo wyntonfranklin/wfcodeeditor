@@ -41,7 +41,9 @@ module.exports =  {
     db.projects.update(query, update, { upsert: true }, function (err, numReplaced) {
         console.log(err);
         console.log(numReplaced);
-        callback();
+        if(callback){
+          callback();
+        }
     });
   },
   changeProjectContent : function(oldObject, name, content){
