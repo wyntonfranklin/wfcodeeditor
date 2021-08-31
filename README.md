@@ -18,3 +18,13 @@ A simple portable code editor that does what I need it to do.
 # Download Options
 
 Check out the releases page or click [here](https://github.com/wyntonfranklin/code-automater/releases)
+
+# Build With
+
+* Ace Editor
+* Electron
+* Electron Store
+* Notify Js
+* Electron Builder
+* Bootstrap
+* Much more
