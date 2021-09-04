@@ -9,7 +9,7 @@ There is so much more wfCodeEditor can do. Let see some of the features in actio
 
 It's very easy to run a command with PHP and Python Files. Once you have these install on your computer.
 
-![screenshot](./images/wfcodeeditor-runcommand.gif)
+![screenshot](images/wfcodeeditor-runcommand.gif)
 
 ### Some Heading
 
