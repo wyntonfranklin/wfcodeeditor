@@ -2,11 +2,21 @@
 
 wfCodeEditor is a simple editor that bridges the gap between a simple text editor and a full fledge IDE. You can work with your files as a project. You can open different type of 
 file without issue. You can run certain files. It has a fast start up time. You can add task and snippets and even view tutorial right from within the editor. 
-There is so much much wfCodeEditor can do. Check it out below.
+There is so much more wfCodeEditor can do. Let see some of the features in action.
+
+
+### Running a Command
+
+It's very easy to run a command with PHP and Python Files. Once you have these install on your computer.
+
+![screenshot](./images/wfcodeeditor-runcommand.gif)
+
+### Some Heading
 
 You can use the [editor on GitHub](https://github.com/wyntonfranklin/wfcodeeditor/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+
 
 ### Markdown
 
