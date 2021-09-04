@@ -11,41 +11,59 @@ It's very easy to run a command with PHP and Python Files. Once you have these i
 
 ![screenshot](images/wfcodeeditor-runcommand.gif)
 
-### Some Heading
+But wait there is more.
 
-You can use the [editor on GitHub](https://github.com/wyntonfranklin/wfcodeeditor/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
+### Saving a snippet and Add a task
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+We can save snippets and add task. Lets see how.
+
+![screenshot](images/wfce-add-task-add-snippet.gif)
+
+You can add snippets by selecting or opening up the snippet menu. You can do the same with task.
+
+But wait there is more.
 
 
-### Markdown
+### Embedded Snippets for various languages
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+wfCE comes with different snippets in various languages. Its basic stuff but it's the kinda you might forget right
+at your fingertips.
 
-```markdown
-Syntax highlighted code block
+![screenshot](images/embedd_snippets.gif)
 
-# Header 1
-## Header 2
-### Header 3
+So far there are snippets in PHP, C#, HTML, Java, Javasript, Python and a little SQL.
 
-- Bulleted
-- List
+But wait there is more.
 
-1. Numbered
-2. List
+### Tutorials from wfTutorials
 
-**Bold** and _Italic_ and `Code` text
+With a click you can access the most recent and search for any tutorials that you want.
 
-[Link](url) and ![Image](src)
-```
+![screenshot](images/tutorials.gif)
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Straight from [wftutorials.com](https://app.wftutorials.com/dashboard/) all the tutorials you will ever need and more are being added.
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/wyntonfranklin/wfcodeeditor/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Working with Pictures
 
-### Support or Contact
+Working with pictures is just like working with code.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+![screenshot](images/workingwithpictures.gif)
+
+Kinda of.
+
+But with there is more.
+
+### Recent Projects
+
+You can access your recent project easily. Add open you projects with one click.
+
+![screenshoot](images/recentprojects.gif)
+
+But with there is more.
+
+### Dark Theme and Light Themes and Font size
+
+You can change your font size and dark and light themes.
+
+![screeshot](images/settings.gif)
