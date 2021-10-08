@@ -983,10 +983,15 @@ function fileExistsConfirmation(file, callback){
          }
       }
     });
+  }else{
+    if(callback && typeof callback === "function"){
+      callback();
+    }
   }
 }
 
 function renameAFile(el, filename){
+  console.log("renaming file");
   let file = el.getAttribute("data-path");
   let fileType = el.getAttribute("data-type");
   let dir = path.dirname(file);
@@ -996,6 +1001,7 @@ function renameAFile(el, filename){
   let newFile = path.join(dir, filename);
   try{
     fileExistsConfirmation(newFile, function(){
+      //console.log("file should be renamed");
       fs.renameSync(file, newFile);
       if(fileObject){
         let updateFileObject = fileObject.file;
@@ -1011,7 +1017,8 @@ function renameAFile(el, filename){
       createTabs();
     });
   }catch (e){
-
+    //console.log(e);
+      notificationsManager.error(e);
   }
 }
 
