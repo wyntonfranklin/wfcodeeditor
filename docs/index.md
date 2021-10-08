@@ -4,6 +4,8 @@ wfCodeEditor is a simple editor that bridges the gap between a simple text edito
 file without issue. You can run certain files. It has a fast start up time. You can add task and snippets and even view tutorial right from within the editor. 
 There is so much more wfCodeEditor can do. Let see some of the features in action.
 
+Download the portable app [here](https://github.com/wyntonfranklin/wfcodeeditor/releases/download/v1.1.2/wfCodeEditor.1.1.2.exe)
+
 
 ### Running a Command
 

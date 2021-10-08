@@ -1,5 +1,2 @@
 theme: jekyll-theme-slate
-show_downloads: true
-github:
-  zip_url: https://github.com/wyntonfranklin/wfcodeeditor/releases/download/v1.1.1/wfCodeEditor.1.1.1.zip
-  tar_url: https://github.com/wyntonfranklin/wfcodeeditor/archive/refs/tags/v1.1.1.tar.gz
+show_downloads: false
