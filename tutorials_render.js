@@ -10,6 +10,11 @@ let views = [webView, imageView, codeView];
 //start
 setStyling();
 
+document.getElementById('code-view').addEventListener('contextmenu', e=>{
+    ipcRenderer.invoke('show-context-menu','swindow');
+});
+
+
 ipcRenderer.on('get-tutorial-data', function (evt, message) {
     setStyling();
     if(message.type === "link"){

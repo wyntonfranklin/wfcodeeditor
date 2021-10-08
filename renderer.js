@@ -470,6 +470,11 @@ document.getElementById('cmd-layout-content').addEventListener('contextmenu', e=
   ipcRenderer.invoke('show-context-menu','cmd');
 });
 
+document.getElementById('sbl-codeview').addEventListener('contextmenu', e=>{
+  ipcRenderer.invoke('show-context-menu','swindow');
+});
+
+
 
 closeModalButton.addEventListener('click', e => {
   hideShowModal("hide","new-file-modal");

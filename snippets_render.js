@@ -6,6 +6,7 @@ const snippetsManager = require('./snippets');
 let currentSnippetType = null;
 
 
+
 document.getElementById("search-snippets").addEventListener('click', e => {
   let query = document.getElementById('search-query').value;
   if(query){

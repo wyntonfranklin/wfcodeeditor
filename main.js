@@ -11,7 +11,7 @@ db.init(dbPath)
 let wc;
 let mainMenu;
 let contextMenu, fileContextMenu, tabsContextMenu, tasksContextMenu,
-    snippetsContextMenu, tutorialsContextMenu, cmdContextMenu;
+    snippetsContextMenu, tutorialsContextMenu, cmdContextMenu, previewWindowMenu, sideViewMenu;
 let snippetsWindow, tutorialWindow, settingsWindow;
 let message; // pass messages to different windows
 
@@ -48,6 +48,8 @@ ipcMain.handle('show-context-menu', (event, menu, options) => {
     tutorialsContextMenu.popup();
   }else if(menu == 'cmd'){
     cmdContextMenu.popup();
+  }else if(menu == "swindow"){
+    previewWindowMenu.popup();
   }
 });
 
@@ -152,7 +154,7 @@ function createWindow () {
 
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
   wc = mainWindow.webContents
   mainMenu = Menu.buildFromTemplate( require('./mainMenu').createMenu(wc, dialog, snippetsWindow, settingsWindow) )
   Menu.setApplicationMenu(mainMenu)
@@ -190,6 +192,7 @@ function createWindow () {
   snippetsContextMenu = Menu.buildFromTemplate(require('./snippetsMenu').createMenu(mainWindow));
   tutorialsContextMenu = Menu.buildFromTemplate(require('./tutorialMenus').createMenu(mainWindow));
   cmdContextMenu = Menu.buildFromTemplate(require('./cmdMenu').createMenu(mainWindow));
+  previewWindowMenu = Menu.buildFromTemplate(require('./previewWindowMenu').createMenu());
 
   mainWindow.on('maximize', function(){
     mainWindow.webContents.executeJavaScript('resizeAll()');
