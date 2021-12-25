@@ -48,7 +48,11 @@
     "win": {
       "target": [
         "portable"
-      ]
+      ],
+      "certificateSubjectName": "Wynton I Franklin",
+      "signingHashAlgorithms": ["sha256"],
+      "publisherName": "Wynton I Franklin",
+      "signAndEditExecutable": true
     }
   }
 }
