@@ -45,14 +45,16 @@
   "build": {
     "appId": "com.wftutorials.wfCodeEditor",
     "copyright": "Copyright wfTutorials.com",
+    "appx" : {
+      "applicationId" : "wfCodeEditor",
+      "identityName": "42258wfSoftware.wfCodeEditor",
+      "publisher" : "CN=181B903A-B583-4019-B527-119F9209AC90",
+      "displayName" : "wfCodeEditor"
+    },
     "win": {
       "target": [
-        "portable"
-      ],
-      "certificateSubjectName": "Wynton I Franklin",
-      "signingHashAlgorithms": ["sha256"],
-      "publisherName": "Wynton I Franklin",
-      "signAndEditExecutable": true
+        "appx"
+      ]
     }
   }
 }
