@@ -67,6 +67,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: settingsManager.get('mwwidth', 800),
     height: settingsManager.get('mwheight', 600),
+    icon: path.join(__dirname, 'assets/icons/png/64x64.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
