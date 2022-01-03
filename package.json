@@ -34,7 +34,7 @@
     "interactjs": "^1.10.11",
     "jimp": "^0.16.1",
     "jszip": "^3.7.1",
-    "micromodal": "^0.4.6",
+    "micromodal": "^0.4.10",
     "nedb": "^1.8.0",
     "node-cmd": "^4.0.0",
     "notifyjs": "^3.0.0",
