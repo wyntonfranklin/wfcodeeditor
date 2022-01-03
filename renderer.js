@@ -31,7 +31,7 @@ const JSZip = require("jszip");
 
 let ctrlIsPressed = false;
 const settings = new Store();
-let baseDir = 'C:\\Users\\wfranklin\\Documents\\snippets';
+let baseDir = '';
 let currentProject = null;
 let APPLICATION_PATH = "";
 let SHOW_TASK_BY_FILE = false;
