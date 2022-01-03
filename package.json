@@ -38,7 +38,7 @@
     "nedb": "^1.8.0",
     "node-cmd": "^4.0.0",
     "notifyjs": "^3.0.0",
-    "open": "^8.2.1",
+    "open": "^8.4.0",
     "open-file-explorer": "^1.0.2"
   },
   "build": {
