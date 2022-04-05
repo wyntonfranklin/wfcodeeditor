@@ -33,7 +33,7 @@
     "highlight.js": "^11.1.0",
     "interactjs": "^1.10.11",
     "jimp": "^0.16.1",
-    "jszip": "^3.7.1",
+    "jszip": "^3.9.0",
     "micromodal": "^0.4.6",
     "nedb": "^1.8.0",
     "node-cmd": "^4.0.0",
